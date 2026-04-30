@@ -18,209 +18,230 @@
   --red: #ff5577;
   --gold: #ffd700;
 
-  --d0:#ff6b6b; --d1:#ff9f43; --d2:#ffd93d; --d3:#56e39f;
+  /* digit colors — 0=grey, 1=white, rest distinct */
+  --d0:#888899; --d1:#f0f0f0; --d2:#ffd93d; --d3:#56e39f;
   --d4:#4ecdc4; --d5:#45b7d1; --d6:#7c6af7; --d7:#c77dff;
-  --d8:#f76a8a; --d9:#fa8231;
+  --d8:#f76a8a; --d9:#ff6b6b;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Syne', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background: var(--bg); color: var(--text);
+  height: 100vh; display: flex; flex-direction: column; overflow: hidden;
 }
 
 /* ── HEADER ── */
 header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 9px 20px;
+  padding: 8px 16px;
   background: var(--surface); border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.logo { font-size: 1rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.logo { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
 .logo span { color: var(--accent); }
-.hstats { display: flex; gap: 20px; }
-.hstat { text-align: center; }
-.hstat-val { font-family: 'Space Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--accent); line-height: 1; }
-.hstat-val.streak { color: var(--gold); }
-.hstat-val.shake { animation: streakShake 0.5s ease; color: var(--red) !important; }
-@keyframes streakShake {
-  0%,100%{transform:translateX(0)} 15%{transform:translateX(-6px)} 30%{transform:translateX(6px)}
-  45%{transform:translateX(-4px)} 60%{transform:translateX(4px)} 80%{transform:translateX(-2px)}
-}
-.hstat-label { font-size: 0.57rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
 
-/* ── APP ── */
-.app { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-/* ── TOP PANEL ── */
-.top-panel {
+/* ── DIGIT KEY BAR ── */
+.key-bar {
   flex-shrink: 0;
-  display: flex; align-items: center;
-  gap: 20px;
-  padding: 14px 20px;
+  display: flex; align-items: center; gap: 0;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 16px;
+  overflow-x: auto;
+}
+.key-bar-label {
+  font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--dim); margin-right: 10px; white-space: nowrap; flex-shrink: 0;
+}
+.key-items { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
+.ki {
+  display: flex; align-items: center; gap: 3px;
+  padding: 2px 6px; border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+}
+.ki-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+.ki-digit { font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700; }
+
+/* ── BODY LAYOUT: tile area + gallery + sidebar ── */
+.body-row {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* ── CENTER COLUMN ── */
+.center-col {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* ── TILE PANEL ── */
+.tile-panel {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 14px 20px 10px;
   background: var(--surface);
   border-bottom: 2px solid var(--border);
 }
-
-/* digit key */
-.digit-key {
-  display: flex; flex-direction: column; gap: 0;
-  flex-shrink: 0; padding-right: 14px;
-  border-right: 1px solid var(--border);
-}
-.dk-title { font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); text-align: center; padding-bottom: 4px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
-.dk-item { display: flex; align-items: center; gap: 4px; padding: 1px 0; }
-.dk-swatch { width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0; }
-.dk-digit { font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 700; }
-
-/* ── DRAGGABLE NUMBER TILE ── */
-.tile-area {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 6px; flex: 1;
-}
-.tile-prompt { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
-
 .drag-tile {
-  display: inline-flex; flex-direction: column; align-items: flex-start;
-  gap: 6px; padding: 10px 14px;
-  background: var(--surface2);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
+  display: inline-flex; flex-direction: column; align-items: center;
+  gap: 8px; padding: 14px 22px;
+  background: var(--surface2); border: 2px solid var(--border); border-radius: 14px;
+  cursor: grab; user-select: none; touch-action: none;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-  max-width: 100%;
 }
-.drag-tile:hover { border-color: var(--accent); box-shadow: 0 0 22px rgba(108,99,255,0.28); }
-.drag-tile.dragging { opacity: 0.35; transform: scale(0.93); cursor: grabbing; }
+.drag-tile:hover { border-color: var(--accent); box-shadow: 0 0 28px rgba(108,99,255,0.3); }
+.drag-tile.dragging { opacity: 0.3; transform: scale(0.9); cursor: grabbing; }
 .drag-tile.gone { visibility: hidden; }
-
 .tile-number {
   font-family: 'Space Mono', monospace;
-  font-size: 1.6rem; font-weight: 700;
-  color: var(--text); line-height: 1;
-  white-space: nowrap;
+  font-size: 2.6rem; font-weight: 700; color: var(--text); line-height: 1; white-space: nowrap;
 }
+.tile-hint { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
 .tile-strip { display: flex; flex-wrap: nowrap; align-items: center; gap: 2px; }
 .tc {
-  width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0;
+  width: 26px; height: 26px; border-radius: 4px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Mono', monospace; font-size: 0.62rem; font-weight: 700;
-  color: rgba(0,0,0,0.72);
-  opacity: 0; transform: scale(0.5);
-  transition: opacity 0.12s, transform 0.12s;
+  font-family: 'Space Mono', monospace; font-size: 0.65rem; font-weight: 700;
+  color: rgba(0,0,0,0.75);
+  opacity: 0; transform: scale(0.5); transition: opacity 0.12s, transform 0.12s;
 }
 .tc.vis { opacity: 1; transform: scale(1); }
-.tdot { font-family: 'Space Mono', monospace; font-size: 0.95rem; color: var(--dim); flex-shrink: 0; line-height: 24px; padding: 0 1px; }
-.tell { font-size: 0.95rem; color: var(--dim); padding-left: 3px; flex-shrink: 0; }
-
-/* ── FEEDBACK BAR ── */
-.feedback-bar {
-  flex-shrink: 0; min-height: 34px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 18px; font-size: 0.8rem; font-weight: 600;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.25s, color 0.25s;
-}
-.feedback-bar.neutral { background: var(--surface); color: var(--dim); }
-.feedback-bar.correct { background: rgba(46,204,142,0.1); color: var(--green); }
-.feedback-bar.wrong   { background: rgba(255,85,119,0.1); color: var(--red); }
-.next-hint {
-  font-size: 0.68rem; color: var(--dim); cursor: pointer;
-  text-decoration: underline; white-space: nowrap; display: none;
-}
+/* white digit needs dark text override */
+.tc.d1 { color: rgba(0,0,0,0.55); }
+.tc.d0 { color: rgba(255,255,255,0.7); }
+.tdot { font-family:'Space Mono',monospace; font-size:0.95rem; color:var(--dim); flex-shrink:0; line-height:26px; padding:0 1px; }
+.tell { font-size:0.95rem; color:var(--dim); padding-left:3px; flex-shrink:0; }
 
 /* ── GALLERY ── */
 .gallery {
   flex: 1; display: flex;
-  overflow-x: auto; overflow-y: hidden;
-  background: var(--bg);
+  overflow-x: auto; overflow-y: hidden; background: var(--bg);
 }
-
 .zone-col {
-  flex: 1; min-width: 100px;
+  flex: 1; min-width: 95px;
   display: flex; flex-direction: column;
   border-right: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.18s;
-  overflow: hidden;
+  cursor: pointer; transition: background 0.18s; overflow: hidden;
 }
 .zone-col:last-child { border-right: none; }
-.zone-col.drag-over { background: rgba(108,99,255,0.07); }
-@keyframes zFlashG { 0%,100%{background:transparent} 50%{background:rgba(46,204,142,0.15)} }
-@keyframes zFlashR { 0%,100%{background:transparent} 50%{background:rgba(255,85,119,0.15)} }
+.zone-col.drag-over { background: rgba(108,99,255,0.08); }
+@keyframes zFlashG { 0%,100%{background:transparent} 50%{background:rgba(46,204,142,0.14)} }
+@keyframes zFlashR { 0%,100%{background:transparent} 50%{background:rgba(255,85,119,0.14)} }
 .zone-col.correct-flash { animation: zFlashG 0.5s ease; }
 .zone-col.wrong-flash   { animation: zFlashR 0.5s ease; }
 
-/* zone header */
 .zone-header {
-  flex-shrink: 0; text-align: center;
-  padding: 7px 4px 5px;
-  border-bottom: 2px solid var(--border);
-  background: var(--surface);
+  flex-shrink: 0; text-align: center; padding: 6px 4px 4px;
+  border-bottom: 2px solid var(--border); background: var(--surface);
 }
-.zone-super { font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 3px; }
-.zone-name { font-size: 0.63rem; font-weight: 700; line-height: 1.25; white-space: pre-line; }
-.zone-math { font-family: 'Space Mono', monospace; font-size: 1rem; line-height: 1.1; }
-.zone-math .rad { display: inline-block; border-top: 2px solid currentColor; padding: 0 2px; margin-left: 1px; }
-.zone-math-sub { font-size: 0.57rem; color: var(--dim); margin-top: 2px; line-height: 1.2; }
+.zone-super { font-size: 0.46rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 3px; }
+.zone-name { font-size: 0.6rem; font-weight: 700; line-height: 1.25; white-space: pre-line; }
+.zone-math { font-family:'Space Mono',monospace; font-size:0.95rem; line-height:1.1; }
+.zone-math .rad { display:inline-block; border-top:2px solid currentColor; padding:0 2px; margin-left:1px; }
+.zone-math-sub { font-size:0.55rem; color:var(--dim); margin-top:2px; line-height:1.2; }
 
-/* mastery pips */
-.mastery-pips { display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 4px; min-height: 15px; }
-.pip { width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; transition: all 0.3s; }
-.crown { display: none; font-size: 0.9rem; }
-.crown.show { display: inline; animation: crownPop 0.65s cubic-bezier(0.34,1.56,0.64,1); }
+.mastery-pips { display:flex; align-items:center; justify-content:center; gap:3px; margin-top:4px; min-height:14px; }
+.pip { width:6px; height:6px; border-radius:50%; border:1.5px solid var(--border); background:transparent; transition:all 0.3s; }
+.crown { display:none; font-size:0.85rem; }
+.crown.show { display:inline; animation: crownPop 0.65s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes crownPop {
   0%{transform:scale(0) rotate(-25deg);opacity:0}
   65%{transform:scale(1.4) rotate(6deg);opacity:1}
   100%{transform:scale(1) rotate(0);opacity:1}
 }
 
-/* ── HANGING CHAINS ── */
 .chain-area {
-  flex: 1;
-  display: flex; flex-direction: row;
-  align-items: flex-start;
-  padding: 6px 4px;
-  gap: 5px;
-  overflow-x: auto; overflow-y: hidden;
+  flex:1; display:flex; flex-direction:row; align-items:flex-start;
+  padding:6px 4px; gap:5px; overflow-x:auto; overflow-y:hidden;
 }
-.chain-empty { font-size: 0.56rem; color: var(--border); text-align: center; padding: 14px 4px; pointer-events: none; letter-spacing: 0.04em; width: 100%; }
+.chain-empty { font-size:0.54rem; color:var(--border); text-align:center; padding:14px 4px; pointer-events:none; letter-spacing:0.04em; width:100%; }
 
-/* one hanging number */
 .hang-item {
-  display: flex; flex-direction: column; align-items: center; gap: 1px;
-  flex-shrink: 0;
+  display:flex; flex-direction:column; align-items:center; gap:1px; flex-shrink:0;
   animation: hangDrop 0.4s cubic-bezier(0.34,1.2,0.64,1);
 }
-@keyframes hangDrop {
-  0%{transform:translateY(-16px);opacity:0}
-  100%{transform:translateY(0);opacity:1}
-}
-.hang-label {
-  font-family: 'Space Mono', monospace; font-size: 0.48rem;
-  color: var(--dim); white-space: nowrap;
-  text-align: center; max-width: 60px; overflow: hidden; text-overflow: ellipsis;
-}
-/* the vertical color strip */
-.hang-strip { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-.hcell {
-  width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Mono', monospace; font-size: 0.38rem; font-weight: 700;
-  color: rgba(0,0,0,0.72);
-}
-.hdot {
-  font-size: 0.55rem; color: var(--dim); line-height: 10px; text-align: center; width: 13px;
-}
-.hell { font-size: 0.6rem; color: var(--dim); text-align: center; line-height: 1.2; }
-.hconn { width: 2px; height: 4px; background: var(--border); border-radius: 1px; margin: 0 auto; }
+@keyframes hangDrop { 0%{transform:translateY(-16px);opacity:0} 100%{transform:translateY(0);opacity:1} }
+.hang-label { font-family:'Space Mono',monospace; font-size:0.46rem; color:var(--dim); white-space:nowrap; text-align:center; max-width:58px; overflow:hidden; text-overflow:ellipsis; }
+.hang-strip { display:flex; flex-direction:column; align-items:center; gap:1px; }
+.hcell { width:12px; height:12px; border-radius:2px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:0.38rem; font-weight:700; color:rgba(0,0,0,0.7); }
+.hcell.d0 { color:rgba(255,255,255,0.6); }
+.hcell.d1 { color:rgba(0,0,0,0.4); }
+.hdot { font-size:0.55rem; color:var(--dim); line-height:10px; text-align:center; width:12px; }
+.hell { font-size:0.6rem; color:var(--dim); text-align:center; line-height:1.2; }
+.hconn { width:2px; height:4px; background:var(--border); border-radius:1px; margin:0 auto; }
 
-/* modal */
+/* ── RIGHT SIDEBAR ── */
+.sidebar {
+  width: 130px; flex-shrink: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 12px 10px;
+  gap: 14px;
+}
+
+.sb-section { display: flex; flex-direction: column; gap: 5px; }
+.sb-title {
+  font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--dim); border-bottom: 1px solid var(--border); padding-bottom: 4px;
+}
+
+.sb-stat { text-align: center; }
+.sb-val {
+  font-family: 'Space Mono', monospace; font-size: 1.6rem; font-weight: 700;
+  color: var(--accent); line-height: 1; display: block;
+}
+.sb-val.streak-val { color: var(--gold); }
+.sb-val.shake { animation: streakShake 0.5s ease; color: var(--red) !important; }
+@keyframes streakShake {
+  0%,100%{transform:translateX(0)} 15%{transform:translateX(-5px)} 30%{transform:translateX(5px)}
+  45%{transform:translateX(-3px)} 60%{transform:translateX(3px)} 80%{transform:translateX(-2px)}
+}
+.sb-label { font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+
+.badge-list { display: flex; flex-direction: column; gap: 5px; }
+.badge {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 7px; border-radius: 7px;
+  background: var(--surface2); border: 1px solid var(--border);
+  opacity: 0; transform: scale(0.85);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.badge.earned { opacity: 1; transform: scale(1); }
+.badge-icon { font-size: 0.95rem; flex-shrink: 0; }
+.badge-text { font-size: 0.55rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+
+/* ── FEEDBACK POPUP ── */
+.popup-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.popup-overlay.show { opacity: 1; pointer-events: all; }
+
+.popup {
+  background: var(--surface);
+  border-radius: 18px; padding: 28px 36px;
+  text-align: center; max-width: 340px; width: 90%;
+  transform: scale(0.85); transition: transform 0.25s cubic-bezier(0.34,1.3,0.64,1);
+  border: 2px solid var(--border);
+  box-shadow: 0 8px 60px rgba(0,0,0,0.5);
+}
+.popup-overlay.show .popup { transform: scale(1); }
+
+.popup-icon { font-size: 3.2rem; line-height: 1; margin-bottom: 8px; display: block; }
+.popup-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+.popup-body { font-size: 0.82rem; line-height: 1.55; color: var(--dim); }
+
+.popup.correct-popup { border-color: var(--green); }
+.popup.correct-popup .popup-title { color: var(--green); }
+.popup.wrong-popup { border-color: var(--red); }
+.popup.wrong-popup .popup-title { color: var(--red); }
+
+.popup-dismiss { font-size: 0.62rem; color: var(--dim); margin-top: 14px; letter-spacing: 0.06em; }
+
+/* ── ALL MASTERED MODAL ── */
 .overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;display:none; }
 .overlay.show { display:block; }
 .modal {
@@ -236,183 +257,201 @@ header {
 }
 .modal h2 { font-size:1.8rem;color:var(--gold);margin-bottom:8px; }
 .modal p { color:var(--dim);font-size:0.87rem;margin-bottom:20px;line-height:1.5; }
-.modal-btn {
-  padding:10px 26px;border-radius:8px;border:none;background:var(--accent);color:white;
-  font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;
-}
-.modal-btn:hover { background:#8b83ff; transform:translateY(-1px); }
+.modal-btn { padding:10px 26px;border-radius:8px;border:none;background:var(--accent);color:white; font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer; }
+.modal-btn:hover { background:#8b83ff; }
 
-::-webkit-scrollbar { width:3px;height:3px; }
-::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
   <div class="logo">Number <span>Classifier</span></div>
-  <div class="hstats">
-    <div class="hstat"><div class="hstat-val" id="s-score">0</div><div class="hstat-label">Points</div></div>
-    <div class="hstat"><div class="hstat-val streak" id="s-streak">0</div><div class="hstat-label">🔥 Streak</div></div>
-    <div class="hstat"><div class="hstat-val" id="s-total">0</div><div class="hstat-label">Played</div></div>
-  </div>
 </header>
 
-<div class="app">
+<!-- DIGIT KEY BAR -->
+<div class="key-bar">
+  <div class="key-bar-label">Digit Key →</div>
+  <div class="key-items" id="key-items"></div>
+</div>
 
-  <div class="top-panel">
-    <!-- digit key -->
-    <div class="digit-key">
-      <div class="dk-title">Key</div>
-      <div id="dk-items"></div>
-    </div>
+<!-- MAIN BODY -->
+<div class="body-row">
 
-    <!-- big draggable tile -->
-    <div class="tile-area">
-      <div class="tile-prompt">Drag this number to the correct category ↓</div>
+  <!-- CENTER -->
+  <div class="center-col">
+
+    <!-- BIG DRAG TILE -->
+    <div class="tile-panel">
       <div class="drag-tile" id="drag-tile" draggable="true">
+        <div class="tile-hint">Drag to the correct category ↓</div>
         <div class="tile-number" id="tile-number">—</div>
         <div class="tile-strip" id="tile-strip"></div>
       </div>
     </div>
+
+    <!-- GALLERY -->
+    <div class="gallery" id="gallery"></div>
+
   </div>
 
-  <div class="feedback-bar neutral" id="feedback-bar">
-    <span id="feedback-text">Drag the number into a category below</span>
-    <span class="next-hint" id="next-hint" onclick="nextNumber()">Tap anywhere for next →</span>
-  </div>
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar">
 
-  <div class="gallery" id="gallery"></div>
+    <div class="sb-section">
+      <div class="sb-title">Current Streak</div>
+      <div class="sb-stat">
+        <span class="sb-val streak-val" id="s-streak">0</span>
+        <span class="sb-label">🔥 in a row</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title">Best Streak</div>
+      <div class="sb-stat">
+        <span class="sb-val" id="s-best">0</span>
+        <span class="sb-label">longest</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title">Total Played</div>
+      <div class="sb-stat">
+        <span class="sb-val" id="s-total">0</span>
+        <span class="sb-label">problems</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title">Points</div>
+      <div class="sb-stat">
+        <span class="sb-val" id="s-score">0</span>
+        <span class="sb-label">correct</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title">Badges</div>
+      <div class="badge-list" id="badge-list"></div>
+    </div>
+
+  </div>
 </div>
 
+<!-- FEEDBACK POPUP -->
+<div class="popup-overlay" id="popup-overlay" onclick="dismissPopup()">
+  <div class="popup" id="popup">
+    <span class="popup-icon" id="popup-icon">✓</span>
+    <div class="popup-title" id="popup-title">Correct!</div>
+    <div class="popup-body" id="popup-body"></div>
+    <div class="popup-dismiss">tap anywhere to continue</div>
+  </div>
+</div>
+
+<!-- ALL MASTERED MODAL -->
 <div class="overlay" id="overlay" onclick="closeCelebration()"></div>
 <div class="modal" id="modal">
   <h2>👑 All Mastered!</h2>
-  <p>You've conquered every category.<br>Keep going — beat your streak!</p>
+  <p>You've conquered every category.<br>Keep going — beat your best streak!</p>
   <button class="modal-btn" onclick="closeCelebration()">Keep Going</button>
 </div>
 
 <script>
-const DC = ['#ff6b6b','#ff9f43','#ffd93d','#56e39f','#4ecdc4','#45b7d1','#7c6af7','#c77dff','#f76a8a','#fa8231'];
+const DC = ['#888899','#f0f0f0','#ffd93d','#56e39f','#4ecdc4','#45b7d1','#7c6af7','#c77dff','#f76a8a','#ff6b6b'];
 
-// 5 zones — fractions split by decimal type, no standalone decimal zones
 const ZONES = [
-  { id:'whole',     superLabel:'Rational',   color:'#3d9fd6', math:null,   name:'Integer or\nWhole Number',              sub:'includes √perfect squares' },
-  { id:'frac-term', superLabel:'Rational',   color:'#2ecc8e', math:null,   name:'Fraction:\nTerminating Decimal',         sub:null },
-  { id:'frac-rep',  superLabel:'Rational',   color:'#7c6af7', math:null,   name:'Fraction:\nRepeating Decimal',           sub:null },
-  { id:'irr-sqrt',  superLabel:'Irrational', color:'#ff9f43', math:'sqrt', name:'non-perfect square',                    sub:null },
-  { id:'irr-dec',   superLabel:'Irrational', color:'#f76a8a', math:null,   name:'Non-Repeating\nNon-Terminating',         sub:null },
+  { id:'whole',     superLabel:'Rational',   color:'#3d9fd6', math:null,   name:'Integer or\nWhole Number',       sub:'includes √perfect squares' },
+  { id:'frac-term', superLabel:'Rational',   color:'#2ecc8e', math:null,   name:'Fraction:\nTerminating Decimal', sub:null },
+  { id:'frac-rep',  superLabel:'Rational',   color:'#7c6af7', math:null,   name:'Fraction:\nRepeating Decimal',   sub:null },
+  { id:'irr-sqrt',  superLabel:'Irrational', color:'#ff9f43', math:'sqrt', name:'non-perfect square',             sub:null },
+  { id:'irr-dec',   superLabel:'Irrational', color:'#f76a8a', math:null,   name:'Non-Repeating\nNon-Terminating', sub:null },
+];
+
+// Badges: { id, icon, label, check(state) }
+const BADGE_DEFS = [
+  { id:'first',       icon:'⭐', label:'First Answer',     check:s=>s.total>=1 },
+  { id:'streak3',     icon:'🔥', label:'Streak Starter',   check:s=>s.streak>=3 },
+  { id:'streak5',     icon:'💥', label:'On Fire!',         check:s=>s.streak>=5 },
+  { id:'streak10',    icon:'🚀', label:'Unstoppable',      check:s=>s.streak>=10 },
+  { id:'frac-whiz',   icon:'🍕', label:'Fraction Whiz',    check:s=>s.masteryDone.has('frac-term')&&s.masteryDone.has('frac-rep') },
+  { id:'root-hunter', icon:'🌿', label:'Root Hunter',      check:s=>s.masteryDone.has('irr-sqrt') },
+  { id:'pi-curious',  icon:'π',  label:'Pi Curious',       check:s=>s.masteryDone.has('irr-dec') },
+  { id:'whole-deal',  icon:'💎', label:'The Whole Deal',   check:s=>s.masteryDone.has('whole') },
+  { id:'all-zones',   icon:'👑', label:'Number Master',    check:s=>s.masteryDone.size>=ZONES.length },
 ];
 
 const BANK = [
-  // ── Whole numbers / integers (including √perfect squares) ──
-  { display:'7',    dec:'7',  cat:'whole', answer:'whole',
-    fb:{y:"7 is an integer — whole numbers are always rational.",n:"Integers are whole numbers. All whole numbers are rational."}},
-  { display:'−12',  dec:'-12',cat:'whole', answer:'whole',
-    fb:{y:"Correct! −12 is an integer — rational.",n:"−12 is an integer. Integers are rational: −12 = −12/1."}},
-  { display:'0',    dec:'0',  cat:'whole', answer:'whole',
-    fb:{y:"Yes! Zero is a whole number — rational.",n:"Zero is a whole number. Whole numbers are always rational."}},
-  { display:'√4',   dec:'2',  cat:'whole', answer:'whole',
-    fb:{y:"Correct! √4 = 2, a whole number — rational.",n:"√4 = 2 exactly. When a square root is a whole number, it's rational."}},
-  { display:'√9',   dec:'3',  cat:'whole', answer:'whole',
-    fb:{y:"Yes! √9 = 3 — a whole number, so rational.",n:"√9 = 3 exactly — rational."}},
-  { display:'√25',  dec:'5',  cat:'whole', answer:'whole',
-    fb:{y:"Right! √25 = 5. Whole number → rational.",n:"√25 = 5 — a perfect result, so rational."}},
-  { display:'√100', dec:'10', cat:'whole', answer:'whole',
-    fb:{y:"Correct! √100 = 10 — whole number, rational.",n:"√100 = 10 exactly. Rational."}},
-  { display:'√36',  dec:'6',  cat:'whole', answer:'whole',
-    fb:{y:"Yes! √36 = 6 — whole number, rational.",n:"√36 = 6. A perfect square root — rational."}},
+  // whole
+  { display:'7',    dec:'7',   cat:'whole', answer:'whole', fb:{y:"7 is an integer — whole numbers are always rational.",n:"Integers are whole numbers. All whole numbers are rational."}},
+  { display:'−12',  dec:'-12', cat:'whole', answer:'whole', fb:{y:"−12 is an integer — rational, even as a negative.",n:"−12 is an integer. Integers are rational: −12 = −12/1."}},
+  { display:'0',    dec:'0',   cat:'whole', answer:'whole', fb:{y:"Zero is a whole number — rational.",n:"Zero is a whole number. Whole numbers are always rational."}},
+  { display:'√4',   dec:'2',   cat:'whole', answer:'whole', fb:{y:"√4 = 2 — a whole number, so rational.",n:"√4 = 2 exactly. When a square root is a whole number, it's rational."}},
+  { display:'√9',   dec:'3',   cat:'whole', answer:'whole', fb:{y:"√9 = 3 — a whole number, rational.",n:"√9 = 3 exactly — rational."}},
+  { display:'√25',  dec:'5',   cat:'whole', answer:'whole', fb:{y:"√25 = 5 — whole number, rational.",n:"√25 = 5 — a perfect result, rational."}},
+  { display:'√100', dec:'10',  cat:'whole', answer:'whole', fb:{y:"√100 = 10 — whole number, rational.",n:"√100 = 10 exactly. Rational."}},
+  { display:'√36',  dec:'6',   cat:'whole', answer:'whole', fb:{y:"√36 = 6 — whole number, rational.",n:"√36 = 6. A perfect square root — rational."}},
 
-  // ── Fractions: Terminating decimal (fraction notation) ──
-  { display:'1/2',  dec:'0.5',    cat:'frac-term', answer:'frac-term',
-    fb:{y:"Correct! 1/2 = 0.5 — terminates after one decimal place.",n:"1/2 = 0.5. It ends — terminating decimal."}},
-  { display:'3/4',  dec:'0.75',   cat:'frac-term', answer:'frac-term',
-    fb:{y:"Yes! 3/4 = 0.75 — terminates at hundredths.",n:"3/4 = 0.75. Ends cleanly — terminating decimal."}},
-  { display:'5/8',  dec:'0.625',  cat:'frac-term', answer:'frac-term',
-    fb:{y:"Right! 5/8 = 0.625 — terminates at thousandths.",n:"5/8 = 0.625. Three places, then done — terminating."}},
-  { display:'7/4',  dec:'1.75',   cat:'frac-term', answer:'frac-term',
-    fb:{y:"Correct! 7/4 = 1.75 — terminates.",n:"7/4 = 1.75. Ends at hundredths — terminating decimal."}},
-  { display:'1/25', dec:'0.04',   cat:'frac-term', answer:'frac-term',
-    fb:{y:"Yes! 1/25 = 0.04 — terminates.",n:"1/25 = 0.04. Ends cleanly — terminating."}},
-  { display:'9/16', dec:'0.5625', cat:'frac-term', answer:'frac-term',
-    fb:{y:"Correct! 9/16 = 0.5625 — terminates at ten-thousandths.",n:"9/16 = 0.5625. Four places, then done — terminating."}},
+  // frac-term (fraction notation)
+  { display:'1/2',  dec:'0.5',    cat:'frac-term', answer:'frac-term', fb:{y:"1/2 = 0.5 — terminates after one decimal place.",n:"1/2 = 0.5. It ends — terminating decimal."}},
+  { display:'3/4',  dec:'0.75',   cat:'frac-term', answer:'frac-term', fb:{y:"3/4 = 0.75 — terminates at hundredths.",n:"3/4 = 0.75. Ends cleanly — terminating decimal."}},
+  { display:'5/8',  dec:'0.625',  cat:'frac-term', answer:'frac-term', fb:{y:"5/8 = 0.625 — terminates at thousandths.",n:"5/8 = 0.625. Three places, then done — terminating."}},
+  { display:'7/4',  dec:'1.75',   cat:'frac-term', answer:'frac-term', fb:{y:"7/4 = 1.75 — terminates.",n:"7/4 = 1.75. Ends at hundredths — terminating decimal."}},
+  { display:'1/25', dec:'0.04',   cat:'frac-term', answer:'frac-term', fb:{y:"1/25 = 0.04 — terminates.",n:"1/25 = 0.04. Ends cleanly — terminating."}},
+  { display:'9/16', dec:'0.5625', cat:'frac-term', answer:'frac-term', fb:{y:"9/16 = 0.5625 — terminates at ten-thousandths.",n:"9/16 = 0.5625. Four places, then done — terminating."}},
+  // frac-term (bare decimal)
+  { display:'0.5',   dec:'0.5',   cat:'frac-term', answer:'frac-term', fb:{y:"0.5 terminates — equals 1/2. Terminating decimals are rational.",n:"0.5 ends after one decimal place. Terminating = rational."}},
+  { display:'0.75',  dec:'0.75',  cat:'frac-term', answer:'frac-term', fb:{y:"0.75 terminates — equals 3/4.",n:"0.75 ends at hundredths. It's 3/4 — terminating decimal."}},
+  { display:'0.625', dec:'0.625', cat:'frac-term', answer:'frac-term', fb:{y:"0.625 terminates — equals 5/8.",n:"0.625 ends at thousandths. It's 5/8 — terminating."}},
+  { display:'3.125', dec:'3.125', cat:'frac-term', answer:'frac-term', fb:{y:"3.125 terminates — equals 25/8.",n:"3.125 ends at thousandths. It's 25/8 — terminating decimal."}},
 
-  // ── Fractions: Terminating decimal (bare decimal notation) ──
-  { display:'0.5',   dec:'0.5',   cat:'frac-term', answer:'frac-term',
-    fb:{y:"Correct! 0.5 terminates — it equals 1/2, a rational fraction.",n:"0.5 ends after one decimal place. Terminating decimals are rational fractions."}},
-  { display:'0.75',  dec:'0.75',  cat:'frac-term', answer:'frac-term',
-    fb:{y:"Yes! 0.75 terminates — it equals 3/4.",n:"0.75 ends at hundredths. It's 3/4 — a terminating decimal."}},
-  { display:'0.625', dec:'0.625', cat:'frac-term', answer:'frac-term',
-    fb:{y:"Right! 0.625 terminates — it equals 5/8.",n:"0.625 ends at thousandths. It's 5/8 — terminating."}},
-  { display:'3.125', dec:'3.125', cat:'frac-term', answer:'frac-term',
-    fb:{y:"Correct! 3.125 terminates — it equals 25/8.",n:"3.125 ends at thousandths. It's 25/8 — terminating decimal."}},
+  // frac-rep (fraction notation)
+  { display:'1/3',  dec:'0.3333333333',   repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"1/3 = 0.3̄ — the 3 repeats forever. Repeating decimal.",n:"1/3 = 0.333... The digit 3 repeats without end — repeating decimal."}},
+  { display:'2/3',  dec:'0.6666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"2/3 = 0.6̄ — repeating decimal.",n:"2/3 = 0.666... The 6 repeats — repeating decimal."}},
+  { display:'1/6',  dec:'0.1666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"1/6 = 0.16̄ — the 6 repeats.",n:"1/6 = 0.1666... The 6 repeats — repeating decimal."}},
+  { display:'1/7',  dec:'0.142857',       repeat:'142857', cat:'frac-rep', answer:'frac-rep', fb:{y:"1/7 = 0.1̄4̄2̄8̄5̄7̄ — block 142857 repeats.",n:"1/7 = 0.142857142857... Six-digit block repeats — repeating decimal."}},
+  { display:'1/9',  dec:'0.1111111111',   repeat:'1',      cat:'frac-rep', answer:'frac-rep', fb:{y:"1/9 = 0.1̄ — the 1 repeats forever.",n:"1/9 = 0.111... The digit 1 repeats — repeating decimal."}},
+  { display:'1/11', dec:'0.090909090909', repeat:'09',     cat:'frac-rep', answer:'frac-rep', fb:{y:"1/11 = 0.09̄ — block 09 repeats.",n:"1/11 = 0.0909... Block 09 repeats — repeating decimal."}},
+  { display:'5/6',  dec:'0.833333',       repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"5/6 = 0.83̄ — the 3 repeats.",n:"5/6 = 0.8333... The 3 repeats — repeating decimal."}},
+  // frac-rep (bare decimal)
+  { display:'0.3̄',       dec:'0.3333333333',   repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"0.3̄ repeats forever — equals 1/3. Repeating decimal.",n:"0.333... The 3 repeats without end — this is 1/3."}},
+  { display:'0.6̄',       dec:'0.6666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... The 6 repeats. This is 2/3 — repeating decimal."}},
+  { display:'0.09̄',      dec:'0.090909090909', repeat:'09',     cat:'frac-rep', answer:'frac-rep', fb:{y:"0.09̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11 — repeating decimal."}},
+  { display:'0.1̄4̄2̄8̄5̄7̄',  dec:'0.142857',       repeat:'142857', cat:'frac-rep', answer:'frac-rep', fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7 — repeating decimal."}},
 
-  // ── Fractions: Repeating decimal (fraction notation) ──
-  { display:'1/3',  dec:'0.3333333333',  repeat:'3',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Correct! 1/3 = 0.3̄ — the 3 repeats forever.",n:"1/3 = 0.333... The digit 3 repeats without end — repeating decimal."}},
-  { display:'2/3',  dec:'0.6666666666',  repeat:'6',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Yes! 2/3 = 0.6̄ — repeating decimal.",n:"2/3 = 0.666... The 6 repeats — repeating decimal."}},
-  { display:'1/6',  dec:'0.1666666666',  repeat:'6',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Right! 1/6 = 0.16̄ — the 6 repeats.",n:"1/6 = 0.1666... The 6 repeats — repeating decimal."}},
-  { display:'1/7',  dec:'0.142857',      repeat:'142857', cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Excellent! 1/7 = 0.1̄4̄2̄8̄5̄7̄ — block 142857 repeats.",n:"1/7 = 0.142857142857... Six-digit block repeats — repeating decimal."}},
-  { display:'1/9',  dec:'0.1111111111',  repeat:'1',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Correct! 1/9 = 0.1̄ — the 1 repeats forever.",n:"1/9 = 0.111... The digit 1 repeats — repeating decimal."}},
-  { display:'1/11', dec:'0.090909090909',repeat:'09',     cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Yes! 1/11 = 0.09̄ — block 09 repeats.",n:"1/11 = 0.0909... Block 09 repeats — repeating decimal."}},
-  { display:'5/6',  dec:'0.833333',      repeat:'3',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Right! 5/6 = 0.83̄ — the 3 repeats.",n:"5/6 = 0.8333... The 3 repeats — repeating decimal."}},
+  // irr-sqrt
+  { display:'√2',  dec:'1.41421356237', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."}},
+  { display:'√3',  dec:'1.73205080757', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√3 is irrational — 3 is not a perfect square.",n:"√3 = 1.73205... No pattern, no end. Irrational."}},
+  { display:'√5',  dec:'2.23606797750', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√5 is irrational.",n:"5 isn't a perfect square — √5 is irrational."}},
+  { display:'√7',  dec:'2.64575131106', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√7 is irrational.",n:"√7 = 2.64575... Non-terminating, non-repeating. Irrational."}},
+  { display:'√11', dec:'3.31662479036', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√11 is irrational — 11 is not a perfect square.",n:"11 is not a perfect square — √11 is irrational."}},
+  { display:'√13', dec:'3.60555127546', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating. Irrational."}},
 
-  // ── Fractions: Repeating decimal (bare decimal notation) ──
-  { display:'0.3̄',      dec:'0.3333333333',  repeat:'3',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Correct! 0.3̄ repeats forever — it equals 1/3, a rational fraction.",n:"0.333... The 3 repeats without end. Repeating decimals are rational — this is 1/3."}},
-  { display:'0.6̄',      dec:'0.6666666666',  repeat:'6',      cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Yes! 0.6̄ repeats — it equals 2/3.",n:"0.666... The 6 repeats. This is 2/3 — repeating decimal."}},
-  { display:'0.09̄',     dec:'0.090909090909',repeat:'09',     cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Right! 0.09̄ repeats — block 09 cycles. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11 — repeating decimal."}},
-  { display:'0.1̄4̄2̄8̄5̄7̄', dec:'0.142857',      repeat:'142857', cat:'frac-rep', answer:'frac-rep',
-    fb:{y:"Excellent! Block 142857 repeats — this is 1/7.",n:"0.142857142857... The six-digit block cycles. This is 1/7 — repeating decimal."}},
-
-  // ── Irrational: √non-perfect square ──
-  { display:'√2',  dec:'1.41421356237', cat:'irr-sqrt', answer:'irr-sqrt',
-    fb:{y:"Correct! √2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."}},
-  { display:'√3',  dec:'1.73205080757', cat:'irr-sqrt', answer:'irr-sqrt',
-    fb:{y:"Yes! √3 is irrational — 3 is not a perfect square.",n:"√3 = 1.73205... No pattern, no end. Irrational."}},
-  { display:'√5',  dec:'2.23606797750', cat:'irr-sqrt', answer:'irr-sqrt',
-    fb:{y:"Right! √5 is irrational.",n:"5 isn't a perfect square — √5 is irrational."}},
-  { display:'√7',  dec:'2.64575131106', cat:'irr-sqrt', answer:'irr-sqrt',
-    fb:{y:"Correct! √7 is irrational.",n:"√7 = 2.64575... Non-terminating, non-repeating. Irrational."}},
-  { display:'√11', dec:'3.31662479036', cat:'irr-sqrt', answer:'irr-sqrt',
-    fb:{y:"Yes! √11 is irrational — 11 is not a perfect square.",n:"11 is not a perfect square — √11 is irrational."}},
-  { display:'√13', dec:'3.60555127546', cat:'irr-sqrt', answer:'irr-sqrt',
-    fb:{y:"Correct! √13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating. Irrational."}},
-
-  // ── Irrational: non-repeating non-terminating ──
-  { display:'π',         dec:'3.14159265358',      cat:'irr-dec', answer:'irr-dec',
-    fb:{y:"Yes! π is the most famous irrational number — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."}},
-  { display:'2π',        dec:'6.28318530718',      cat:'irr-dec', answer:'irr-dec',
-    fb:{y:"Correct! Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 keeps it irrational."}},
-  { display:'π/2',       dec:'1.57079632679',      cat:'irr-dec', answer:'irr-dec',
-    fb:{y:"Right! π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."}},
-  { display:'0.101001…', dec:'0.101001000100001',  pattern:true, cat:'irr-dec', answer:'irr-dec',
-    fb:{y:"Correct! The pattern grows — never repeats a fixed block. Irrational.",n:"Each group adds an extra zero — no fixed repeating block. Irrational."}},
-  { display:'0.313113…', dec:'0.313113111311113',  pattern:true, cat:'irr-dec', answer:'irr-dec',
-    fb:{y:"Yes! The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles into a repeating block. Irrational."}},
+  // irr-dec
+  { display:'π',           dec:'3.14159265358',     cat:'irr-dec', answer:'irr-dec', fb:{y:"π is the most famous irrational number — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."}},
+  { display:'2π',          dec:'6.28318530718',     cat:'irr-dec', answer:'irr-dec', fb:{y:"Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 keeps it irrational."}},
+  { display:'π/2',         dec:'1.57079632679',     cat:'irr-dec', answer:'irr-dec', fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."}},
+  { display:'0.101001…',   dec:'0.101001000100001', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The pattern grows — never repeats a fixed block. Irrational.",n:"Each group adds an extra zero — no fixed repeating block. Irrational."}},
+  { display:'0.313113…',   dec:'0.313113111311113', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles into a repeating block. Irrational."}},
 ];
 
 // ── STATE ──
-let score=0,streak=0,total=0;
-let current=null,answered=false;
+let score=0, streak=0, bestStreak=0, total=0;
+let current=null, answered=false;
 let usedIdx=new Set();
-let masteryHits={},masteryDone=new Set();
+let masteryHits={}, masteryDone=new Set();
+let earnedBadges=new Set();
+let popupTimer=null;
 ZONES.forEach(z=>masteryHits[z.id]=0);
 
-// ── DIGIT KEY ──
-function buildKey(){
-  const c=document.getElementById('dk-items');
+// ── DIGIT KEY BAR ──
+function buildKeyBar(){
+  const c=document.getElementById('key-items');
   for(let d=0;d<=9;d++){
-    const el=document.createElement('div');el.className='dk-item';
-    el.innerHTML=`<div class="dk-swatch" style="background:${DC[d]}"></div><div class="dk-digit" style="color:${DC[d]}">${d}</div>`;
-    c.appendChild(el);
+    const ki=document.createElement('div');ki.className='ki';
+    ki.innerHTML=`<div class="ki-swatch" style="background:${DC[d]};${d===1?'border:1px solid #555':''}"></div><div class="ki-digit" style="color:${DC[d]};${d===1?'color:#aaa':''}">${d}</div>`;
+    c.appendChild(ki);
   }
 }
 
@@ -420,16 +459,11 @@ function buildKey(){
 function buildGallery(){
   const g=document.getElementById('gallery');g.innerHTML='';
   ZONES.forEach(z=>{
-    const col=document.createElement('div');
-    col.className='zone-col';col.dataset.zoneId=z.id;
-
-    // header
+    const col=document.createElement('div');col.className='zone-col';col.dataset.zoneId=z.id;
     const hdr=document.createElement('div');hdr.className='zone-header';
     const sup=document.createElement('div');sup.className='zone-super';sup.style.color=z.color;sup.textContent=z.superLabel;
-
     const nameWrap=document.createElement('div');
     if(z.math==='sqrt'){
-      nameWrap.innerHTML='';
       const md=document.createElement('div');md.className='zone-math';md.style.color=z.color;
       md.innerHTML=`√<span class="rad">n</span>`;
       const sb=document.createElement('div');sb.className='zone-math-sub';sb.textContent=z.name;
@@ -438,56 +472,54 @@ function buildGallery(){
       nameWrap.className='zone-name';nameWrap.style.color=z.color;
       nameWrap.style.whiteSpace='pre-line';nameWrap.textContent=z.name;
     }
-    if(z.sub){
-      const s=document.createElement('div');
-      s.style.cssText='font-size:0.5rem;color:var(--dim);margin-top:2px;';
-      s.textContent=z.sub;nameWrap.appendChild(s);
-    }
-
-    // pips + crown
+    if(z.sub){const s=document.createElement('div');s.style.cssText='font-size:0.48rem;color:var(--dim);margin-top:2px;';s.textContent=z.sub;nameWrap.appendChild(s);}
     const pips=document.createElement('div');pips.className='mastery-pips';pips.id='pips-'+z.id;
-    for(let i=0;i<3;i++){
-      const p=document.createElement('div');p.className='pip';p.id=`pip-${z.id}-${i}`;pips.appendChild(p);
-    }
-    const crown=document.createElement('div');crown.className='crown';crown.id='crown-'+z.id;crown.textContent='👑';
-    pips.appendChild(crown);
-
+    for(let i=0;i<3;i++){const p=document.createElement('div');p.className='pip';p.id=`pip-${z.id}-${i}`;pips.appendChild(p);}
+    const crown=document.createElement('div');crown.className='crown';crown.id='crown-'+z.id;crown.textContent='👑';pips.appendChild(crown);
     hdr.appendChild(sup);hdr.appendChild(nameWrap);hdr.appendChild(pips);
-
-    // chain area
     const chain=document.createElement('div');chain.className='chain-area';chain.id='chain-'+z.id;
-    const empty=document.createElement('div');empty.className='chain-empty';empty.id='empty-'+z.id;empty.textContent='drop here';
-    chain.appendChild(empty);
-
+    const empty=document.createElement('div');empty.className='chain-empty';empty.id='empty-'+z.id;empty.textContent='drop here';chain.appendChild(empty);
     col.appendChild(hdr);col.appendChild(chain);
-
-    // drag events on entire column
     col.addEventListener('dragover',e=>{e.preventDefault();if(!answered)col.classList.add('drag-over');});
     col.addEventListener('dragleave',e=>{if(!col.contains(e.relatedTarget))col.classList.remove('drag-over');});
-    col.addEventListener('drop',e=>{
-      e.preventDefault();col.classList.remove('drag-over');
-      if(!answered&&e.dataTransfer.getData('text/plain')==='token')classify(z.id);
-    });
-    // click zone to classify OR advance — use flag to avoid same-event double-fire
-    col.addEventListener('click',e=>{
-      if(!answered){ classify(z.id); }
-      // advance handled by gallery listener set after delay
-    });
-
+    col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drag-over');if(!answered&&e.dataTransfer.getData('text/plain')==='token')classify(z.id);});
+    col.addEventListener('click',()=>{if(!answered)classify(z.id);});
     g.appendChild(col);
   });
 }
 
-// ── TILE STRIP (large, digits visible) ──
+// ── BUILD BADGE LIST ──
+function buildBadgeList(){
+  const bl=document.getElementById('badge-list');bl.innerHTML='';
+  BADGE_DEFS.forEach(b=>{
+    const el=document.createElement('div');el.className='badge';el.id='badge-'+b.id;
+    el.innerHTML=`<span class="badge-icon">${b.icon}</span><span class="badge-text">${b.label}</span>`;
+    bl.appendChild(el);
+  });
+}
+
+// ── CHECK BADGES ──
+function checkBadges(){
+  const state={total,streak,masteryDone};
+  BADGE_DEFS.forEach(b=>{
+    if(!earnedBadges.has(b.id)&&b.check(state)){
+      earnedBadges.add(b.id);
+      const el=document.getElementById('badge-'+b.id);
+      if(el){
+        el.classList.add('earned');
+        el.style.borderColor=ZONES.find(z=>masteryDone.has(z.id))?.color||'var(--accent)';
+      }
+    }
+  });
+}
+
+// ── TILE STRIP ──
 function renderTileStrip(num){
-  const strip=document.getElementById('tile-strip');
-  strip.innerHTML='';
+  const strip=document.getElementById('tile-strip');strip.innerHTML='';
   const raw=num.dec,isNeg=raw.startsWith('-');
   const abs=raw.replace('-','');
-  const MAX=36;
-
+  const MAX=34;
   if(isNeg){const n=document.createElement('div');n.className='tdot';n.textContent='−';strip.appendChild(n);}
-
   let chars=[];
   const dotIdx=abs.indexOf('.');
   if(num.repeat){
@@ -499,40 +531,32 @@ function renderTileStrip(num){
     while(s.replace(/\./g,'').length<MAX+4)s+=num.repeat;
     for(const c of s){if(chars.filter(x=>x.isD).length>=MAX)break;chars.push({c,isD:true});}
   } else {
-    for(const c of abs){
-      if(c==='.'){chars.push({c:'.',isD:false});continue;}
-      chars.push({c,isD:true});
-    }
+    for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
   }
   const needsEll=num.repeat||num.pattern||chars.filter(x=>x.isD).length>=MAX;
   let dCount=0,trimmed=[];
   for(const s of chars){if(s.isD){if(dCount>=MAX)break;dCount++;}trimmed.push(s);}
-
   trimmed.forEach((s,i)=>{
     if(!s.isD){const el=document.createElement('div');el.className='tdot';el.textContent=s.c;strip.appendChild(el);return;}
     const d=parseInt(s.c);
-    const cell=document.createElement('div');cell.className='tc';
+    const cell=document.createElement('div');
+    cell.className=`tc d${d}`;
     cell.style.background=DC[d];cell.textContent=s.c;
-    setTimeout(()=>cell.classList.add('vis'),i*12);
+    setTimeout(()=>cell.classList.add('vis'),i*11);
     strip.appendChild(cell);
   });
   if(needsEll){const el=document.createElement('div');el.className='tell';el.textContent='…';strip.appendChild(el);}
 }
 
-// ── BUILD HANGING ITEM ──
+// ── BUILD HANG ITEM ──
 function buildHangItem(num){
   const item=document.createElement('div');item.className='hang-item';item.title=num.display;
-
   const lbl=document.createElement('div');lbl.className='hang-label';lbl.textContent=num.display;
   item.appendChild(lbl);
-
   const conn0=document.createElement('div');conn0.className='hconn';item.appendChild(conn0);
-
   const vstrip=document.createElement('div');vstrip.className='hang-strip';
-
   const raw=num.dec,abs=raw.replace('-','');
-  const MAX=24;
-  const dotIdx=abs.indexOf('.');
+  const MAX=22;const dotIdx=abs.indexOf('.');
   let chars=[];
   if(num.repeat){
     const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
@@ -543,26 +567,41 @@ function buildHangItem(num){
     while(s.replace(/\./g,'').length<MAX+2)s+=num.repeat;
     for(const c of s){if(chars.filter(x=>x.isD).length>=MAX)break;chars.push({c,isD:true});}
   } else {
-    for(const c of abs){
-      if(c==='.'){chars.push({c:'.',isD:false});continue;}
-      chars.push({c,isD:true});
-    }
+    for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
   }
   const needsEll=num.repeat||num.pattern||chars.filter(x=>x.isD).length>=MAX;
   let dCount=0,trimmed=[];
   for(const s of chars){if(s.isD){if(dCount>=MAX)break;dCount++;}trimmed.push(s);}
-
   trimmed.forEach(s=>{
     if(!s.isD){const el=document.createElement('div');el.className='hdot';el.textContent=s.c;vstrip.appendChild(el);return;}
     const d=parseInt(s.c);
-    const cell=document.createElement('div');cell.className='hcell';
-    cell.style.background=DC[d];cell.textContent=s.c;
-    vstrip.appendChild(cell);
+    const cell=document.createElement('div');cell.className=`hcell d${d}`;
+    cell.style.background=DC[d];cell.textContent=s.c;vstrip.appendChild(cell);
   });
   if(needsEll){const el=document.createElement('div');el.className='hell';el.textContent='…';vstrip.appendChild(el);}
-
   item.appendChild(vstrip);
   return item;
+}
+
+// ── POPUP ──
+function showPopup(correct, message){
+  const overlay=document.getElementById('popup-overlay');
+  const popup=document.getElementById('popup');
+  document.getElementById('popup-icon').textContent=correct?'✓':'✗';
+  document.getElementById('popup-title').textContent=correct?'Correct!':'Not quite.';
+  document.getElementById('popup-body').textContent=message;
+  popup.className='popup '+(correct?'correct-popup':'wrong-popup');
+  overlay.classList.add('show');
+  // auto-dismiss: correct=2s, wrong=3.5s
+  if(popupTimer)clearTimeout(popupTimer);
+  popupTimer=setTimeout(dismissPopup, correct?2000:3500);
+}
+
+function dismissPopup(){
+  if(popupTimer){clearTimeout(popupTimer);popupTimer=null;}
+  document.getElementById('popup-overlay').classList.remove('show');
+  // auto-advance immediately after popup closes
+  nextNumber();
 }
 
 // ── CLASSIFY ──
@@ -570,48 +609,40 @@ function classify(zoneId){
   if(answered)return;
   answered=true;total++;
   document.getElementById('s-total').textContent=total;
+  document.getElementById('drag-tile').classList.add('gone');
 
   const correct=zoneId===current.answer;
   const targetId=correct?zoneId:current.answer;
 
-  document.getElementById('drag-tile').classList.add('gone');
-
-  // place hang item in correct zone
+  // place in correct zone
   const chain=document.getElementById('chain-'+targetId);
   const emptyEl=document.getElementById('empty-'+targetId);
   if(emptyEl)emptyEl.remove();
   const item=buildHangItem(current);
   chain.appendChild(item);
-  // scroll to show new item
   chain.scrollLeft=chain.scrollWidth;
-
-  const correctCol=document.getElementById('chain-'+targetId).closest('.zone-col');
-  correctCol.classList.add('correct-flash');
+  document.getElementById('chain-'+targetId).closest('.zone-col').classList.add('correct-flash');
 
   if(!correct){
-    // brief ghost in wrong zone then remove
+    // ghost in wrong zone
     const wchain=document.getElementById('chain-'+zoneId);
     const we=document.getElementById('empty-'+zoneId);
     if(we)we.remove();
     const ghost=buildHangItem(current);
-    ghost.style.opacity='0.3';ghost.style.filter='grayscale(0.8)';
+    ghost.style.opacity='0.25';ghost.style.filter='grayscale(0.9)';
     wchain.appendChild(ghost);
     document.getElementById('chain-'+zoneId).closest('.zone-col').classList.add('wrong-flash');
-    setTimeout(()=>ghost.remove(),600);
-  }
-
-  const fb=document.getElementById('feedback-bar');
-  const ft=document.getElementById('feedback-text');
-  const nh=document.getElementById('next-hint');
-
-  if(correct){
+    setTimeout(()=>ghost.remove(),700);
+    // shake streak
+    streak=0;
+    const sEl=document.getElementById('s-streak');
+    sEl.textContent=0;sEl.classList.remove('shake');void sEl.offsetWidth;sEl.classList.add('shake');
+  } else {
     score++;streak++;
+    if(streak>bestStreak){bestStreak=streak;document.getElementById('s-best').textContent=bestStreak;}
     document.getElementById('s-score').textContent=score;
     document.getElementById('s-streak').textContent=streak;
-    fb.className='feedback-bar correct';
-    ft.textContent=`✓  ${current.fb.y}`;
-
-    // mastery
+    // mastery pips
     const aid=current.answer;
     if(!masteryDone.has(aid)){
       masteryHits[aid]=(masteryHits[aid]||0)+1;
@@ -619,11 +650,7 @@ function classify(zoneId){
       const zc=ZONES.find(z=>z.id===aid)?.color||'var(--green)';
       for(let i=0;i<Math.min(hits,3);i++){
         const pip=document.getElementById(`pip-${aid}-${i}`);
-        if(pip)setTimeout(()=>{
-          pip.classList.add('filled');
-          pip.style.background=zc;pip.style.borderColor=zc;
-          pip.style.boxShadow=`0 0 5px ${zc}99`;
-        },i*180);
+        if(pip)setTimeout(()=>{pip.classList.add('filled');pip.style.background=zc;pip.style.borderColor=zc;pip.style.boxShadow=`0 0 5px ${zc}99`;},i*180);
       }
       if(hits>=3){
         masteryDone.add(aid);
@@ -636,34 +663,16 @@ function classify(zoneId){
         },650);
       }
     }
-  } else {
-    streak=0;
-    const sEl=document.getElementById('s-streak');
-    sEl.textContent=0;sEl.classList.remove('shake');void sEl.offsetWidth;sEl.classList.add('shake');
-    fb.className='feedback-bar wrong';
-    ft.textContent=`✗  ${current.fb.n}`;
   }
 
-  nh.style.display='inline';
-
-  // Set up next-number on gallery click — but with a timeout so this classify
-  // click doesn't immediately trigger it, and only once.
-  setTimeout(()=>{
-    document.getElementById('gallery').addEventListener('click', galleryAdvance, {once:true});
-  }, 300);
+  checkBadges();
+  // Show popup — it will auto-advance when dismissed
+  setTimeout(()=>showPopup(correct, correct?current.fb.y:current.fb.n), 150);
 }
-
-function galleryAdvance(){ nextNumber(); }
 
 // ── NEXT NUMBER ──
 function nextNumber(){
-  // Remove any pending gallery listener to avoid double-fire
-  document.getElementById('gallery').removeEventListener('click', galleryAdvance);
-
   answered=false;
-  document.getElementById('feedback-bar').className='feedback-bar neutral';
-  document.getElementById('feedback-text').textContent='Drag the number into a category below';
-  document.getElementById('next-hint').style.display='none';
   document.getElementById('drag-tile').classList.remove('gone');
   document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('correct-flash','wrong-flash','drag-over'));
 
@@ -679,27 +688,23 @@ function nextNumber(){
   renderTileStrip(current);
 }
 
-// ── DRAG (mouse + touch) ──
+// ── DRAG ──
 function initDrag(){
   const tile=document.getElementById('drag-tile');
-  tile.addEventListener('dragstart',e=>{
-    e.dataTransfer.setData('text/plain','token');
-    tile.classList.add('dragging');
-  });
+  tile.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain','token');tile.classList.add('dragging');});
   tile.addEventListener('dragend',()=>tile.classList.remove('dragging'));
-
   let clone=null,touchZone=null;
   tile.addEventListener('touchstart',e=>{
     if(answered)return;
     const t=e.touches[0];
     clone=tile.cloneNode(true);
-    clone.style.cssText=`position:fixed;top:${t.clientY-30}px;left:${t.clientX-60}px;z-index:200;opacity:0.82;pointer-events:none;transition:none;width:auto;`;
+    clone.style.cssText=`position:fixed;top:${t.clientY-40}px;left:${t.clientX-80}px;z-index:200;opacity:0.82;pointer-events:none;transition:none;width:auto;`;
     document.body.appendChild(clone);tile.classList.add('dragging');
   },{passive:true});
   tile.addEventListener('touchmove',e=>{
     if(!clone)return;e.preventDefault();
     const t=e.touches[0];
-    clone.style.top=(t.clientY-30)+'px';clone.style.left=(t.clientX-60)+'px';
+    clone.style.top=(t.clientY-40)+'px';clone.style.left=(t.clientX-80)+'px';
     clone.style.display='none';
     const el=document.elementFromPoint(t.clientX,t.clientY);
     clone.style.display='';
@@ -723,7 +728,7 @@ function closeCelebration(){
   nextNumber();
 }
 
-buildKey();buildGallery();initDrag();nextNumber();
+buildKeyBar();buildGallery();buildBadgeList();initDrag();nextNumber();
 </script>
 </body>
 </html>
