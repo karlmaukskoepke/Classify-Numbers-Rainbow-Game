@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rational & Irrational Numbers</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a40;
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+    --accent: #7c6af7;
+    --rational-color: #3dd6a3;
+    --irrational-color: #f76a8a;
+
+    --d0: #ff6b6b; --d1: #ff9f43; --d2: #ffd93d; --d3: #6bcb77;
+    --d4: #4ecdc4; --d5: #45b7d1; --d6: #7c6af7; --d7: #c77dff;
+    --d8: #f76a8a; --d9: #fa8231;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  header h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  header h1 span { color: var(--accent); }
+
+  .stats { display: flex; gap: 20px; align-items: center; }
+  .stat { text-align: center; }
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--accent); line-height: 1;
+  }
+  .streak-val { color: #ffd93d; }
+  .stat-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+
+  /* ── LAYOUT ── */
+  main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── DIGIT KEY ── */
+  .digit-key {
+    width: 68px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    flex-shrink: 0;
+  }
+  .digit-key-title {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .key-item {
+    display: flex; align-items: center; gap: 7px; padding: 4px 9px;
+  }
+  .key-swatch { width: 18px; height: 18px; border-radius: 3px; flex-shrink: 0; }
+  .key-digit { font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; }
+
+  /* ── GAME AREA ── */
+  .game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px;
+    gap: 16px;
+    overflow-y: auto;
+  }
+
+  /* category badges */
+  .cat-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: var(--surface);
+    white-space: nowrap;
+    transition: all 0.3s;
+  }
+  .cat-badge.done {
+    border-color: var(--rational-color);
+    color: var(--rational-color);
+    background: rgba(61,214,163,0.08);
+  }
+  .cat-badge.done::before { content: '✓ '; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .card-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  /* number display */
+  .number-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── COLOR STRIP (single row, no wrap) ── */
+  .strip-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .strip-outer {
+    overflow: hidden;
+    width: 100%;
+  }
+  .color-strip {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 3px;
+    width: max-content;
+  }
+  .color-cell {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(0,0,0,0.72);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.15s, transform 0.15s;
+    user-select: none;
+    position: relative;
+  }
+  .color-cell.visible { opacity: 1; transform: scale(1); }
+  .color-cell .digit-label {
+    display: none;
+    position: absolute; inset: 0;
+    align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem; font-weight: 700;
+    color: rgba(0,0,0,0.75);
+  }
+  .color-cell.revealed .digit-label { display: flex; }
+
+  .dot-cell {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    padding: 0 1px;
+    line-height: 26px;
+  }
+  .ellipsis-cell {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    padding-left: 4px;
+    flex-shrink: 0;
+    line-height: 26px;
+    font-weight: 700;
+  }
+
+  /* ── DRAGGABLE TOKEN ── */
+  .drag-token-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 4px 0 8px;
+    min-height: 48px;
+  }
+  .drag-token {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: grab;
+    user-select: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    touch-action: none;
+  }
+  .drag-token:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(124,106,247,0.25);
+  }
+  .drag-token.dragging {
+    opacity: 0.5;
+    transform: scale(0.96);
+    cursor: grabbing;
+  }
+  .drag-token.placed { display: none; }
+  .drag-hint {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── DROP ZONES ── */
+  .zones-wrapper {
+    display: flex;
+    gap: 12px;
+  }
+  .zone-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .zone-column-header {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .zone-column-header.rational {
+    color: var(--rational-color);
+    background: rgba(61,214,163,0.08);
+    border: 1px solid rgba(61,214,163,0.25);
+  }
+  .zone-column-header.irrational {
+    color: var(--irrational-color);
+    background: rgba(247,106,138,0.08);
+    border: 1px solid rgba(247,106,138,0.25);
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 12px 10px;
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  .drop-zone-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    line-height: 1.3;
+    pointer-events: none;
+  }
+  .drop-zone.rational-zone {
+    border-color: rgba(61,214,163,0.2);
+  }
+  .drop-zone.irrational-zone {
+    border-color: rgba(247,106,138,0.2);
+  }
+  .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(124,106,247,0.1);
+    transform: scale(1.02);
+  }
+  .drop-zone.correct-flash {
+    border-color: var(--rational-color);
+    background: rgba(61,214,163,0.12);
+    animation: flashGreen 0.5s ease;
+  }
+  .drop-zone.wrong-flash {
+    border-color: var(--irrational-color);
+    background: rgba(247,106,138,0.12);
+    animation: flashRed 0.5s ease;
+  }
+  @keyframes flashGreen {
+    0%,100% { background: transparent; }
+    50% { background: rgba(61,214,163,0.2); }
+  }
+  @keyframes flashRed {
+    0%,100% { background: transparent; }
+    50% { background: rgba(247,106,138,0.2); }
+  }
+
+  /* placed token inside zone */
+  .placed-token {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    margin-top: 4px;
+  }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    display: none;
+    animation: slideIn 0.3s ease;
+    margin-top: 12px;
+  }
+  .feedback.correct {
+    background: rgba(61,214,163,0.1);
+    border: 1px solid var(--rational-color);
+    color: var(--rational-color);
+    display: block;
+  }
+  .feedback.incorrect {
+    background: rgba(247,106,138,0.1);
+    border: 1px solid var(--irrational-color);
+    color: var(--irrational-color);
+    display: block;
+  }
+  .feedback strong { display: block; font-size: 0.95rem; margin-bottom: 4px; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── NEXT BUTTON ── */
+  .next-btn {
+    padding: 11px 26px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    margin-top: 12px;
+    transition: all 0.18s;
+    letter-spacing: 0.04em;
+  }
+  .next-btn:hover { background: #9580ff; transform: translateY(-1px); }
+  .next-btn.show { display: inline-block; }
+
+  /* ── CELEBRATION ── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 99; display: none;
+  }
+  .overlay.show { display: block; }
+  .celebration {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 32px 44px;
+    text-align: center;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 0 60px rgba(124,106,247,0.3);
+    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .celebration.show { display: block; }
+  .celebration h2 { font-size: 1.7rem; color: var(--accent); margin-bottom: 8px; }
+  .celebration p { color: var(--text-dim); margin-bottom: 20px; font-size: 0.9rem; }
+  @keyframes popIn {
+    from { opacity:0; transform: translate(-50%,-50%) scale(0.7); }
+    to   { opacity:1; transform: translate(-50%,-50%) scale(1); }
+  }
+
+  @keyframes streakPop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.5); color: #ffd93d; }
+    100% { transform: scale(1); }
+  }
+  .streak-pop { animation: streakPop 0.4s ease; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <h1>Number <span>Classifier</span></h1>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="score-display">0</div>
+      <div class="stat-label">Points</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val streak-val" id="streak-display">0</div>
+      <div class="stat-label">🔥 Streak</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="total-display">0</div>
+      <div class="stat-label">Played</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Digit Key -->
+  <aside class="digit-key">
+    <div class="digit-key-title">Key</div>
+    <div id="digit-key-items"></div>
+  </aside>
+
+  <!-- Game -->
+  <div class="game-area">
+
+    <!-- Categories mastered -->
+    <div>
+      <div class="card-label">Categories Mastered</div>
+      <div class="cat-row" id="cat-grid"></div>
+    </div>
+
+    <!-- Current number -->
+    <div class="card">
+      <div class="card-label">Classify this number</div>
+      <div class="number-display" id="number-display">—</div>
+      <div class="strip-label">Decimal expansion →</div>
+      <div class="strip-outer">
+        <div class="color-strip" id="color-strip"></div>
+      </div>
+    </div>
+
+    <!-- Drag token + zones -->
+    <div class="card">
+      <div class="card-label">Drag the number to its correct category</div>
+
+      <div class="drag-token-wrap">
+        <div class="drag-token" id="drag-token" draggable="true">
+          <span id="drag-token-label">—</span>
+        </div>
+      </div>
+      <div class="drag-hint" id="drag-hint">Drag to a category below ↓</div>
+
+      <div style="height:12px"></div>
+
+      <div class="zones-wrapper">
+        <!-- RATIONAL -->
+        <div class="zone-column">
+          <div class="zone-column-header rational">Rational</div>
+          <div class="drop-zone rational-zone" data-answer="integer" id="zone-integer">
+            <div class="drop-zone-name">Integer</div>
+          </div>
+          <div class="drop-zone rational-zone" data-answer="terminating" id="zone-terminating">
+            <div class="drop-zone-name">Terminating Decimal</div>
+          </div>
+          <div class="drop-zone rational-zone" data-answer="repeating" id="zone-repeating">
+            <div class="drop-zone-name">Repeating Decimal</div>
+          </div>
+          <div class="drop-zone rational-zone" data-answer="perfect-sqrt" id="zone-perfect-sqrt">
+            <div class="drop-zone-name">Square Root of a Perfect Square</div>
+          </div>
+          <div class="drop-zone rational-zone" data-answer="fraction" id="zone-fraction">
+            <div class="drop-zone-name">Fraction</div>
+          </div>
+        </div>
+
+        <!-- IRRATIONAL -->
+        <div class="zone-column">
+          <div class="zone-column-header irrational">Irrational</div>
+          <div class="drop-zone irrational-zone" data-answer="irrational-sqrt" id="zone-irrational-sqrt">
+            <div class="drop-zone-name">Non-Perfect Square Under a Square Root</div>
+          </div>
+          <div class="drop-zone irrational-zone" data-answer="irrational-decimal" id="zone-irrational-decimal">
+            <div class="drop-zone-name">Non-Repeating, Non-Terminating Decimal</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="next-btn" onclick="nextNumber()">Next Number →</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- Celebration -->
+<div class="overlay" id="overlay" onclick="closeCelebration()"></div>
+<div class="celebration" id="celebration">
+  <h2>🎉 All Categories!</h2>
+  <p id="cel-body">You've seen every type of number.<br>Keep going for a higher score!</p>
+  <button class="next-btn show" onclick="closeCelebration()">Keep Going</button>
+</div>
+
+<script>
+// ── COLORS ──
+const DC = ['#ff6b6b','#ff9f43','#ffd93d','#6bcb77','#4ecdc4','#45b7d1','#7c6af7','#c77dff','#f76a8a','#fa8231'];
+
+// ── CATEGORIES ──
+const CATEGORIES = [
+  { id: 'integer',           label: 'Integer' },
+  { id: 'terminating',       label: 'Terminating Decimal' },
+  { id: 'repeating',         label: 'Repeating Decimal' },
+  { id: 'perfect-sqrt',      label: '√ Perfect Square' },
+  { id: 'fraction',          label: 'Fraction' },
+  { id: 'irrational-sqrt',   label: '√ Non-Perfect Square' },
+  { id: 'irrational-decimal',label: 'Non-Repeating Decimal' },
+];
+
+// ── NUMBER BANK ──
+// answer must match a drop-zone data-answer value
+const BANK = [
+  // Integers
+  { display:'7',      decimal:'7',               catId:'integer',            answer:'integer',
+    fb:{ y:"Correct! 7 is an integer — it has no decimal part. Integers are always rational.",
+         n:"7 is an integer — a whole number, no decimal needed. Integers are rational." }},
+  { display:'−12',    decimal:'-12',             catId:'integer',            answer:'integer',
+    fb:{ y:"Yes! Negative integers are still rational — they can be written as −12/1.",
+         n:"−12 is an integer. Integers are rational: −12 = −12/1." }},
+  { display:'0',      decimal:'0',               catId:'integer',            answer:'integer',
+    fb:{ y:"Correct! Zero is rational — it equals 0/1.",
+         n:"Zero is an integer, and all integers are rational: 0 = 0/1." }},
+  { display:'−3',     decimal:'-3',              catId:'integer',            answer:'integer',
+    fb:{ y:"Right! −3 is an integer, and all integers are rational.",
+         n:"−3 is an integer — rational, as all integers are." }},
+
+  // Terminating decimals
+  { display:'0.5',    decimal:'0.5',             catId:'terminating',        answer:'terminating',
+    fb:{ y:"Correct! 0.5 terminates — it equals exactly 1/2. Terminating decimals are rational.",
+         n:"0.5 stops after one decimal place — it's 1/2. Terminating = rational." }},
+  { display:'0.75',   decimal:'0.75',            catId:'terminating',        answer:'terminating',
+    fb:{ y:"Yes! 0.75 = 3/4. It terminates, so it's rational.",
+         n:"0.75 ends at the hundredths place. It's 3/4 — rational." }},
+  { display:'3.125',  decimal:'3.125',           catId:'terminating',        answer:'terminating',
+    fb:{ y:"Right! 3.125 = 25/8. Terminates → rational.",
+         n:"3.125 terminates at the thousandths place. It's 25/8 — rational." }},
+  { display:'0.04',   decimal:'0.04',            catId:'terminating',        answer:'terminating',
+    fb:{ y:"Correct! 0.04 = 1/25. Terminates → rational.",
+         n:"0.04 ends cleanly — it's 1/25. Terminating decimals are rational." }},
+
+  // Repeating decimals
+  { display:'0.3̄',    decimal:'0.3333333333',    catId:'repeating', repeat:'3', answer:'repeating',
+    fb:{ y:"Correct! 0.3̄ repeats forever, but it's rational — it equals exactly 1/3.",
+         n:"0.333... repeats the digit 3. Repeating decimals are rational — this one is 1/3." }},
+  { display:'0.6̄',    decimal:'0.6666666666',    catId:'repeating', repeat:'6', answer:'repeating',
+    fb:{ y:"Yes! 0.6̄ = 2/3. Repeating → rational.",
+         n:"0.666... is a repeating decimal — it equals exactly 2/3." }},
+  { display:'0.1̄4̄2̄8̄5̄7̄', decimal:'0.142857',  catId:'repeating', repeat:'142857', answer:'repeating',
+    fb:{ y:"Excellent! The block 142857 repeats — this is 1/7. Rational.",
+         n:"The digits 142857 cycle forever. That's 1/7 — repeating, so rational." }},
+  { display:'0.09̄',   decimal:'0.090909090909', catId:'repeating', repeat:'09', answer:'repeating',
+    fb:{ y:"Right! 0.09̄ = 1/11. Repeating block → rational.",
+         n:"The block 09 repeats. 0.09̄ = 1/11 — rational." }},
+
+  // Fractions
+  { display:'3/4',    decimal:'0.75',            catId:'fraction',           answer:'fraction',
+    fb:{ y:"Correct! 3/4 is a fraction of two integers — by definition, rational.",
+         n:"3/4 is a ratio of two integers. That's literally the definition of rational!" }},
+  { display:'5/8',    decimal:'0.625',           catId:'fraction',           answer:'fraction',
+    fb:{ y:"Yes! 5/8 is rational — it's a ratio of two integers.",
+         n:"5/8 is a fraction — a ratio of two integers, so it's rational." }},
+  { display:'2/3',    decimal:'0.6666666666',    catId:'fraction',           answer:'fraction',
+    fb:{ y:"Right! 2/3 is rational. It produces a repeating decimal, but it's still a fraction.",
+         n:"2/3 is rational — it's a fraction of integers, even though it gives a repeating decimal." }},
+  { display:'7/4',    decimal:'1.75',            catId:'fraction',           answer:'fraction',
+    fb:{ y:"Correct! 7/4 is rational — a fraction of two integers.",
+         n:"7/4 is a ratio of integers. Rational!" }},
+
+  // Perfect square roots
+  { display:'√4',     decimal:'2',               catId:'perfect-sqrt',       answer:'perfect-sqrt',
+    fb:{ y:"Correct! √4 = 2 exactly — a whole number, so rational.",
+         n:"√4 = 2. When a square root works out to an integer, it's rational." }},
+  { display:'√9',     decimal:'3',               catId:'perfect-sqrt',       answer:'perfect-sqrt',
+    fb:{ y:"Yes! √9 = 3. Perfect square root = integer = rational.",
+         n:"√9 = 3 exactly. Rational!" }},
+  { display:'√25',    decimal:'5',               catId:'perfect-sqrt',       answer:'perfect-sqrt',
+    fb:{ y:"Right! √25 = 5. Rational.",
+         n:"√25 = 5 — a perfect integer result, so rational." }},
+  { display:'√100',   decimal:'10',              catId:'perfect-sqrt',       answer:'perfect-sqrt',
+    fb:{ y:"Correct! √100 = 10. Rational.",
+         n:"√100 = 10 exactly. Rational." }},
+
+  // Irrational square roots
+  { display:'√2',     decimal:'1.41421356237',   catId:'irrational-sqrt',    answer:'irrational-sqrt',
+    fb:{ y:"Correct! √2 is irrational — its decimal never terminates or repeats.",
+         n:"√2 = 1.41421356... — non-terminating, non-repeating. Irrational." }},
+  { display:'√3',     decimal:'1.73205080757',   catId:'irrational-sqrt',    answer:'irrational-sqrt',
+    fb:{ y:"Yes! √3 is irrational — 3 is not a perfect square.",
+         n:"√3 = 1.73205... No repeating block, no end. Irrational." }},
+  { display:'√5',     decimal:'2.23606797750',   catId:'irrational-sqrt',    answer:'irrational-sqrt',
+    fb:{ y:"Right! √5 is irrational — 5 is not a perfect square.",
+         n:"√5 = 2.23606... Non-terminating, non-repeating. Irrational." }},
+  { display:'√7',     decimal:'2.64575131106',   catId:'irrational-sqrt',    answer:'irrational-sqrt',
+    fb:{ y:"Correct! √7 is irrational.",
+         n:"7 is not a perfect square, so √7 is irrational." }},
+
+  // Irrational decimals (π and pattern)
+  { display:'π',      decimal:'3.14159265358',   catId:'irrational-decimal', answer:'irrational-decimal',
+    fb:{ y:"Yes! π is one of the most famous irrational numbers — non-repeating, non-terminating.",
+         n:"π = 3.14159265... goes on forever with no repeating block. Irrational." }},
+  { display:'2π',     decimal:'6.28318530718',   catId:'irrational-decimal', answer:'irrational-decimal',
+    fb:{ y:"Correct! Rational × irrational = irrational. 2π is irrational.",
+         n:"2π = 6.28318... Multiplying π by a rational number keeps it irrational." }},
+  { display:'0.101001000100001…', decimal:'0.101001000100001', pattern:true, catId:'irrational-decimal', answer:'irrational-decimal',
+    fb:{ y:"Correct! The pattern evolves but never repeats the same block — irrational.",
+         n:"Each group gains an extra zero. The decimal never settles into a repeating block. Irrational." }},
+  { display:'0.313113111…', decimal:'0.313113111311113', pattern:true, catId:'irrational-decimal', answer:'irrational-decimal',
+    fb:{ y:"Yes! The runs of 1s grow each time — no repeating block. Irrational.",
+         n:"The 1s keep multiplying — the pattern grows, never repeats. Irrational." }},
+];
+
+// ── STATE ──
+let score=0, streak=0, total=0;
+let current=null, answered=false;
+let catsDone=new Set(), usedIdx=new Set();
+
+// ── INIT KEY ──
+function buildKey() {
+  const c = document.getElementById('digit-key-items');
+  for (let d=0;d<=9;d++) {
+    const el = document.createElement('div');
+    el.className = 'key-item';
+    el.innerHTML = `<div class="key-swatch" style="background:${DC[d]}"></div>
+                    <div class="key-digit" style="color:${DC[d]}">${d}</div>`;
+    c.appendChild(el);
+  }
+}
+
+// ── INIT CAT GRID ──
+function buildCatGrid() {
+  const g = document.getElementById('cat-grid');
+  g.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const b = document.createElement('div');
+    b.className = 'cat-badge' + (catsDone.has(cat.id) ? ' done' : '');
+    b.id = 'cat-'+cat.id;
+    b.textContent = cat.label;
+    g.appendChild(b);
+  });
+}
+
+// ── RENDER STRIP (single row) ──
+function renderStrip(num, reveal) {
+  const strip = document.getElementById('color-strip');
+  strip.innerHTML = '';
+
+  const raw = num.decimal;
+  const isNeg = raw.startsWith('-');
+  const abs = raw.replace('-','');
+  const dotIdx = abs.indexOf('.');
+
+  // Build digit sequence for display
+  const MAX = 48;
+  let sequence = []; // {char, isDigit}
+
+  if (isNeg) sequence.push({char:'−', isDigit:false, isDot:false});
+
+  if (num.repeat) {
+    const before = dotIdx >= 0 ? abs.slice(0, dotIdx) : abs;
+    const afterGiven = dotIdx >= 0 ? abs.slice(dotIdx+1) : '';
+    // add integer part
+    for (const c of before) sequence.push({char:c, isDigit:true, isDot:false});
+    if (dotIdx >= 0) sequence.push({char:'.', isDigit:false, isDot:true});
+    // fill with repeating block
+    let block = num.repeat;
+    let s = afterGiven;
+    while (s.replace(/[^0-9]/g,'').length < MAX) s += block;
+    for (const c of s) {
+      if (sequence.filter(x=>x.isDigit).length >= MAX) break;
+      sequence.push({char:c, isDigit:true, isDot:false});
+    }
+  } else {
+    for (const c of abs) {
+      if (c === '.') { sequence.push({char:'.', isDigit:false, isDot:true}); continue; }
+      sequence.push({char:c, isDigit:true, isDot:false});
+    }
+  }
+
+  const needsEllipsis = num.repeat || num.pattern || (sequence.filter(x=>x.isDigit).length >= MAX);
+  const trimmed = [];
+  let dCount = 0;
+  for (const s of sequence) {
+    if (s.isDigit) { if (dCount >= MAX) break; dCount++; }
+    trimmed.push(s);
+  }
+
+  trimmed.forEach((s, i) => {
+    if (s.isDot) {
+      const el = document.createElement('div');
+      el.className = 'dot-cell'; el.textContent = '.';
+      strip.appendChild(el); return;
+    }
+    if (!s.isDigit) {
+      const el = document.createElement('div');
+      el.className = 'dot-cell'; el.textContent = s.char;
+      strip.appendChild(el); return;
+    }
+    const d = parseInt(s.char);
+    const cell = document.createElement('div');
+    cell.className = 'color-cell' + (reveal ? ' visible revealed' : '');
+    cell.style.background = DC[d];
+    const lbl = document.createElement('div');
+    lbl.className = 'digit-label'; lbl.textContent = s.char;
+    cell.appendChild(lbl);
+    if (!reveal) {
+      const delay = dCount > 0 ? (i * 16) : 0;
+      setTimeout(() => cell.classList.add('visible'), delay);
+    }
+    strip.appendChild(cell);
+  });
+
+  if (needsEllipsis) {
+    const el = document.createElement('div');
+    el.className = 'ellipsis-cell'; el.textContent = '…';
+    strip.appendChild(el);
+  }
+}
+
+function revealDigits() {
+  document.querySelectorAll('.color-cell').forEach(c => c.classList.add('revealed'));
+}
+
+// ── PICK NUMBER ──
+function nextNumber() {
+  answered = false;
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-btn').className = 'next-btn';
+  document.getElementById('drag-hint').style.display = '';
+
+  // reset zones
+  document.querySelectorAll('.drop-zone').forEach(z => {
+    z.className = z.className.replace(/ correct-flash| wrong-flash/g,'');
+    const placed = z.querySelector('.placed-token');
+    if (placed) placed.remove();
+  });
+
+  // reset token
+  const token = document.getElementById('drag-token');
+  token.className = 'drag-token';
+
+  let pool = BANK.map((_,i)=>i).filter(i=>!usedIdx.has(i));
+  if (!pool.length) { usedIdx.clear(); pool = BANK.map((_,i)=>i); }
+
+  const incompleteCats = CATEGORIES.filter(c=>!catsDone.has(c.id)).map(c=>c.id);
+  const preferred = pool.filter(i=>incompleteCats.includes(BANK[i].catId));
+  const finalPool = preferred.length ? preferred : pool;
+
+  const idx = finalPool[Math.floor(Math.random()*finalPool.length)];
+  usedIdx.add(idx);
+  current = BANK[idx];
+
+  document.getElementById('number-display').textContent = current.display;
+  document.getElementById('drag-token-label').textContent = current.display;
+  renderStrip(current, false);
+}
+
+// ── CLASSIFY ──
+function classify(zoneEl) {
+  if (answered) return;
+  answered = true;
+  total++;
+  document.getElementById('total-display').textContent = total;
+  document.getElementById('drag-hint').style.display = 'none';
+
+  const chosen = zoneEl.dataset.answer;
+  const correct = chosen === current.answer;
+
+  // place token in zone
+  const token = document.getElementById('drag-token');
+  token.classList.add('placed');
+
+  let targetZone = zoneEl;
+  if (!correct) {
+    targetZone = document.getElementById('zone-' + current.answer);
+  }
+
+  const placed = document.createElement('div');
+  placed.className = 'placed-token';
+  placed.textContent = current.display;
+  targetZone.appendChild(placed);
+
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    score++;
+    streak++;
+    document.getElementById('score-display').textContent = score;
+    const sEl = document.getElementById('streak-display');
+    sEl.textContent = streak;
+    sEl.classList.remove('streak-pop');
+    void sEl.offsetWidth;
+    sEl.classList.add('streak-pop');
+    fb.className = 'feedback correct';
+    fb.innerHTML = `<strong>✓ Correct!${streak>=3?' '+'🔥'.repeat(Math.min(streak,5)):''}</strong>${current.fb.y}`;
+    zoneEl.classList.add('correct-flash');
+
+    if (!catsDone.has(current.catId)) {
+      catsDone.add(current.catId);
+      const badge = document.getElementById('cat-'+current.catId);
+      if (badge) badge.className = 'cat-badge done';
+      if (catsDone.size === CATEGORIES.length) {
+        setTimeout(()=>{
+          document.getElementById('overlay').className='overlay show';
+          document.getElementById('celebration').className='celebration show';
+        }, 900);
+      }
+    }
+  } else {
+    streak = 0;
+    document.getElementById('streak-display').textContent = 0;
+    fb.className = 'feedback incorrect';
+    fb.innerHTML = `<strong>✗ Not quite.</strong>${current.fb.n}`;
+    zoneEl.classList.add('wrong-flash');
+    targetZone.classList.add('correct-flash');
+  }
+
+  setTimeout(revealDigits, 350);
+  document.getElementById('next-btn').className = 'next-btn show';
+}
+
+// ── DRAG & DROP ──
+function initDragDrop() {
+  const token = document.getElementById('drag-token');
+
+  token.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain','token');
+    token.classList.add('dragging');
+  });
+  token.addEventListener('dragend', () => token.classList.remove('dragging'));
+
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (!answered) zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (!answered && e.dataTransfer.getData('text/plain')==='token') {
+        classify(zone);
+      }
+    });
+    // click fallback
+    zone.addEventListener('click', () => { if (!answered) classify(zone); });
+  });
+
+  // Touch drag (mobile)
+  let touchZone = null;
+  let startX, startY, clone;
+
+  token.addEventListener('touchstart', e => {
+    if (answered) return;
+    const t = e.touches[0];
+    startX = t.clientX; startY = t.clientY;
+    clone = token.cloneNode(true);
+    clone.style.cssText = `position:fixed;top:${startY-20}px;left:${startX-40}px;z-index:200;opacity:0.85;pointer-events:none;transition:none;`;
+    document.body.appendChild(clone);
+    token.classList.add('dragging');
+  }, {passive:true});
+
+  token.addEventListener('touchmove', e => {
+    if (!clone) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    clone.style.top = (t.clientY - 20) + 'px';
+    clone.style.left = (t.clientX - 40) + 'px';
+    // highlight zone under finger
+    clone.style.display = 'none';
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    clone.style.display = '';
+    document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over'));
+    const zone = el && el.closest('.drop-zone');
+    if (zone && !answered) zone.classList.add('drag-over');
+    touchZone = zone || null;
+  }, {passive:false});
+
+  token.addEventListener('touchend', () => {
+    if (clone) { clone.remove(); clone = null; }
+    token.classList.remove('dragging');
+    document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over'));
+    if (touchZone && !answered) classify(touchZone);
+    touchZone = null;
+  });
+}
+
+// ── CELEBRATION ──
+function closeCelebration() {
+  document.getElementById('overlay').className='overlay';
+  document.getElementById('celebration').className='celebration';
+  nextNumber();
+}
+
+// ── START ──
+buildKey();
+buildCatGrid();
+initDragDrop();
+nextNumber();
+</script>
+</body>
+</html>
