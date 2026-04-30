@@ -17,8 +17,11 @@
   --green: #2ecc8e;
   --red: #ff5577;
   --gold: #ffd700;
+  --rational-bg: #071a14;
+  --rational-glow: #2ecc8e;
+  --irrational-bg: #1a0710;
+  --irrational-glow: #f72585;
 
-  /* digit colors — rainbow order ROYGBIV, each fully distinct */
   --d0:#aaaaaa; --d1:#ff3b3b; --d2:#ff8c00; --d3:#ffe600;
   --d4:#7ed321; --d5:#22c55e; --d6:#06c9c9; --d7:#3b82f6;
   --d8:#a855f7; --d9:#f72585;
@@ -40,27 +43,23 @@ header {
 .logo { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
 .logo span { color: var(--accent); }
 
-/* ── BODY LAYOUT: tile area + gallery + sidebar ── */
-.body-row {
-  flex: 1; display: flex; overflow: hidden;
-}
+/* ── BODY ROW ── */
+.body-row { flex: 1; display: flex; overflow: hidden; }
 
-/* ── CENTER COLUMN ── */
-.center-col {
-  flex: 1; display: flex; flex-direction: column; overflow: hidden;
-}
+/* ── CENTER ── */
+.center-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
 /* ── TILE PANEL ── */
 .tile-panel {
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  padding: 14px 20px 10px;
+  padding: 12px 20px 10px;
   background: var(--surface);
   border-bottom: 2px solid var(--border);
 }
 .drag-tile {
   display: inline-flex; flex-direction: column; align-items: center;
-  gap: 8px; padding: 14px 22px;
+  gap: 8px; padding: 14px 24px;
   background: var(--surface2); border: 2px solid var(--border); border-radius: 14px;
   cursor: grab; user-select: none; touch-action: none;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
@@ -68,77 +67,149 @@ header {
 .drag-tile:hover { border-color: var(--accent); box-shadow: 0 0 28px rgba(108,99,255,0.3); }
 .drag-tile.dragging { opacity: 0.3; transform: scale(0.9); cursor: grabbing; }
 .drag-tile.gone { visibility: hidden; }
-.tile-number {
-  font-family: 'Space Mono', monospace;
-  font-size: 2.6rem; font-weight: 700; color: var(--text); line-height: 1; white-space: nowrap;
-}
-.tile-hint { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
-.tile-strip { display: flex; flex-wrap: nowrap; align-items: center; gap: 2px; }
+.tile-number { font-family:'Space Mono',monospace; font-size:2.6rem; font-weight:700; color:var(--text); line-height:1; white-space:nowrap; }
+.tile-hint { font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--dim); }
+.tile-strip { display:flex; flex-wrap:nowrap; align-items:center; gap:2px; }
 .tc {
-  width: 26px; height: 26px; border-radius: 4px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Mono', monospace; font-size: 0.65rem; font-weight: 700;
-  color: rgba(0,0,0,0.75);
-  opacity: 0; transform: scale(0.5); transition: opacity 0.12s, transform 0.12s;
+  width:26px; height:26px; border-radius:4px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Space Mono',monospace; font-size:0.65rem; font-weight:700;
+  color:rgba(0,0,0,0.75);
+  opacity:0; transform:scale(0.5); transition:opacity 0.12s, transform 0.12s;
 }
-.tc.vis { opacity: 1; transform: scale(1); }
-/* text contrast overrides for light digit colors */
-.tc.d0 { color: rgba(0,0,0,0.5); }
-.tc.d3 { color: rgba(0,0,0,0.6); }
-.tc.d4 { color: rgba(0,0,0,0.6); }
-.hcell.d0 { color: rgba(0,0,0,0.5); }
-.hcell.d3 { color: rgba(0,0,0,0.6); }
-.hcell.d4 { color: rgba(0,0,0,0.6); }
+.tc.vis { opacity:1; transform:scale(1); }
+.tc.d0,.hcell.d0 { color:rgba(0,0,0,0.45); }
+.tc.d3,.hcell.d3 { color:rgba(0,0,0,0.6); }
+.tc.d4,.hcell.d4 { color:rgba(0,0,0,0.6); }
 .tdot { font-family:'Space Mono',monospace; font-size:0.95rem; color:var(--dim); flex-shrink:0; line-height:26px; padding:0 1px; }
 .tell { font-size:0.95rem; color:var(--dim); padding-left:3px; flex-shrink:0; }
 
-/* ── GALLERY ── */
+/* ══════════════════════════════════════
+   TWO-ZONE GALLERY
+══════════════════════════════════════ */
 .gallery {
-  flex: 1; display: flex;
-  overflow-x: auto; overflow-y: hidden; background: var(--bg);
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
 }
+
+/* ── PARENT ZONE (Rational / Irrational) ── */
+.parent-zone {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: flex 0.4s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+
+.parent-zone.rational {
+  flex: 1;
+  background: var(--rational-bg);
+  border-right: 3px solid var(--border);
+}
+.parent-zone.irrational {
+  flex: 1;
+  background: var(--irrational-bg);
+}
+
+/* When a parent is bloomed open vs collapsed */
+.parent-zone.expanded { flex: 3; }
+.parent-zone.collapsed { flex: 0.6; }
+
+/* ── PARENT LABEL (shown when collapsed / as header) ── */
+.parent-label {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  z-index: 2;
+  gap: 8px;
+}
+.parent-zone.expanded .parent-label { opacity: 0; }
+.parent-zone.collapsed .parent-label { opacity: 1; }
+/* also show when not yet hovered during drag */
+.parent-zone:not(.expanded):not(.collapsed) .parent-label { opacity: 1; }
+
+.parent-label-text {
+  font-size: 1.4rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.rational .parent-label-text { color: var(--rational-glow); }
+.irrational .parent-label-text { color: var(--irrational-glow); }
+
+.parent-label-hint {
+  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim);
+}
+
+/* glow border when dragging over parent */
+.parent-zone.drag-hover-rational {
+  box-shadow: inset 0 0 40px rgba(46,204,142,0.12);
+  border-color: rgba(46,204,142,0.4) !important;
+}
+.parent-zone.drag-hover-irrational {
+  box-shadow: inset 0 0 40px rgba(247,37,133,0.12);
+}
+
+/* ── SUBCATEGORY ROW (inside expanded parent) ── */
+.sub-row {
+  display: flex;
+  flex: 1;
+  opacity: 0;
+  transition: opacity 0.3s 0.15s;
+  overflow: hidden;
+}
+.parent-zone.expanded .sub-row { opacity: 1; }
+
+/* ── ZONE COLUMN (subcategory) ── */
 .zone-col {
-  flex: 1; min-width: 95px;
+  flex: 1; min-width: 80px;
   display: flex; flex-direction: column;
   border-right: 1px solid var(--border);
   cursor: pointer; transition: background 0.18s; overflow: hidden;
 }
 .zone-col:last-child { border-right: none; }
-.zone-col.drag-over { background: rgba(108,99,255,0.08); }
-@keyframes zFlashG { 0%,100%{background:transparent} 50%{background:rgba(46,204,142,0.14)} }
-@keyframes zFlashR { 0%,100%{background:transparent} 50%{background:rgba(255,85,119,0.14)} }
+.rational .zone-col { border-color: rgba(46,204,142,0.15); }
+.irrational .zone-col { border-color: rgba(247,37,133,0.15); }
+
+.zone-col.drag-over { background: rgba(255,255,255,0.06); }
+@keyframes zFlashG { 0%,100%{background:transparent} 50%{background:rgba(46,204,142,0.18)} }
+@keyframes zFlashR { 0%,100%{background:transparent} 50%{background:rgba(255,85,119,0.18)} }
 .zone-col.correct-flash { animation: zFlashG 0.5s ease; }
 .zone-col.wrong-flash   { animation: zFlashR 0.5s ease; }
 
 .zone-header {
-  flex-shrink: 0; text-align: center; padding: 6px 4px 4px;
-  border-bottom: 2px solid var(--border); background: var(--surface);
+  flex-shrink:0; text-align:center; padding:6px 4px 4px;
+  border-bottom:2px solid var(--border); background:rgba(0,0,0,0.25);
 }
-.zone-super { font-size: 0.46rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 3px; }
-.zone-name { font-size: 0.6rem; font-weight: 700; line-height: 1.25; white-space: pre-line; }
-.zone-math { font-family:'Space Mono',monospace; font-size:0.95rem; line-height:1.1; }
+.rational .zone-header { border-color: rgba(46,204,142,0.2); }
+.irrational .zone-header { border-color: rgba(247,37,133,0.2); }
+
+.zone-name { font-size:0.6rem; font-weight:700; line-height:1.25; white-space:pre-line; }
+.zone-math { font-family:'Space Mono',monospace; font-size:0.92rem; line-height:1.1; }
 .zone-math .rad { display:inline-block; border-top:2px solid currentColor; padding:0 2px; margin-left:1px; }
-.zone-math-sub { font-size:0.55rem; color:var(--dim); margin-top:2px; line-height:1.2; }
+.zone-math-sub { font-size:0.54rem; color:var(--dim); margin-top:2px; line-height:1.2; }
 
 .mastery-pips { display:flex; align-items:center; justify-content:center; gap:3px; margin-top:4px; min-height:14px; }
 .pip { width:6px; height:6px; border-radius:50%; border:1.5px solid var(--border); background:transparent; transition:all 0.3s; }
 .crown { display:none; font-size:0.85rem; }
-.crown.show { display:inline; animation: crownPop 0.65s cubic-bezier(0.34,1.56,0.64,1); }
+.crown.show { display:inline; animation:crownPop 0.65s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes crownPop {
   0%{transform:scale(0) rotate(-25deg);opacity:0}
   65%{transform:scale(1.4) rotate(6deg);opacity:1}
   100%{transform:scale(1) rotate(0);opacity:1}
 }
 
+/* ── HANGING CHAINS ── */
 .chain-area {
   flex:1; display:flex; flex-direction:row; align-items:flex-start;
   padding:6px 4px; gap:5px; overflow-x:auto; overflow-y:hidden;
 }
-.chain-empty { font-size:0.54rem; color:var(--border); text-align:center; padding:14px 4px; pointer-events:none; letter-spacing:0.04em; width:100%; }
-
+.chain-empty { font-size:0.52rem; color:var(--border); text-align:center; padding:14px 4px; pointer-events:none; letter-spacing:0.04em; width:100%; }
 .hang-item {
   display:flex; flex-direction:column; align-items:center; gap:1px; flex-shrink:0;
-  animation: hangDrop 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  animation:hangDrop 0.4s cubic-bezier(0.34,1.2,0.64,1);
 }
 @keyframes hangDrop { 0%{transform:translateY(-16px);opacity:0} 100%{transform:translateY(0);opacity:1} }
 .hang-label { font-family:'Space Mono',monospace; font-size:0.46rem; color:var(--dim); white-space:nowrap; text-align:center; max-width:58px; overflow:hidden; text-overflow:ellipsis; }
@@ -150,76 +221,63 @@ header {
 
 /* ── RIGHT SIDEBAR ── */
 .sidebar {
-  width: 130px; flex-shrink: 0;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  overflow-y: auto; overflow-x: hidden;
-  padding: 12px 10px;
-  gap: 14px;
+  width:130px; flex-shrink:0;
+  background:var(--surface); border-left:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow-y:auto; overflow-x:hidden;
+  padding:12px 10px; gap:14px;
 }
-
-.sb-section { display: flex; flex-direction: column; gap: 5px; }
-.sb-title {
-  font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--dim); border-bottom: 1px solid var(--border); padding-bottom: 4px;
-}
-
-.sb-stat { text-align: center; }
-.sb-val {
-  font-family: 'Space Mono', monospace; font-size: 1.6rem; font-weight: 700;
-  color: var(--accent); line-height: 1; display: block;
-}
-.sb-val.streak-val { color: var(--gold); }
-.sb-val.shake { animation: streakShake 0.5s ease; color: var(--red) !important; }
+.sb-section { display:flex; flex-direction:column; gap:5px; }
+.sb-title { font-size:0.5rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); border-bottom:1px solid var(--border); padding-bottom:4px; }
+.sb-stat { text-align:center; }
+.sb-val { font-family:'Space Mono',monospace; font-size:1.5rem; font-weight:700; color:var(--accent); line-height:1; display:block; }
+.sb-val.streak-val { color:var(--gold); }
+.sb-val.clean-val { color:#06c9c9; }
+.sb-val.shake { animation:streakShake 0.5s ease; color:var(--red) !important; }
 @keyframes streakShake {
   0%,100%{transform:translateX(0)} 15%{transform:translateX(-5px)} 30%{transform:translateX(5px)}
   45%{transform:translateX(-3px)} 60%{transform:translateX(3px)} 80%{transform:translateX(-2px)}
 }
-.sb-label { font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.sb-label { font-size:0.5rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--dim); }
 
-.badge-list { display: flex; flex-direction: column; gap: 5px; }
+.badge-list { display:flex; flex-direction:column; gap:5px; }
 .badge {
-  display: flex; align-items: center; gap: 5px;
-  padding: 5px 7px; border-radius: 7px;
-  background: var(--surface2); border: 1px solid var(--border);
-  opacity: 0; transform: scale(0.85);
-  transition: opacity 0.3s, transform 0.3s;
+  display:flex; align-items:center; gap:5px;
+  padding:5px 7px; border-radius:7px;
+  background:var(--surface2); border:1px solid var(--border);
+  opacity:0; transform:scale(0.85);
+  transition:opacity 0.3s, transform 0.3s;
 }
-.badge.earned { opacity: 1; transform: scale(1); }
-.badge-icon { font-size: 0.95rem; flex-shrink: 0; }
-.badge-text { font-size: 0.55rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+.badge.earned { opacity:1; transform:scale(1); }
+.badge-icon { font-size:0.95rem; flex-shrink:0; }
+.badge-text { font-size:0.54rem; font-weight:700; color:var(--text); line-height:1.25; }
 
 /* ── FEEDBACK POPUP ── */
 .popup-overlay {
-  position: fixed; inset: 0; z-index: 50;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.45);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.2s;
+  position:fixed; inset:0; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.45);
+  opacity:0; pointer-events:none; transition:opacity 0.2s;
 }
-.popup-overlay.show { opacity: 1; pointer-events: all; }
-
+.popup-overlay.show { opacity:1; pointer-events:all; }
 .popup {
-  background: var(--surface);
-  border-radius: 18px; padding: 28px 36px;
-  text-align: center; max-width: 340px; width: 90%;
-  transform: scale(0.85); transition: transform 0.25s cubic-bezier(0.34,1.3,0.64,1);
-  border: 2px solid var(--border);
-  box-shadow: 0 8px 60px rgba(0,0,0,0.5);
+  background:var(--surface); border-radius:18px; padding:28px 36px;
+  text-align:center; max-width:340px; width:90%;
+  transform:scale(0.85); transition:transform 0.25s cubic-bezier(0.34,1.3,0.64,1);
+  border:2px solid var(--border);
+  box-shadow:0 8px 60px rgba(0,0,0,0.5);
 }
-.popup-overlay.show .popup { transform: scale(1); }
-
-.popup-icon { font-size: 3.2rem; line-height: 1; margin-bottom: 8px; display: block; }
-.popup-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
-.popup-body { font-size: 0.82rem; line-height: 1.55; color: var(--dim); }
-
-.popup.correct-popup { border-color: var(--green); }
-.popup.correct-popup .popup-title { color: var(--green); }
-.popup.wrong-popup { border-color: var(--red); }
-.popup.wrong-popup .popup-title { color: var(--red); }
-
-.popup-dismiss { font-size: 0.62rem; color: var(--dim); margin-top: 14px; letter-spacing: 0.06em; }
+.popup-overlay.show .popup { transform:scale(1); }
+.popup-icon { font-size:3.2rem; line-height:1; margin-bottom:8px; display:block; }
+.popup-title { font-size:1.3rem; font-weight:800; margin-bottom:8px; }
+.popup-body { font-size:0.82rem; line-height:1.55; color:var(--dim); }
+.popup.correct-popup { border-color:var(--green); }
+.popup.correct-popup .popup-title { color:var(--green); }
+.popup.wrong-popup { border-color:var(--red); }
+.popup.wrong-popup .popup-title { color:var(--red); }
+.popup-bonus { font-size:0.75rem; color:#06c9c9; font-weight:700; margin-top:8px; display:none; }
+.popup-bonus.show { display:block; }
+.popup-dismiss { font-size:0.62rem; color:var(--dim); margin-top:14px; letter-spacing:0.06em; }
 
 /* ── ALL MASTERED MODAL ── */
 .overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;display:none; }
@@ -230,14 +288,14 @@ header {
   padding:32px 44px;text-align:center;z-index:100;display:none;
   box-shadow:0 0 80px rgba(108,99,255,0.35);
 }
-.modal.show { display:block; animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+.modal.show { display:block; animation:popIn 0.45s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes popIn {
   from{opacity:0;transform:translate(-50%,-50%) scale(0.6)}
   to{opacity:1;transform:translate(-50%,-50%) scale(1)}
 }
 .modal h2 { font-size:1.8rem;color:var(--gold);margin-bottom:8px; }
 .modal p { color:var(--dim);font-size:0.87rem;margin-bottom:20px;line-height:1.5; }
-.modal-btn { padding:10px 26px;border-radius:8px;border:none;background:var(--accent);color:white; font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer; }
+.modal-btn { padding:10px 26px;border-radius:8px;border:none;background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer; }
 .modal-btn:hover { background:#8b83ff; }
 
 ::-webkit-scrollbar { width:3px; height:3px; }
@@ -246,42 +304,59 @@ header {
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="logo">Number <span>Classifier</span></div>
 </header>
 
-<!-- MAIN BODY -->
 <div class="body-row">
-
-  <!-- CENTER -->
   <div class="center-col">
 
-    <!-- BIG DRAG TILE -->
+    <!-- TILE PANEL -->
     <div class="tile-panel">
       <div class="drag-tile" id="drag-tile" draggable="true">
-        <div class="tile-hint">Drag to the correct category ↓</div>
+        <div class="tile-hint">Drag to Rational or Irrational ↓</div>
         <div class="tile-number" id="tile-number">—</div>
         <div class="tile-strip" id="tile-strip"></div>
       </div>
     </div>
 
-    <!-- GALLERY -->
-    <div class="gallery" id="gallery"></div>
+    <!-- TWO-ZONE GALLERY -->
+    <div class="gallery" id="gallery">
 
+      <!-- RATIONAL PARENT -->
+      <div class="parent-zone rational" id="parent-rational">
+        <div class="parent-label">
+          <div class="parent-label-text">Rational</div>
+          <div class="parent-label-hint">hover to reveal subcategories</div>
+        </div>
+        <div class="sub-row" id="sub-rational">
+          <!-- zone cols injected by JS -->
+        </div>
+      </div>
+
+      <!-- IRRATIONAL PARENT -->
+      <div class="parent-zone irrational" id="parent-irrational">
+        <div class="parent-label">
+          <div class="parent-label-text">Irrational</div>
+          <div class="parent-label-hint">hover to reveal subcategories</div>
+        </div>
+        <div class="sub-row" id="sub-irrational">
+          <!-- zone cols injected by JS -->
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <!-- RIGHT SIDEBAR -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
-
     <div class="sb-section">
-      <div class="sb-title">Current Streak</div>
+      <div class="sb-title">Streak</div>
       <div class="sb-stat">
         <span class="sb-val streak-val" id="s-streak">0</span>
         <span class="sb-label">🔥 in a row</span>
       </div>
     </div>
-
     <div class="sb-section">
       <div class="sb-title">Best Streak</div>
       <div class="sb-stat">
@@ -289,15 +364,13 @@ header {
         <span class="sb-label">longest</span>
       </div>
     </div>
-
     <div class="sb-section">
-      <div class="sb-title">Total Played</div>
+      <div class="sb-title">Clean Drops</div>
       <div class="sb-stat">
-        <span class="sb-val" id="s-total">0</span>
-        <span class="sb-label">problems</span>
+        <span class="sb-val clean-val" id="s-clean">0</span>
+        <span class="sb-label">💎 straight in</span>
       </div>
     </div>
-
     <div class="sb-section">
       <div class="sb-title">Points</div>
       <div class="sb-stat">
@@ -305,26 +378,32 @@ header {
         <span class="sb-label">correct</span>
       </div>
     </div>
-
+    <div class="sb-section">
+      <div class="sb-title">Played</div>
+      <div class="sb-stat">
+        <span class="sb-val" id="s-total">0</span>
+        <span class="sb-label">problems</span>
+      </div>
+    </div>
     <div class="sb-section">
       <div class="sb-title">Badges</div>
       <div class="badge-list" id="badge-list"></div>
     </div>
-
   </div>
 </div>
 
-<!-- FEEDBACK POPUP -->
+<!-- POPUP -->
 <div class="popup-overlay" id="popup-overlay" onclick="dismissPopup()">
   <div class="popup" id="popup">
     <span class="popup-icon" id="popup-icon">✓</span>
     <div class="popup-title" id="popup-title">Correct!</div>
     <div class="popup-body" id="popup-body"></div>
+    <div class="popup-bonus" id="popup-bonus">💎 Clean Drop! +1 bonus</div>
     <div class="popup-dismiss">tap anywhere to continue</div>
   </div>
 </div>
 
-<!-- ALL MASTERED MODAL -->
+<!-- MODAL -->
 <div class="overlay" id="overlay" onclick="closeCelebration()"></div>
 <div class="modal" id="modal">
   <h2>👑 All Mastered!</h2>
@@ -333,27 +412,36 @@ header {
 </div>
 
 <script>
-const DC = ['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
+const DC=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
+
+// Which parent does each zone belong to?
+const ZONE_PARENT = {
+  'whole':'rational','frac-term':'rational','frac-rep':'rational',
+  'irr-sqrt':'irrational','irr-dec':'irrational'
+};
 
 const ZONES = [
-  { id:'whole',     superLabel:'Rational',   color:'#3d9fd6', math:null,   name:'Integer or\nWhole Number',       sub:'includes √perfect squares' },
-  { id:'frac-term', superLabel:'Rational',   color:'#2ecc8e', math:null,   name:'Fraction:\nTerminating Decimal', sub:null },
-  { id:'frac-rep',  superLabel:'Rational',   color:'#7c6af7', math:null,   name:'Fraction:\nRepeating Decimal',   sub:null },
-  { id:'irr-sqrt',  superLabel:'Irrational', color:'#ff9f43', math:'sqrt', name:'non-perfect square',             sub:null },
-  { id:'irr-dec',   superLabel:'Irrational', color:'#f76a8a', math:null,   name:'Non-Repeating\nNon-Terminating', sub:null },
+  // rational subcategories
+  { id:'whole',     parent:'rational',   color:'#3d9fd6', math:null,   name:'Integer or\nWhole Number',       sub:'includes √perfect squares' },
+  { id:'frac-term', parent:'rational',   color:'#2ecc8e', math:null,   name:'Fraction:\nTerminating Decimal', sub:null },
+  { id:'frac-rep',  parent:'rational',   color:'#7c6af7', math:null,   name:'Fraction:\nRepeating Decimal',   sub:null },
+  // irrational subcategories
+  { id:'irr-sqrt',  parent:'irrational', color:'#ff9f43', math:'sqrt', name:'non-perfect square',             sub:null },
+  { id:'irr-dec',   parent:'irrational', color:'#f76a8a', math:null,   name:'Non-Repeating\nNon-Terminating', sub:null },
 ];
 
-// Badges: { id, icon, label, check(state) }
 const BADGE_DEFS = [
-  { id:'first',       icon:'⭐', label:'First Answer',     check:s=>s.total>=1 },
-  { id:'streak3',     icon:'🔥', label:'Streak Starter',   check:s=>s.streak>=3 },
-  { id:'streak5',     icon:'💥', label:'On Fire!',         check:s=>s.streak>=5 },
-  { id:'streak10',    icon:'🚀', label:'Unstoppable',      check:s=>s.streak>=10 },
-  { id:'frac-whiz',   icon:'🍕', label:'Fraction Whiz',    check:s=>s.masteryDone.has('frac-term')&&s.masteryDone.has('frac-rep') },
-  { id:'root-hunter', icon:'🌿', label:'Root Hunter',      check:s=>s.masteryDone.has('irr-sqrt') },
-  { id:'pi-curious',  icon:'π',  label:'Pi Curious',       check:s=>s.masteryDone.has('irr-dec') },
-  { id:'whole-deal',  icon:'💎', label:'The Whole Deal',   check:s=>s.masteryDone.has('whole') },
-  { id:'all-zones',   icon:'👑', label:'Number Master',    check:s=>s.masteryDone.size>=ZONES.length },
+  { id:'first',       icon:'⭐', label:'First Answer',      check:s=>s.total>=1 },
+  { id:'streak3',     icon:'🔥', label:'Streak Starter',    check:s=>s.streak>=3 },
+  { id:'streak5',     icon:'💥', label:'On Fire!',          check:s=>s.streak>=5 },
+  { id:'streak10',    icon:'🚀', label:'Unstoppable',       check:s=>s.streak>=10 },
+  { id:'clean3',      icon:'💎', label:'Precision Thinker', check:s=>s.cleanStreak>=3 },
+  { id:'clean5',      icon:'🎯', label:'Laser Focus',       check:s=>s.cleanStreak>=5 },
+  { id:'frac-whiz',   icon:'🍕', label:'Fraction Whiz',     check:s=>s.masteryDone.has('frac-term')&&s.masteryDone.has('frac-rep') },
+  { id:'root-hunter', icon:'🌿', label:'Root Hunter',       check:s=>s.masteryDone.has('irr-sqrt') },
+  { id:'pi-curious',  icon:'π',  label:'Pi Curious',        check:s=>s.masteryDone.has('irr-dec') },
+  { id:'whole-deal',  icon:'💎', label:'The Whole Deal',    check:s=>s.masteryDone.has('whole') },
+  { id:'all-zones',   icon:'👑', label:'Number Master',     check:s=>s.masteryDone.size>=ZONES.length },
 ];
 
 const BANK = [
@@ -367,20 +455,20 @@ const BANK = [
   { display:'√100', dec:'10',  cat:'whole', answer:'whole', fb:{y:"√100 = 10 — whole number, rational.",n:"√100 = 10 exactly. Rational."}},
   { display:'√36',  dec:'6',   cat:'whole', answer:'whole', fb:{y:"√36 = 6 — whole number, rational.",n:"√36 = 6. A perfect square root — rational."}},
 
-  // frac-term (fraction notation)
+  // frac-term fraction notation
   { display:'1/2',  dec:'0.5',    cat:'frac-term', answer:'frac-term', fb:{y:"1/2 = 0.5 — terminates after one decimal place.",n:"1/2 = 0.5. It ends — terminating decimal."}},
   { display:'3/4',  dec:'0.75',   cat:'frac-term', answer:'frac-term', fb:{y:"3/4 = 0.75 — terminates at hundredths.",n:"3/4 = 0.75. Ends cleanly — terminating decimal."}},
   { display:'5/8',  dec:'0.625',  cat:'frac-term', answer:'frac-term', fb:{y:"5/8 = 0.625 — terminates at thousandths.",n:"5/8 = 0.625. Three places, then done — terminating."}},
   { display:'7/4',  dec:'1.75',   cat:'frac-term', answer:'frac-term', fb:{y:"7/4 = 1.75 — terminates.",n:"7/4 = 1.75. Ends at hundredths — terminating decimal."}},
   { display:'1/25', dec:'0.04',   cat:'frac-term', answer:'frac-term', fb:{y:"1/25 = 0.04 — terminates.",n:"1/25 = 0.04. Ends cleanly — terminating."}},
   { display:'9/16', dec:'0.5625', cat:'frac-term', answer:'frac-term', fb:{y:"9/16 = 0.5625 — terminates at ten-thousandths.",n:"9/16 = 0.5625. Four places, then done — terminating."}},
-  // frac-term (bare decimal)
-  { display:'0.5',   dec:'0.5',   cat:'frac-term', answer:'frac-term', fb:{y:"0.5 terminates — equals 1/2. Terminating decimals are rational.",n:"0.5 ends after one decimal place. Terminating = rational."}},
+  // frac-term bare decimal
+  { display:'0.5',   dec:'0.5',   cat:'frac-term', answer:'frac-term', fb:{y:"0.5 terminates — equals 1/2. Terminating = rational.",n:"0.5 ends after one decimal place. Terminating = rational."}},
   { display:'0.75',  dec:'0.75',  cat:'frac-term', answer:'frac-term', fb:{y:"0.75 terminates — equals 3/4.",n:"0.75 ends at hundredths. It's 3/4 — terminating decimal."}},
   { display:'0.625', dec:'0.625', cat:'frac-term', answer:'frac-term', fb:{y:"0.625 terminates — equals 5/8.",n:"0.625 ends at thousandths. It's 5/8 — terminating."}},
   { display:'3.125', dec:'3.125', cat:'frac-term', answer:'frac-term', fb:{y:"3.125 terminates — equals 25/8.",n:"3.125 ends at thousandths. It's 25/8 — terminating decimal."}},
 
-  // frac-rep (fraction notation)
+  // frac-rep fraction notation
   { display:'1/3',  dec:'0.3333333333',   repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"1/3 = 0.3̄ — the 3 repeats forever. Repeating decimal.",n:"1/3 = 0.333... The digit 3 repeats without end — repeating decimal."}},
   { display:'2/3',  dec:'0.6666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"2/3 = 0.6̄ — repeating decimal.",n:"2/3 = 0.666... The 6 repeats — repeating decimal."}},
   { display:'1/6',  dec:'0.1666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"1/6 = 0.16̄ — the 6 repeats.",n:"1/6 = 0.1666... The 6 repeats — repeating decimal."}},
@@ -388,11 +476,11 @@ const BANK = [
   { display:'1/9',  dec:'0.1111111111',   repeat:'1',      cat:'frac-rep', answer:'frac-rep', fb:{y:"1/9 = 0.1̄ — the 1 repeats forever.",n:"1/9 = 0.111... The digit 1 repeats — repeating decimal."}},
   { display:'1/11', dec:'0.090909090909', repeat:'09',     cat:'frac-rep', answer:'frac-rep', fb:{y:"1/11 = 0.09̄ — block 09 repeats.",n:"1/11 = 0.0909... Block 09 repeats — repeating decimal."}},
   { display:'5/6',  dec:'0.833333',       repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"5/6 = 0.83̄ — the 3 repeats.",n:"5/6 = 0.8333... The 3 repeats — repeating decimal."}},
-  // frac-rep (bare decimal)
-  { display:'0.3̄',       dec:'0.3333333333',   repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"0.3̄ repeats forever — equals 1/3. Repeating decimal.",n:"0.333... The 3 repeats without end — this is 1/3."}},
-  { display:'0.6̄',       dec:'0.6666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... The 6 repeats. This is 2/3 — repeating decimal."}},
-  { display:'0.09̄',      dec:'0.090909090909', repeat:'09',     cat:'frac-rep', answer:'frac-rep', fb:{y:"0.09̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11 — repeating decimal."}},
-  { display:'0.1̄4̄2̄8̄5̄7̄',  dec:'0.142857',       repeat:'142857', cat:'frac-rep', answer:'frac-rep', fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7 — repeating decimal."}},
+  // frac-rep bare decimal
+  { display:'0.3̄',      dec:'0.3333333333',   repeat:'3',      cat:'frac-rep', answer:'frac-rep', fb:{y:"0.3̄ repeats forever — equals 1/3.",n:"0.333... The 3 repeats without end — this is 1/3."}},
+  { display:'0.6̄',      dec:'0.6666666666',   repeat:'6',      cat:'frac-rep', answer:'frac-rep', fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... The 6 repeats. This is 2/3 — repeating decimal."}},
+  { display:'0.09̄',     dec:'0.090909090909', repeat:'09',     cat:'frac-rep', answer:'frac-rep', fb:{y:"0.09̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11 — repeating decimal."}},
+  { display:'0.1̄4̄2̄8̄5̄7̄', dec:'0.142857',       repeat:'142857', cat:'frac-rep', answer:'frac-rep', fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7 — repeating decimal."}},
 
   // irr-sqrt
   { display:'√2',  dec:'1.41421356237309504880168872', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."}},
@@ -403,58 +491,81 @@ const BANK = [
   { display:'√13', dec:'3.60555127546398929311921607', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating. Irrational."}},
 
   // irr-dec
-  { display:'π',           dec:'3.14159265358979323846264338', cat:'irr-dec', answer:'irr-dec', fb:{y:"π is the most famous irrational number — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."}},
-  { display:'2π',          dec:'6.28318530717958647692528676', cat:'irr-dec', answer:'irr-dec', fb:{y:"Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 keeps it irrational."}},
-  { display:'π/2',         dec:'1.57079632679489661923132169', cat:'irr-dec', answer:'irr-dec', fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."}},
-  { display:'0.101001…',   dec:'0.101001000100001000010000010000001', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The pattern grows — never repeats a fixed block. Irrational.",n:"Each group adds an extra zero — no fixed repeating block. Irrational."}},
-  { display:'0.313113…',   dec:'0.31311311131111311113111131111131', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles into a repeating block. Irrational."}},
+  { display:'π',         dec:'3.14159265358979323846264338', cat:'irr-dec', answer:'irr-dec', fb:{y:"π is the most famous irrational number — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."}},
+  { display:'2π',        dec:'6.28318530717958647692528676', cat:'irr-dec', answer:'irr-dec', fb:{y:"Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 keeps it irrational."}},
+  { display:'π/2',       dec:'1.57079632679489661923132169', cat:'irr-dec', answer:'irr-dec', fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."}},
+  { display:'0.101001…', dec:'0.101001000100001000010000010000001', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The pattern grows — never repeats a fixed block. Irrational.",n:"Each group adds an extra zero — no fixed repeating block. Irrational."}},
+  { display:'0.313113…', dec:'0.31311311131111311113111131111131',  pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles into a repeating block. Irrational."}},
 ];
 
 // ── STATE ──
-let score=0, streak=0, bestStreak=0, total=0;
+let score=0, streak=0, bestStreak=0, total=0, cleanStreak=0;
 let current=null, answered=false;
 let usedIdx=new Set();
 let masteryHits={}, masteryDone=new Set();
 let earnedBadges=new Set();
 let popupTimer=null;
+// clean-drop tracking: which parent zones were hovered before drop
+let hoveredParents=new Set();
+let isDragging=false;
 ZONES.forEach(z=>masteryHits[z.id]=0);
 
 // ── BUILD GALLERY ──
 function buildGallery(){
-  const g=document.getElementById('gallery');g.innerHTML='';
-  ZONES.forEach(z=>{
-    const col=document.createElement('div');col.className='zone-col';col.dataset.zoneId=z.id;
-    const hdr=document.createElement('div');hdr.className='zone-header';
-    const sup=document.createElement('div');sup.className='zone-super';sup.style.color=z.color;sup.textContent=z.superLabel;
-    const nameWrap=document.createElement('div');
-    if(z.math==='sqrt'){
-      const md=document.createElement('div');md.className='zone-math';md.style.color=z.color;
-      md.innerHTML=`√<span class="rad">n</span>`;
-      const sb=document.createElement('div');sb.className='zone-math-sub';sb.textContent=z.name;
-      nameWrap.appendChild(md);nameWrap.appendChild(sb);
-    } else {
-      nameWrap.className='zone-name';nameWrap.style.color=z.color;
-      nameWrap.style.whiteSpace='pre-line';nameWrap.textContent=z.name;
-    }
-    if(z.sub){const s=document.createElement('div');s.style.cssText='font-size:0.48rem;color:var(--dim);margin-top:2px;';s.textContent=z.sub;nameWrap.appendChild(s);}
-    const pips=document.createElement('div');pips.className='mastery-pips';pips.id='pips-'+z.id;
-    for(let i=0;i<3;i++){const p=document.createElement('div');p.className='pip';p.id=`pip-${z.id}-${i}`;pips.appendChild(p);}
-    const crown=document.createElement('div');crown.className='crown';crown.id='crown-'+z.id;crown.textContent='👑';pips.appendChild(crown);
-    hdr.appendChild(sup);hdr.appendChild(nameWrap);hdr.appendChild(pips);
-    const chain=document.createElement('div');chain.className='chain-area';chain.id='chain-'+z.id;
-    const empty=document.createElement('div');empty.className='chain-empty';empty.id='empty-'+z.id;empty.textContent='drop here';chain.appendChild(empty);
-    col.appendChild(hdr);col.appendChild(chain);
-    col.addEventListener('dragover',e=>{e.preventDefault();if(!answered)col.classList.add('drag-over');});
-    col.addEventListener('dragleave',e=>{if(!col.contains(e.relatedTarget))col.classList.remove('drag-over');});
-    col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drag-over');if(!answered&&e.dataTransfer.getData('text/plain')==='token')classify(z.id);});
-    col.addEventListener('click',()=>{if(!answered)classify(z.id);});
-    g.appendChild(col);
+  ['rational','irrational'].forEach(parentId=>{
+    const subRow=document.getElementById('sub-'+parentId);
+    subRow.innerHTML='';
+    ZONES.filter(z=>z.parent===parentId).forEach(z=>{
+      const col=document.createElement('div');
+      col.className='zone-col'; col.dataset.zoneId=z.id;
+
+      const hdr=document.createElement('div'); hdr.className='zone-header';
+      const nameWrap=document.createElement('div');
+      if(z.math==='sqrt'){
+        const md=document.createElement('div');md.className='zone-math';md.style.color=z.color;
+        md.innerHTML=`√<span class="rad">n</span>`;
+        const sb=document.createElement('div');sb.className='zone-math-sub';sb.textContent=z.name;
+        nameWrap.appendChild(md); nameWrap.appendChild(sb);
+      } else {
+        nameWrap.className='zone-name'; nameWrap.style.color=z.color;
+        nameWrap.style.whiteSpace='pre-line'; nameWrap.textContent=z.name;
+      }
+      if(z.sub){const s=document.createElement('div');s.style.cssText='font-size:0.47rem;color:var(--dim);margin-top:2px;';s.textContent=z.sub;nameWrap.appendChild(s);}
+
+      const pips=document.createElement('div');pips.className='mastery-pips';pips.id='pips-'+z.id;
+      for(let i=0;i<3;i++){const p=document.createElement('div');p.className='pip';p.id=`pip-${z.id}-${i}`;pips.appendChild(p);}
+      const crown=document.createElement('div');crown.className='crown';crown.id='crown-'+z.id;crown.textContent='👑';pips.appendChild(crown);
+
+      hdr.appendChild(nameWrap); hdr.appendChild(pips);
+
+      const chain=document.createElement('div');chain.className='chain-area';chain.id='chain-'+z.id;
+      const empty=document.createElement('div');empty.className='chain-empty';empty.id='empty-'+z.id;empty.textContent='drop here';
+      chain.appendChild(empty);
+
+      col.appendChild(hdr); col.appendChild(chain);
+
+      // drop events on zone column
+      col.addEventListener('dragover',e=>{
+        e.preventDefault(); e.stopPropagation();
+        if(!answered) col.classList.add('drag-over');
+      });
+      col.addEventListener('dragleave',e=>{
+        if(!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+      });
+      col.addEventListener('drop',e=>{
+        e.preventDefault(); col.classList.remove('drag-over');
+        if(!answered&&e.dataTransfer.getData('text/plain')==='token') classify(z.id);
+      });
+      col.addEventListener('click',()=>{ if(!answered) classify(z.id); });
+
+      subRow.appendChild(col);
+    });
   });
 }
 
-// ── BUILD BADGE LIST ──
+// ── BADGE LIST ──
 function buildBadgeList(){
-  const bl=document.getElementById('badge-list');bl.innerHTML='';
+  const bl=document.getElementById('badge-list'); bl.innerHTML='';
   BADGE_DEFS.forEach(b=>{
     const el=document.createElement('div');el.className='badge';el.id='badge-'+b.id;
     el.innerHTML=`<span class="badge-icon">${b.icon}</span><span class="badge-text">${b.label}</span>`;
@@ -462,25 +573,21 @@ function buildBadgeList(){
   });
 }
 
-// ── CHECK BADGES ──
 function checkBadges(){
-  const state={total,streak,masteryDone};
+  const state={total,streak,cleanStreak,masteryDone};
   BADGE_DEFS.forEach(b=>{
     if(!earnedBadges.has(b.id)&&b.check(state)){
       earnedBadges.add(b.id);
       const el=document.getElementById('badge-'+b.id);
-      if(el){
-        el.classList.add('earned');
-        el.style.borderColor=ZONES.find(z=>masteryDone.has(z.id))?.color||'var(--accent)';
-      }
+      if(el){ el.classList.add('earned'); el.style.borderColor='var(--accent)'; }
     }
   });
 }
 
 // ── TILE STRIP ──
 function renderTileStrip(num){
-  const strip=document.getElementById('tile-strip');strip.innerHTML='';
-  const raw=num.dec,isNeg=raw.startsWith('-');
+  const strip=document.getElementById('tile-strip'); strip.innerHTML='';
+  const raw=num.dec, isNeg=raw.startsWith('-');
   const abs=raw.replace('-','');
   const MAX=48;
   if(isNeg){const n=document.createElement('div');n.className='tdot';n.textContent='−';strip.appendChild(n);}
@@ -489,10 +596,10 @@ function renderTileStrip(num){
   if(num.repeat){
     const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
     const afterGiven=dotIdx>=0?abs.slice(dotIdx+1):'';
-    for(const c of before)chars.push({c,isD:true});
+    for(const c of before) chars.push({c,isD:true});
     chars.push({c:'.',isD:false});
     let s=afterGiven;
-    while(s.replace(/\./g,'').length<MAX+4)s+=num.repeat;
+    while(s.replace(/\./g,'').length<MAX+4) s+=num.repeat;
     for(const c of s){if(chars.filter(x=>x.isD).length>=MAX)break;chars.push({c,isD:true});}
   } else {
     for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
@@ -504,15 +611,14 @@ function renderTileStrip(num){
     if(!s.isD){const el=document.createElement('div');el.className='tdot';el.textContent=s.c;strip.appendChild(el);return;}
     const d=parseInt(s.c);
     const cell=document.createElement('div');
-    cell.className=`tc d${d}`;
-    cell.style.background=DC[d];cell.textContent=s.c;
+    cell.className=`tc d${d}`; cell.style.background=DC[d]; cell.textContent=s.c;
     setTimeout(()=>cell.classList.add('vis'),i*11);
     strip.appendChild(cell);
   });
   if(needsEll){const el=document.createElement('div');el.className='tell';el.textContent='…';strip.appendChild(el);}
 }
 
-// ── BUILD HANG ITEM ──
+// ── HANG ITEM ──
 function buildHangItem(num){
   const item=document.createElement('div');item.className='hang-item';item.title=num.display;
   const lbl=document.createElement('div');lbl.className='hang-label';lbl.textContent=num.display;
@@ -520,15 +626,15 @@ function buildHangItem(num){
   const conn0=document.createElement('div');conn0.className='hconn';item.appendChild(conn0);
   const vstrip=document.createElement('div');vstrip.className='hang-strip';
   const raw=num.dec,abs=raw.replace('-','');
-  const MAX=32;const dotIdx=abs.indexOf('.');
+  const MAX=32; const dotIdx=abs.indexOf('.');
   let chars=[];
   if(num.repeat){
     const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
     const afterGiven=dotIdx>=0?abs.slice(dotIdx+1):'';
-    for(const c of before)chars.push({c,isD:true});
+    for(const c of before) chars.push({c,isD:true});
     chars.push({c:'.',isD:false});
     let s=afterGiven;
-    while(s.replace(/\./g,'').length<MAX+2)s+=num.repeat;
+    while(s.replace(/\./g,'').length<MAX+2) s+=num.repeat;
     for(const c of s){if(chars.filter(x=>x.isD).length>=MAX)break;chars.push({c,isD:true});}
   } else {
     for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
@@ -547,66 +653,114 @@ function buildHangItem(num){
   return item;
 }
 
+// ── HOVER REVEAL ──
+function expandParent(parentId){
+  const pRat=document.getElementById('parent-rational');
+  const pIrr=document.getElementById('parent-irrational');
+  if(parentId==='rational'){
+    pRat.classList.remove('collapsed'); pRat.classList.add('expanded');
+    pIrr.classList.remove('expanded'); pIrr.classList.add('collapsed');
+  } else {
+    pIrr.classList.remove('collapsed'); pIrr.classList.add('expanded');
+    pRat.classList.remove('expanded'); pRat.classList.add('collapsed');
+  }
+  if(isDragging) hoveredParents.add(parentId);
+}
+
+function collapseAll(){
+  document.getElementById('parent-rational').classList.remove('expanded','collapsed');
+  document.getElementById('parent-irrational').classList.remove('expanded','collapsed');
+}
+
+function initParentHover(){
+  ['rational','irrational'].forEach(pid=>{
+    const el=document.getElementById('parent-'+pid);
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();
+      expandParent(pid);
+      el.classList.add(pid==='rational'?'drag-hover-rational':'drag-hover-irrational');
+    });
+    el.addEventListener('dragleave',e=>{
+      if(!el.contains(e.relatedTarget)){
+        el.classList.remove('drag-hover-rational','drag-hover-irrational');
+      }
+    });
+    el.addEventListener('drop',e=>{ e.preventDefault(); }); // subcols handle actual drop
+    // mouse hover (non-drag exploration is fine too)
+    el.addEventListener('mouseenter',()=>{ if(!answered) expandParent(pid); });
+    el.addEventListener('mouseleave',e=>{
+      if(!el.contains(e.relatedTarget)&&!answered) collapseAll();
+      el.classList.remove('drag-hover-rational','drag-hover-irrational');
+    });
+  });
+}
+
 // ── POPUP ──
-function showPopup(correct, message){
+function showPopup(correct, message, isClean){
   const overlay=document.getElementById('popup-overlay');
   const popup=document.getElementById('popup');
   document.getElementById('popup-icon').textContent=correct?'✓':'✗';
   document.getElementById('popup-title').textContent=correct?'Correct!':'Not quite.';
   document.getElementById('popup-body').textContent=message;
   popup.className='popup '+(correct?'correct-popup':'wrong-popup');
+  const bonus=document.getElementById('popup-bonus');
+  bonus.className='popup-bonus'+(isClean?' show':'');
   overlay.classList.add('show');
-  // auto-dismiss: correct=2s, wrong=3.5s
-  if(popupTimer)clearTimeout(popupTimer);
-  popupTimer=setTimeout(dismissPopup, correct?2000:3500);
+  if(popupTimer) clearTimeout(popupTimer);
+  popupTimer=setTimeout(dismissPopup, correct?2200:3500);
 }
 
 function dismissPopup(){
   if(popupTimer){clearTimeout(popupTimer);popupTimer=null;}
   document.getElementById('popup-overlay').classList.remove('show');
-  // auto-advance immediately after popup closes
   nextNumber();
 }
 
 // ── CLASSIFY ──
 function classify(zoneId){
-  if(answered)return;
-  answered=true;total++;
+  if(answered) return;
+  answered=true; total++;
   document.getElementById('s-total').textContent=total;
   document.getElementById('drag-tile').classList.add('gone');
 
   const correct=zoneId===current.answer;
   const targetId=correct?zoneId:current.answer;
+  const correctParent=ZONE_PARENT[current.answer];
 
-  // place in correct zone
+  // Was it a clean drop? Only hovered the correct parent (or none at all)
+  const isClean = correct && !hoveredParents.has(correctParent==='rational'?'irrational':'rational');
+
+  // place hang item
   const chain=document.getElementById('chain-'+targetId);
   const emptyEl=document.getElementById('empty-'+targetId);
-  if(emptyEl)emptyEl.remove();
+  if(emptyEl) emptyEl.remove();
   const item=buildHangItem(current);
   chain.appendChild(item);
   chain.scrollLeft=chain.scrollWidth;
   document.getElementById('chain-'+targetId).closest('.zone-col').classList.add('correct-flash');
 
   if(!correct){
-    // ghost in wrong zone
     const wchain=document.getElementById('chain-'+zoneId);
     const we=document.getElementById('empty-'+zoneId);
-    if(we)we.remove();
+    if(we) we.remove();
     const ghost=buildHangItem(current);
-    ghost.style.opacity='0.25';ghost.style.filter='grayscale(0.9)';
+    ghost.style.opacity='0.25'; ghost.style.filter='grayscale(0.9)';
     wchain.appendChild(ghost);
     document.getElementById('chain-'+zoneId).closest('.zone-col').classList.add('wrong-flash');
     setTimeout(()=>ghost.remove(),700);
-    // shake streak
-    streak=0;
+    streak=0; cleanStreak=0;
     const sEl=document.getElementById('s-streak');
-    sEl.textContent=0;sEl.classList.remove('shake');void sEl.offsetWidth;sEl.classList.add('shake');
+    sEl.textContent=0; sEl.classList.remove('shake'); void sEl.offsetWidth; sEl.classList.add('shake');
   } else {
-    score++;streak++;
-    if(streak>bestStreak){bestStreak=streak;document.getElementById('s-best').textContent=bestStreak;}
+    score++; streak++;
+    if(isClean){ cleanStreak++; score++; } // bonus point for clean drop
+    else cleanStreak=0;
+    if(streak>bestStreak){ bestStreak=streak; document.getElementById('s-best').textContent=bestStreak; }
     document.getElementById('s-score').textContent=score;
     document.getElementById('s-streak').textContent=streak;
-    // mastery pips
+    document.getElementById('s-clean').textContent=cleanStreak;
+
+    // mastery
     const aid=current.answer;
     if(!masteryDone.has(aid)){
       masteryHits[aid]=(masteryHits[aid]||0)+1;
@@ -614,7 +768,7 @@ function classify(zoneId){
       const zc=ZONES.find(z=>z.id===aid)?.color||'var(--green)';
       for(let i=0;i<Math.min(hits,3);i++){
         const pip=document.getElementById(`pip-${aid}-${i}`);
-        if(pip)setTimeout(()=>{pip.classList.add('filled');pip.style.background=zc;pip.style.borderColor=zc;pip.style.boxShadow=`0 0 5px ${zc}99`;},i*180);
+        if(pip) setTimeout(()=>{pip.classList.add('filled');pip.style.background=zc;pip.style.borderColor=zc;pip.style.boxShadow=`0 0 5px ${zc}99`;},i*180);
       }
       if(hits>=3){
         masteryDone.add(aid);
@@ -630,15 +784,16 @@ function classify(zoneId){
   }
 
   checkBadges();
-  // Show popup — it will auto-advance when dismissed
-  setTimeout(()=>showPopup(correct, correct?current.fb.y:current.fb.n), 150);
+  setTimeout(()=>showPopup(correct, correct?current.fb.y:current.fb.n, isClean), 150);
 }
 
 // ── NEXT NUMBER ──
 function nextNumber(){
-  answered=false;
+  answered=false; isDragging=false; hoveredParents.clear();
+  collapseAll();
   document.getElementById('drag-tile').classList.remove('gone');
   document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('correct-flash','wrong-flash','drag-over'));
+  document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('drag-hover-rational','drag-hover-irrational'));
 
   let pool=BANK.map((_,i)=>i).filter(i=>!usedIdx.has(i));
   if(!pool.length){usedIdx.clear();pool=BANK.map((_,i)=>i);}
@@ -646,41 +801,34 @@ function nextNumber(){
   const preferred=pool.filter(i=>unmastered.includes(BANK[i].answer));
   const finalPool=preferred.length?preferred:pool;
   const idx=finalPool[Math.floor(Math.random()*finalPool.length)];
-  usedIdx.add(idx);current=BANK[idx];
+  usedIdx.add(idx); current=BANK[idx];
 
   document.getElementById('tile-number').textContent=current.display;
   renderTileStrip(current);
 }
 
-// ── COMPACT DRAG GHOST ──
-// For long tiles, the drag ghost is a compact pill showing just number + "…"
-function makeCompactGhost(x, y){
-  const isLong = current && (current.repeat || current.pattern || current.dec.replace(/[^0-9]/g,'').length > 6);
+// ── COMPACT GHOST ──
+function makeCompactGhost(x,y){
+  const isLong=current&&(current.repeat||current.pattern||current.dec.replace(/[^0-9]/g,'').length>6);
   let ghost;
   if(isLong){
-    ghost = document.createElement('div');
-    ghost.style.cssText = `position:fixed;z-index:200;opacity:0.88;pointer-events:none;transition:none;
+    ghost=document.createElement('div');
+    ghost.style.cssText=`position:fixed;z-index:200;opacity:0.88;pointer-events:none;transition:none;
       font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text);
       background:var(--surface2);border:2px solid var(--accent);border-radius:10px;
       padding:8px 16px;display:flex;align-items:center;gap:8px;white-space:nowrap;`;
-    // small color cells + ellipsis
-    const num = document.getElementById('tile-number').textContent;
-    const strip = document.getElementById('tile-strip');
-    const cells = strip.querySelectorAll('.tc');
-    const numSpan = document.createElement('span');numSpan.textContent=num;ghost.appendChild(numSpan);
-    const miniStrip = document.createElement('div');
-    miniStrip.style.cssText='display:flex;gap:2px;align-items:center;';
+    const numSpan=document.createElement('span');numSpan.textContent=document.getElementById('tile-number').textContent;ghost.appendChild(numSpan);
+    const miniStrip=document.createElement('div');miniStrip.style.cssText='display:flex;gap:2px;align-items:center;';
     let shown=0;
-    cells.forEach(c=>{
+    document.getElementById('tile-strip').querySelectorAll('.tc').forEach(c=>{
       if(shown>=5)return;
-      const mc=document.createElement('div');
-      mc.style.cssText=`width:14px;height:14px;border-radius:3px;background:${c.style.background};flex-shrink:0;`;
+      const mc=document.createElement('div');mc.style.cssText=`width:14px;height:14px;border-radius:3px;background:${c.style.background};flex-shrink:0;`;
       miniStrip.appendChild(mc);shown++;
     });
     const ell=document.createElement('span');ell.style.color='var(--dim)';ell.textContent='…';
     miniStrip.appendChild(ell);ghost.appendChild(miniStrip);
   } else {
-    ghost = document.getElementById('drag-tile').cloneNode(true);
+    ghost=document.getElementById('drag-tile').cloneNode(true);
     ghost.style.cssText=`position:fixed;z-index:200;opacity:0.85;pointer-events:none;transition:none;width:auto;`;
   }
   ghost.style.top=(y-30)+'px';ghost.style.left=(x-60)+'px';
@@ -691,45 +839,65 @@ function makeCompactGhost(x, y){
 function initDrag(){
   const tile=document.getElementById('drag-tile');
 
-  // Mouse drag: set compact drag image for long tiles
   tile.addEventListener('dragstart',e=>{
     e.dataTransfer.setData('text/plain','token');
     tile.classList.add('dragging');
-    const isLong = current && (current.repeat || current.pattern || current.dec.replace(/[^0-9]/g,'').length > 6);
+    isDragging=true; hoveredParents.clear();
+    const isLong=current&&(current.repeat||current.pattern||current.dec.replace(/[^0-9]/g,'').length>6);
     if(isLong){
-      const ghost = makeCompactGhost(0,0);
-      ghost.style.top='-9999px';ghost.style.left='-9999px';ghost.style.position='fixed';
+      const ghost=makeCompactGhost(0,0);
+      ghost.style.top='-9999px';ghost.style.left='-9999px';
       document.body.appendChild(ghost);
-      e.dataTransfer.setDragImage(ghost, 60, 30);
-      setTimeout(()=>ghost.remove(), 0);
+      e.dataTransfer.setDragImage(ghost,60,30);
+      setTimeout(()=>ghost.remove(),0);
     }
   });
-  tile.addEventListener('dragend',()=>tile.classList.remove('dragging'));
+  tile.addEventListener('dragend',()=>{
+    tile.classList.remove('dragging');
+    isDragging=false;
+    if(!answered) collapseAll();
+  });
 
   let clone=null,touchZone=null;
   tile.addEventListener('touchstart',e=>{
     if(answered)return;
     const t=e.touches[0];
-    clone=makeCompactGhost(t.clientX, t.clientY);
-    document.body.appendChild(clone);tile.classList.add('dragging');
+    isDragging=true; hoveredParents.clear();
+    clone=makeCompactGhost(t.clientX,t.clientY);
+    document.body.appendChild(clone); tile.classList.add('dragging');
   },{passive:true});
   tile.addEventListener('touchmove',e=>{
-    if(!clone)return;e.preventDefault();
+    if(!clone)return; e.preventDefault();
     const t=e.touches[0];
-    clone.style.top=(t.clientY-30)+'px';clone.style.left=(t.clientX-60)+'px';
+    clone.style.top=(t.clientY-30)+'px'; clone.style.left=(t.clientX-60)+'px';
     clone.style.display='none';
     const el=document.elementFromPoint(t.clientX,t.clientY);
     clone.style.display='';
     document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('drag-over'));
+    document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('drag-hover-rational','drag-hover-irrational'));
+
+    // find what's under finger
     const zc=el&&el.closest('.zone-col');
-    if(zc&&!answered){zc.classList.add('drag-over');touchZone=zc.dataset.zoneId;}
-    else touchZone=null;
+    const pc=el&&el.closest('.parent-zone');
+    if(zc&&!answered){
+      zc.classList.add('drag-over');
+      touchZone=zc.dataset.zoneId;
+      const pid=zc.closest('.parent-zone')?.id?.replace('parent-','');
+      if(pid) expandParent(pid);
+    } else if(pc&&!answered){
+      const pid=pc.id.replace('parent-','');
+      expandParent(pid);
+      touchZone=null;
+    } else {
+      touchZone=null;
+    }
   },{passive:false});
   tile.addEventListener('touchend',()=>{
     if(clone){clone.remove();clone=null;}
-    tile.classList.remove('dragging');
+    tile.classList.remove('dragging'); isDragging=false;
     document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('drag-over'));
-    if(touchZone&&!answered)classify(touchZone);
+    if(touchZone&&!answered) classify(touchZone);
+    else if(!answered) collapseAll();
     touchZone=null;
   });
 }
@@ -740,7 +908,7 @@ function closeCelebration(){
   nextNumber();
 }
 
-buildGallery();buildBadgeList();initDrag();nextNumber();
+buildGallery(); buildBadgeList(); initParentHover(); initDrag(); nextNumber();
 </script>
 </body>
 </html>
