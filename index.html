@@ -395,19 +395,19 @@ const BANK = [
   { display:'0.1̄4̄2̄8̄5̄7̄',  dec:'0.142857',       repeat:'142857', cat:'frac-rep', answer:'frac-rep', fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7 — repeating decimal."}},
 
   // irr-sqrt
-  { display:'√2',  dec:'1.41421356237', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."}},
-  { display:'√3',  dec:'1.73205080757', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√3 is irrational — 3 is not a perfect square.",n:"√3 = 1.73205... No pattern, no end. Irrational."}},
-  { display:'√5',  dec:'2.23606797750', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√5 is irrational.",n:"5 isn't a perfect square — √5 is irrational."}},
-  { display:'√7',  dec:'2.64575131106', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√7 is irrational.",n:"√7 = 2.64575... Non-terminating, non-repeating. Irrational."}},
-  { display:'√11', dec:'3.31662479036', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√11 is irrational — 11 is not a perfect square.",n:"11 is not a perfect square — √11 is irrational."}},
-  { display:'√13', dec:'3.60555127546', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating. Irrational."}},
+  { display:'√2',  dec:'1.41421356237309504880168872', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."}},
+  { display:'√3',  dec:'1.73205080756887729352744634', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√3 is irrational — 3 is not a perfect square.",n:"√3 = 1.73205... No pattern, no end. Irrational."}},
+  { display:'√5',  dec:'2.23606797749978969640917366', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√5 is irrational.",n:"5 isn't a perfect square — √5 is irrational."}},
+  { display:'√7',  dec:'2.64575131106459059050161575', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√7 is irrational.",n:"√7 = 2.64575... Non-terminating, non-repeating. Irrational."}},
+  { display:'√11', dec:'3.31662479035539984359271632', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√11 is irrational — 11 is not a perfect square.",n:"11 is not a perfect square — √11 is irrational."}},
+  { display:'√13', dec:'3.60555127546398929311921607', cat:'irr-sqrt', answer:'irr-sqrt', fb:{y:"√13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating. Irrational."}},
 
   // irr-dec
-  { display:'π',           dec:'3.14159265358',     cat:'irr-dec', answer:'irr-dec', fb:{y:"π is the most famous irrational number — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."}},
-  { display:'2π',          dec:'6.28318530718',     cat:'irr-dec', answer:'irr-dec', fb:{y:"Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 keeps it irrational."}},
-  { display:'π/2',         dec:'1.57079632679',     cat:'irr-dec', answer:'irr-dec', fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."}},
-  { display:'0.101001…',   dec:'0.101001000100001', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The pattern grows — never repeats a fixed block. Irrational.",n:"Each group adds an extra zero — no fixed repeating block. Irrational."}},
-  { display:'0.313113…',   dec:'0.313113111311113', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles into a repeating block. Irrational."}},
+  { display:'π',           dec:'3.14159265358979323846264338', cat:'irr-dec', answer:'irr-dec', fb:{y:"π is the most famous irrational number — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."}},
+  { display:'2π',          dec:'6.28318530717958647692528676', cat:'irr-dec', answer:'irr-dec', fb:{y:"Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 keeps it irrational."}},
+  { display:'π/2',         dec:'1.57079632679489661923132169', cat:'irr-dec', answer:'irr-dec', fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."}},
+  { display:'0.101001…',   dec:'0.101001000100001000010000010000001', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The pattern grows — never repeats a fixed block. Irrational.",n:"Each group adds an extra zero — no fixed repeating block. Irrational."}},
+  { display:'0.313113…',   dec:'0.31311311131111311113111131111131', pattern:true, cat:'irr-dec', answer:'irr-dec', fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles into a repeating block. Irrational."}},
 ];
 
 // ── STATE ──
@@ -482,7 +482,7 @@ function renderTileStrip(num){
   const strip=document.getElementById('tile-strip');strip.innerHTML='';
   const raw=num.dec,isNeg=raw.startsWith('-');
   const abs=raw.replace('-','');
-  const MAX=34;
+  const MAX=48;
   if(isNeg){const n=document.createElement('div');n.className='tdot';n.textContent='−';strip.appendChild(n);}
   let chars=[];
   const dotIdx=abs.indexOf('.');
@@ -497,7 +497,7 @@ function renderTileStrip(num){
   } else {
     for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
   }
-  const needsEll=num.repeat||num.pattern||chars.filter(x=>x.isD).length>=MAX;
+  const needsEll=num.repeat||num.pattern||num.cat==='irr-sqrt'||num.cat==='irr-dec'||chars.filter(x=>x.isD).length>=MAX;
   let dCount=0,trimmed=[];
   for(const s of chars){if(s.isD){if(dCount>=MAX)break;dCount++;}trimmed.push(s);}
   trimmed.forEach((s,i)=>{
@@ -520,7 +520,7 @@ function buildHangItem(num){
   const conn0=document.createElement('div');conn0.className='hconn';item.appendChild(conn0);
   const vstrip=document.createElement('div');vstrip.className='hang-strip';
   const raw=num.dec,abs=raw.replace('-','');
-  const MAX=22;const dotIdx=abs.indexOf('.');
+  const MAX=32;const dotIdx=abs.indexOf('.');
   let chars=[];
   if(num.repeat){
     const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
@@ -533,7 +533,7 @@ function buildHangItem(num){
   } else {
     for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
   }
-  const needsEll=num.repeat||num.pattern||chars.filter(x=>x.isD).length>=MAX;
+  const needsEll=num.repeat||num.pattern||num.cat==='irr-sqrt'||num.cat==='irr-dec'||chars.filter(x=>x.isD).length>=MAX;
   let dCount=0,trimmed=[];
   for(const s of chars){if(s.isD){if(dCount>=MAX)break;dCount++;}trimmed.push(s);}
   trimmed.forEach(s=>{
