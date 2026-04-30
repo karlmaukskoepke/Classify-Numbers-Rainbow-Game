@@ -514,7 +514,10 @@
             <div class="drop-zone-name">Repeating Decimal</div>
           </div>
           <div class="drop-zone rational-zone" data-answer="perfect-sqrt" id="zone-perfect-sqrt">
-            <div class="drop-zone-name">Square Root of a Perfect Square</div>
+            <div class="drop-zone-name">
+  <span style="font-size:1.3em; font-family:'Space Mono',monospace;">√<span style="text-decoration:overline; padding:0 3px;">n</span></span>
+  <br><span style="font-size:0.7em; color:var(--text-dim);">perfect square</span>
+</div>
           </div>
           <div class="drop-zone rational-zone" data-answer="fraction" id="zone-fraction">
             <div class="drop-zone-name">Fraction</div>
@@ -525,7 +528,10 @@
         <div class="zone-column">
           <div class="zone-column-header irrational">Irrational</div>
           <div class="drop-zone irrational-zone" data-answer="irrational-sqrt" id="zone-irrational-sqrt">
-            <div class="drop-zone-name">Non-Perfect Square Under a Square Root</div>
+            <div class="drop-zone-name">
+  <span style="font-size:1.3em; font-family:'Space Mono',monospace;">√<span style="text-decoration:overline; padding:0 3px;">n</span></span>
+  <br><span style="font-size:0.7em; color:var(--text-dim);">non-perfect square</span>
+</div>
           </div>
           <div class="drop-zone irrational-zone" data-answer="irrational-decimal" id="zone-irrational-decimal">
             <div class="drop-zone-name">Non-Repeating, Non-Terminating Decimal</div>
@@ -871,6 +877,7 @@ function classify(zoneEl) {
 
   setTimeout(revealDigits, 350);
   document.getElementById('next-btn').className = 'next-btn show';
+  document.querySelectorAll('.drop-zone').forEach(z => z.style.cursor = 'pointer');
 }
 
 // ── DRAG & DROP ──
@@ -897,7 +904,10 @@ function initDragDrop() {
       }
     });
     // click fallback
-    zone.addEventListener('click', () => { if (!answered) classify(zone); });
+    zone.addEventListener('click', () => {
+  if (!answered) classify(zone);
+  else if (answered) nextNumber();
+});
   });
 
   // Touch drag (mobile)
