@@ -232,6 +232,39 @@ body.shake{animation:screenShake 0.5s ease;}
 .modal-btn{padding:10px 24px;border-radius:8px;border:none;background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;}
 .modal-btn:hover{background:#8b83ff;}
 
+/* ── DEAD ZONE (prevents accidental zone trigger on drag start) ── */
+.gallery-dead-zone{
+  position:absolute;top:0;left:0;right:0;height:28px;
+  z-index:10;pointer-events:all;background:transparent;
+}
+
+/* ── SUB-ROW TRANSPARENCY (hint at Normal, hidden at Ultra) ── */
+/* Normal: subcategories faintly visible through label overlay */
+.parent-zone:not(.expanded):not(.collapsed) .sub-row { opacity:var(--hint-opacity, 0); }
+/* expanded/collapsed states override to full opacity */
+.parent-zone.expanded .sub-row { opacity:1; }
+
+/* ── HEART BREAK SPLASH ── */
+.heart-break-splash{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:88;pointer-events:none;
+  font-size:8rem;line-height:1;
+  opacity:0;transition:none;
+}
+.heart-break-splash.show{
+  animation:heartSplash 1.4s cubic-bezier(0.34,1.2,0.64,1) forwards;
+}
+@keyframes heartSplash{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.3) rotate(-20deg);}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(5deg);}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.0) rotate(0deg);}
+  80%{opacity:0.8;transform:translate(-50%,-60%) scale(1.0);}
+  100%{opacity:0;transform:translate(-50%,-80%) scale(0.8);}
+}
+
+/* ── OVERBAR for repeating decimals ── */
+.overbar{text-decoration:overline;text-decoration-color:currentColor;text-underline-offset:0;}
+
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
@@ -262,6 +295,8 @@ body.shake{animation:screenShake 0.5s ease;}
       </div>
     </div>
     <div class="gallery" id="gallery">
+      <!-- Dead zone: prevents accidental zone trigger when dragging down from tile -->
+      <div class="gallery-dead-zone" id="gallery-dead-zone"></div>
       <div class="parent-zone rational" id="parent-rational">
         <div class="parent-label">
           <div class="parent-label-text">Rational</div>
@@ -327,6 +362,9 @@ body.shake{animation:screenShake 0.5s ease;}
     <div class="levelup-mult" id="levelup-mult">×2 Points</div>
   </div>
 </div>
+
+<!-- HEART BREAK SPLASH -->
+<div class="heart-break-splash" id="heart-break-splash">💔</div>
 
 <!-- SCREEN FLASH -->
 <div class="screen-flash" id="screen-flash"></div>
@@ -426,10 +464,10 @@ const BANK=[
   {display:'5/6',  dec:'0.833333',       repeat:'3',     cat:'frac-rep',answer:'frac-rep',fb:{y:"5/6 = 0.83̄ — the 3 repeats after the 8.",n:"5/6 = 0.8333... The 3 repeats."},pun:{y:"Starts specific, ends infinite. Story of mathematics.",n:"6 in denominator → repeating decimal."}},
 
   // frac-rep bare decimals  
-  {display:'0.3̄',      dec:'0.3333333333',   repeat:'3',     cat:'frac-rep',answer:'frac-rep',fb:{y:"0.3̄ repeats forever — equals 1/3.",n:"0.333... The 3 repeats without end — this is 1/3."},pun:{y:"One third. Three repeating. The universe is consistent.",n:"Repeating decimal → rational fraction. Always."}},
-  {display:'0.6̄',      dec:'0.6666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... The 6 repeats. This is 2/3."},pun:{y:"Two thirds of the way to 1. Always repeating.",n:"0.666... = 2/3. A rational repeating decimal."}},
-  {display:'0.0̄9̄',     dec:'0.090909090909', repeat:'09',    cat:'frac-rep',answer:'frac-rep',fb:{y:"0.0̄9̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11."},pun:{y:"09, eternally. Very on-brand for 1/11.",n:"Block 09 cycles. Repeating = rational."}},
-  {display:'0.1̄4̄2̄8̄5̄7̄',  dec:'0.142857142857',repeat:'142857',cat:'frac-rep',answer:'frac-rep',fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7."},pun:{y:"142857 × 7 = 999999. I didn't make that up.",n:"Six-digit repeat = 1/7. Cyclic number. Very cool."}},
+  {display:'0.3̄',     displayHTML:'0.<span class="overbar">3</span>',      dec:'0.3333333333',   repeat:'3',     cat:'frac-rep',answer:'frac-rep',fb:{y:"0.3̄ repeats forever — equals 1/3.",n:"0.333... The 3 repeats without end — this is 1/3."},pun:{y:"One third. Three repeating. The universe is consistent.",n:"Repeating decimal → rational fraction. Always."}},
+  {display:'0.6̄',     displayHTML:'0.<span class="overbar">6</span>',      dec:'0.6666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... The 6 repeats. This is 2/3."},pun:{y:"Two thirds of the way to 1. Always repeating.",n:"0.666... = 2/3. A rational repeating decimal."}},
+  {display:'0.09̄',    displayHTML:'0.0<span class="overbar">9</span>',     dec:'0.090909090909', repeat:'09',    cat:'frac-rep',answer:'frac-rep',fb:{y:"0.09̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11."},pun:{y:"09, eternally. Very on-brand for 1/11.",n:"Block 09 cycles. Repeating = rational."}},
+  {display:'0.142857̄', displayHTML:'0.<span class="overbar">142857</span>',dec:'0.142857142857',repeat:'142857',cat:'frac-rep',answer:'frac-rep',fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7."},pun:{y:"142857 × 7 = 999999. I didn't make that up.",n:"Six-digit repeat = 1/7. Cyclic number. Very cool."}},
 
   // irr-sqrt
   {display:'√2',  dec:'1.41421356237309504880168872',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."},pun:{y:"The original irrational. Hippasus proved it and apparently paid dearly.",n:"Proof: assume √2 = p/q in lowest terms → contradiction."}},
@@ -670,9 +708,14 @@ function updateModeUI(){
   badge.className='mode-badge '+(mode==='normal'?'':mode);
   document.getElementById('multiplier').textContent='×'+modeData.mult;
   document.getElementById('timer-bar-wrap').className='timer-bar-wrap'+(modeData.timer?' active':'');
-  // update tile hint
   const hints={normal:'Drag to Rational or Irrational ↓',mega:'No colors — classify by sight! ↓',monster:'3 seconds! Classify now! ↓',ultra:'2 seconds! GO! ↓'};
   document.getElementById('tile-hint').textContent=hints[mode];
+
+  // Set subcategory hint transparency — Normal=20% visible, Mega=8%, Monster/Ultra=0%
+  const hintOpacity={normal:'0.20',mega:'0.08',monster:'0',ultra:'0'};
+  document.querySelectorAll('.parent-zone').forEach(pz=>{
+    pz.style.setProperty('--hint-opacity', hintOpacity[mode]||'0');
+  });
 }
 
 // ── SCREEN FLASH ──
@@ -686,13 +729,14 @@ function shakeScreen(){
 }
 
 // ── LIVES ──
-function loseLife(){
+function loseLife(scoreAtMistake){
   if(lives<=0)return;
   lives--;
   const h=document.getElementById('h'+lives);
   h.classList.add('lost');h.textContent='💔';
   shakeScreen();flashScreen('flash-red');
-  if(lives===0) setTimeout(triggerGameOver,600);
+  showHeartBreak();
+  if(lives===0) setTimeout(()=>triggerGameOver(scoreAtMistake||0),1800);
 }
 function updateHearts(){
   for(let i=0;i<3;i++){
@@ -702,13 +746,22 @@ function updateHearts(){
   }
 }
 
-// ── GAME OVER ── 
-function triggerGameOver(){
+// Big heart break in center of screen
+function showHeartBreak(){
+  const el=document.getElementById('heart-break-splash');
+  el.className='heart-break-splash';void el.offsetWidth;
+  el.className='heart-break-splash show';
+  setTimeout(()=>el.className='heart-break-splash',1400);
+}
+
+// ── GAME OVER ──
+function triggerGameOver(finalScore){
   gameActive=false;
   stopTimer();
-  if(score>topScore){topScore=score;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
-  document.getElementById('go-score').textContent=score;
-  document.getElementById('go-label').textContent=`${MODES[mode].name} mode · Streak: ${bestStreak}`;
+  const displayScore=finalScore!==undefined?finalScore:score;
+  if(displayScore>topScore){topScore=displayScore;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
+  document.getElementById('go-score').textContent=displayScore;
+  document.getElementById('go-label').textContent=`${MODES[mode].name} mode · Best Streak: ${bestStreak}`;
   renderLeaderboard(null);
   document.getElementById('gameover-overlay').classList.add('show');
   document.getElementById('name-input').focus();
@@ -742,7 +795,7 @@ function renderLeaderboard(highlight){
 function restartGame(){
   document.getElementById('gameover-overlay').classList.remove('show');
   score=0;streak=0;bestStreak=0;cleanStreak=0;total=0;
-  lives=3;mode='normal';modeTotalCorrect=0;
+  lives=3;mode='normal';modeTotalCorrect=0;correctPopupCount=0;
   answered=false;gameActive=true;
   usedIdx.clear();masteryHits={};masteryDone.clear();
   ZONES.forEach(z=>masteryHits[z.id]=0);
@@ -836,7 +889,6 @@ function handleWrong(zoneId, timedOut){
   stopTimer();
 
   if(zoneId){
-    // ghost in wrong zone
     const wchain=document.getElementById('chain-'+zoneId);
     const we=document.getElementById('empty-'+zoneId);if(we)we.remove();
     const ghost=buildHangItem(current);
@@ -844,24 +896,25 @@ function handleWrong(zoneId, timedOut){
     wchain.appendChild(ghost);
     document.getElementById('chain-'+zoneId).closest('.zone-col').classList.add('wrong-flash');
     setTimeout(()=>ghost.remove(),700);
-
-    // place correctly
     const chain=document.getElementById('chain-'+current.answer);
     const emptyEl=document.getElementById('empty-'+current.answer);if(emptyEl)emptyEl.remove();
     const item=buildHangItem(current);chain.appendChild(item);chain.scrollLeft=chain.scrollWidth;
   }
 
+  // Record score BEFORE zeroing it
+  const scoreAtMistake=score;
   score=0; streak=0; cleanStreak=0;
   document.getElementById('s-score').textContent=0;
   document.getElementById('s-clean').textContent=0;
   updateStreak(0);
 
-  loseLife();
-  if(!gameActive)return; // game over triggered
+  loseLife(scoreAtMistake);
+  if(!gameActive)return;
 
+  correctPopupCount=0; // reset so next correct streak shows popups again
   const msg=timedOut?"Time's up! "+current.fb.n:current.fb.n;
   const pun=timedOut?"Time flies. Unlike irrational numbers, it does terminate.":getPun(false,false,0);
-  setTimeout(()=>showPopup(false,msg,pun,false),150);
+  setTimeout(()=>showPopup(false,msg,pun,false),800); // delay to let heart animation breathe
 }
 
 // ── CLASSIFY ──
@@ -920,10 +973,20 @@ function classify(zoneId){
   }
 
   flashScreen('flash-gold');
-  setTimeout(()=>showPopup(true,current.fb.y,getPun(true,isClean,streak),isClean),150);
+
+  // Show popup for first 5 correct answers, then only on wrong
+  correctPopupCount++;
+  if(correctPopupCount<=5){
+    setTimeout(()=>showPopup(true,current.fb.y,getPun(true,isClean,streak),isClean),150);
+  } else {
+    // Brief flash auto-advance without popup
+    setTimeout(nextNumber, 600);
+  }
 }
 
 // ── NEXT NUMBER ──
+let correctPopupCount=0; // track how many correct popups shown so far
+
 function nextNumber(){
   if(!gameActive)return;
   answered=false;isDragging=false;hoveredParents.clear();
@@ -940,9 +1003,12 @@ function nextNumber(){
   const idx=finalPool[Math.floor(Math.random()*finalPool.length)];
   usedIdx.add(idx);current=BANK[idx];
 
-  document.getElementById('tile-number').textContent=current.display;
-  renderTileStrip(current);
+  // Use displayHTML if available (for overbar notation), else plain text
+  const numEl=document.getElementById('tile-number');
+  if(current.displayHTML){numEl.innerHTML=current.displayHTML;}
+  else{numEl.textContent=current.display;}
 
+  renderTileStrip(current);
   if(MODES[mode].timer)startTimer();
 }
 
