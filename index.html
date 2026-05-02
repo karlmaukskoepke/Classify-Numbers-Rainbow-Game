@@ -41,34 +41,38 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   height:320px;
   padding-top:8px;
 }
-/* title box nestled in the middle of the garland */
+/* title box nestled just below the middle whole numbers */
 .title-box{
   position:absolute;
-  top:12px;
+  top:auto;
+  bottom:-10px;
   left:50%;
   transform:translateX(-50%);
   z-index:10;
-  background:rgba(13,13,20,0.92);
+  background:rgba(13,13,20,0.95);
   border:2px solid var(--accent);
-  border-radius:18px;
-  padding:18px 32px;
+  border-radius:20px;
+  padding:16px 24px;
   text-align:center;
   box-shadow:0 0 40px rgba(108,99,255,0.35), inset 0 0 30px rgba(108,99,255,0.06);
   pointer-events:none;
   white-space:nowrap;
+  width:220px;
 }
 .title-main{
   font-family:'Orbitron',sans-serif;
-  font-size:1.9rem;font-weight:900;
-  letter-spacing:0.06em;
-  line-height:1.1;
+  font-size:1.3rem;font-weight:900;
+  letter-spacing:0.04em;
+  line-height:1.4;
+  display:flex;flex-direction:column;gap:2px;
 }
 .title-rational{color:var(--rational-glow);text-shadow:0 0 20px rgba(46,204,142,0.6);}
-.title-vs{color:var(--dim);font-size:1.1rem;margin:0 8px;}
+.title-vs{color:var(--dim);font-size:0.8rem;letter-spacing:0.2em;}
 .title-irrational{color:var(--irrational-glow);text-shadow:0 0 20px rgba(247,37,133,0.6);}
 .title-sub{
-  font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;
-  color:var(--dim);margin-top:6px;font-family:'Syne',sans-serif;
+  font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--dim);margin-top:8px;font-family:'Syne',sans-serif;
+  white-space:normal;line-height:1.4;
 }
 
 .garland{
@@ -80,13 +84,14 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   position:relative;
 }
 .gs{/* garland string */
-  display:flex;flex-direction:column;align-items:center;
+  display:inline-flex;flex-direction:column;align-items:center;
+  align-self:flex-start;
   position:relative;
   transform-origin:top center;
   animation:sway var(--sd,4s) ease-in-out infinite alternate;
   animation-delay:var(--dl,0s);
   cursor:pointer;
-  padding:0 5px;
+  padding:0 4px;
   flex-shrink:0;
 }
 .gs:hover{animation-play-state:paused;}
@@ -137,13 +142,18 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 
 /* ── SPLASH CENTER ── */
 .splash-center{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;padding:0 20px;
+  flex:1;display:flex;flex-direction:row;align-items:flex-start;justify-content:center;
+  gap:24px;padding:16px 24px 20px;
+  overflow:hidden;
+}
+.splash-main{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;flex-shrink:0;
 }
 .splash-hint{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);opacity:0.55;}
-.splash-sub{font-size:0.88rem;color:var(--dim);text-align:center;max-width:400px;line-height:1.6;}
+.splash-sub{font-size:0.82rem;color:var(--dim);text-align:center;max-width:320px;line-height:1.6;}
 .play-btn{
-  padding:16px 56px;border-radius:14px;border:none;
+  padding:14px 48px;border-radius:14px;border:none;
   background:linear-gradient(135deg,var(--accent),#9580ff);
   color:white;font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;
   cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;
@@ -154,64 +164,64 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 
 /* ── ARCADE LEADERBOARD ── */
 .splash-lb{
-  flex-shrink:0;
-  border-top:1px solid var(--border);
+  flex:1;max-width:440px;
   background:var(--surface);
-  padding:12px 24px 16px;
-  display:flex;flex-direction:column;gap:10px;
+  border:2px solid var(--border);
+  border-radius:18px;
+  padding:14px 18px;
+  display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 0 30px rgba(0,0,0,0.4);
+  overflow:hidden;
 }
 .lb-header{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--border);padding-bottom:8px;
 }
 .lb-arcade-title{
   font-family:'Press Start 2P',monospace;
-  font-size:0.7rem;color:var(--gold);
-  letter-spacing:0.08em;
+  font-size:0.65rem;color:var(--gold);
+  letter-spacing:0.06em;
   text-shadow:0 0 10px rgba(255,215,0,0.5);
   animation:blink 1.4s step-end infinite;
 }
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.lb-tabs{display:flex;gap:6px;}
+.lb-tabs{display:flex;gap:5px;}
 .lb-tab{
-  padding:4px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;
+  padding:3px 10px;border-radius:20px;font-size:0.55rem;font-weight:700;
   letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;
   border:1px solid var(--border);color:var(--dim);background:transparent;
   transition:all 0.2s;font-family:'Syne',sans-serif;
 }
 .lb-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
 
-/* scanlines effect on lb body */
 .lb-body{
-  position:relative;
-  display:flex;gap:16px;
+  position:relative;flex:1;
+  display:flex;flex-direction:column;gap:2px;
   overflow:hidden;
 }
 .lb-body::after{
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);
 }
-.lb-col{flex:1;display:flex;flex-direction:column;gap:3px;}
 .lb-row{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:7px;
   font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;letter-spacing:0.04em;
-  padding:4px 8px;border-radius:4px;
+  font-size:0.5rem;letter-spacing:0.03em;
+  padding:5px 7px;border-radius:4px;
   background:var(--surface2);
-  transition:background 0.2s;
 }
 .lb-row:first-child{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);}
 .lb-row:nth-child(2){background:rgba(200,200,200,0.06);border:1px solid rgba(200,200,200,0.15);}
 .lb-row:nth-child(3){background:rgba(205,127,50,0.06);border:1px solid rgba(205,127,50,0.2);}
-.lb-r{color:var(--dim);width:18px;flex-shrink:0;}
+.lb-r{color:var(--dim);width:16px;flex-shrink:0;}
 .lb-n{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .lb-s{color:var(--gold);}
-.lb-m{font-size:0.42rem;padding:2px 5px;border-radius:6px;font-weight:700;font-family:'Syne',sans-serif;}
+.lb-m{font-size:0.38rem;padding:2px 5px;border-radius:6px;font-weight:700;font-family:'Syne',sans-serif;}
 .lb-m.normal{background:rgba(108,99,255,0.2);color:var(--accent);}
 .lb-m.mega{background:rgba(255,215,0,0.2);color:var(--gold);}
 .lb-m.monster{background:rgba(255,140,0,0.2);color:#ff8c00;}
 .lb-m.ultra{background:rgba(247,37,133,0.2);color:#f72585;}
-.lb-empty{font-family:'Press Start 2P',monospace;font-size:0.52rem;color:var(--dim);padding:8px;text-align:center;}
+.lb-empty{font-family:'Press Start 2P',monospace;font-size:0.48rem;color:var(--dim);padding:12px;text-align:center;line-height:1.8;}
 .lb-cursor{display:inline-block;animation:blink 0.8s step-end infinite;}
 
 /* ══════════════════════════════════════
@@ -393,14 +403,19 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .vc-choice:hover{border-color:var(--accent);background:rgba(108,99,255,0.1);}
 .vc-choice.wrong-choice{border-color:var(--red);background:rgba(255,85,119,0.1);animation:choiceShake 0.3s ease;}
 @keyframes choiceShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.vc-choice.right-choice{border-color:var(--green);background:rgba(46,204,142,0.1);}
-.vc-key{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent);flex-shrink:0;font-size:0.8rem;}
-.vocab-countdown{
-  display:flex;align-items:center;gap:8px;margin-top:16px;
+.vc-choice.right-choice{
+  border-color:var(--green);background:rgba(46,204,142,0.12);
+  font-size:0.95rem;
+  box-shadow:0 0 0 3px rgba(46,204,142,0.3), 0 0 20px rgba(46,204,142,0.2);
+  animation:haloReveal 0.5s cubic-bezier(0.34,1.3,0.64,1);
 }
-.vocab-countdown-bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;}
-.vocab-countdown-bar{height:100%;border-radius:2px;background:var(--red);width:100%;transition:width linear;}
-.vocab-countdown-label{font-size:0.6rem;color:var(--dim);white-space:nowrap;}
+@keyframes haloReveal{
+  0%{transform:scale(0.97);box-shadow:none;}
+  60%{transform:scale(1.03);box-shadow:0 0 0 6px rgba(46,204,142,0.4),0 0 30px rgba(46,204,142,0.3);}
+  100%{transform:scale(1);box-shadow:0 0 0 3px rgba(46,204,142,0.3),0 0 20px rgba(46,204,142,0.2);}
+}
+.vc-choice.right-choice .vc-key{color:var(--green);}
+.vc-key{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent);flex-shrink:0;font-size:0.8rem;}
 .vocab-continue-btn{
   display:none;margin-top:14px;width:100%;
   padding:12px;border-radius:10px;border:none;
@@ -439,6 +454,15 @@ body.shake{animation:screenShake 0.5s ease;}
 .gameover-overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s;}
 .gameover-overlay.show{opacity:1;pointer-events:all;}
 .gameover-box{background:var(--surface);border:2px solid var(--border);border-radius:24px;padding:32px 40px;text-align:center;max-width:460px;width:92%;box-shadow:0 0 100px rgba(255,85,119,0.3);animation:popIn 0.5s cubic-bezier(0.34,1.3,0.64,1);}
+.initials-wrap{display:flex;gap:10px;justify-content:center;margin-bottom:14px;}
+.initial-box{
+  font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;
+  width:56px;height:60px;text-align:center;
+  background:var(--surface2);border:2px solid var(--border);border-radius:10px;
+  color:var(--text);outline:none;transition:border-color 0.2s;
+  text-transform:uppercase;
+}
+.initial-box:focus{border-color:var(--accent);box-shadow:0 0 12px rgba(108,99,255,0.3);}
 .gameover-title{font-family:'Orbitron',sans-serif;font-size:2.4rem;font-weight:900;color:var(--red);margin-bottom:4px;text-shadow:0 0 30px rgba(255,85,119,0.5);}
 .gameover-score{font-family:'Space Mono',monospace;font-size:3.2rem;font-weight:700;color:var(--gold);margin:10px 0;text-shadow:0 0 30px rgba(255,215,0,0.4);}
 .gameover-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:16px;}
@@ -482,26 +506,26 @@ body.shake{animation:screenShake 0.5s ease;}
         <span class="title-vs">vs</span>
         <span class="title-irrational">Irrational</span>
       </div>
-      <div class="title-sub">↑ hover any number chain to explore · click to learn more</div>
+      <div class="title-sub">hover any chain · click to learn</div>
     </div>
     <div class="garland" id="garland"></div>
   </div>
   <div class="splash-center">
-    <div class="splash-sub">Can you classify every number? Drag it to its category — and survive as long as you can.</div>
-    <button class="play-btn" onclick="startGame()">Play →</button>
-  </div>
-  <div class="splash-lb">
-    <div class="lb-header">
-      <div class="lb-arcade-title">HIGH SCORES<span class="lb-cursor">_</span></div>
-      <div class="lb-tabs">
-        <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">This Week</button>
-        <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">All Time</button>
-        <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">Streak</button>
-      </div>
+    <div class="splash-main">
+      <div class="splash-hint">↑ hover any chain to explore</div>
+      <div class="splash-sub">Can you classify every number? Drag it to its category — and survive as long as you can.</div>
+      <button class="play-btn" onclick="startGame()">Play →</button>
     </div>
-    <div class="lb-body">
-      <div class="lb-col" id="lb-col-a"></div>
-      <div class="lb-col" id="lb-col-b"></div>
+    <div class="splash-lb">
+      <div class="lb-header">
+        <div class="lb-arcade-title">HIGH SCORES<span class="lb-cursor">_</span></div>
+        <div class="lb-tabs">
+          <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">Week</button>
+          <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">All Time</button>
+          <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">Streak</button>
+        </div>
+      </div>
+      <div class="lb-body" id="lb-body"></div>
     </div>
   </div>
 </div>
@@ -601,10 +625,6 @@ body.shake{animation:screenShake 0.5s ease;}
     </div>
     <div class="vocab-q" id="vocab-q"></div>
     <div class="vocab-choices" id="vocab-choices"></div>
-    <div class="vocab-countdown">
-      <div class="vocab-countdown-bar-wrap"><div class="vocab-countdown-bar" id="vocab-cbar"></div></div>
-      <div class="vocab-countdown-label" id="vocab-clabel">8s</div>
-    </div>
     <button class="vocab-continue-btn" id="vocab-continue" onclick="dismissVocab()">Got it — back to game →</button>
   </div>
 </div>
@@ -626,7 +646,11 @@ body.shake{animation:screenShake 0.5s ease;}
     <div class="gameover-title">GAME OVER</div>
     <div class="gameover-score" id="go-score">0</div>
     <div class="gameover-label" id="go-label">Final Score</div>
-    <input class="name-input" id="name-input" maxlength="12" placeholder="ENTER INITIALS" autocomplete="off"/>
+    <div class="initials-wrap">
+      <input class="initial-box" id="ini-0" maxlength="1" placeholder="A" autocomplete="off" oninput="initialNext(this,'ini-1')"/>
+      <input class="initial-box" id="ini-1" maxlength="1" placeholder="A" autocomplete="off" oninput="initialNext(this,'ini-2')" onkeydown="initialBack(event,this,'ini-0')"/>
+      <input class="initial-box" id="ini-2" maxlength="1" placeholder="A" autocomplete="off" onkeydown="initialBack(event,this,'ini-1')"/>
+    </div>
     <div>
       <button class="go-btn primary" onclick="saveScore()">Save Score</button>
       <button class="go-btn secondary" onclick="restartGame()">Play Again</button>
@@ -756,64 +780,111 @@ const VOCAB_FALLBACK={
   correct:2
 };
 
-// ── GARLAND DATA ──
+// ── GARLAND DATA ── left→right: repeating(long) → terminating(long→short) → integers(short center) → terminating(short→long) → irrationals(long)
+// cells = visible chain length (controls arch height). Repeating/irrational always show ellipsis.
 const GARLAND_DATA=[
-  // FAR LEFT — long terminating (powers of 2 denominators)
-  {lbl:'1/256', dec:'0.00390625',          type:'frac-term',color:'#2ecc8e',sf:-5,st:-2,sd:5.2,dl:0,   sz:12,
-   tip:'1/256 = 0.00390625. Terminates! 256 = 2⁸ — only 2s in the denominator, so it always terminates in base 10.'},
-  {lbl:'1/128', dec:'0.0078125',           type:'frac-term',color:'#2ecc8e',sf:-4,st:-1,sd:4.8,dl:0.2, sz:12,
+  // FAR LEFT — repeating decimals, tallest curtain
+  {lbl:'1/7',   dec:'0.142857',     repeat:'142857',type:'frac-rep', color:'#7c6af7',cells:26,sf:-5,st:-2,sd:5.1,dl:0.0,sz:13,
+   tip:'1/7 = 0.142857142857... A six-digit block repeats forever. 7 is prime — it shares no factors with 10.'},
+  {lbl:'1/3',   dec:'0.3333333',    repeat:'3',     type:'frac-rep', color:'#7c6af7',cells:26,sf:-5,st:-1,sd:4.2,dl:0.2,sz:14,
+   tip:'1/3 = 0.333... The digit 3 repeats without end. Rational — still just 1 ÷ 3.'},
+  {lbl:'1/6',   dec:'0.1666666',    repeat:'6',     type:'frac-rep', color:'#7c6af7',cells:24,sf:-4,st:-1,sd:3.8,dl:0.4,sz:14,
+   tip:'1/6 = 0.1666... After the first digit, the 6 repeats endlessly. Rational.'},
+  {lbl:'5/11',  dec:'0.454545',     repeat:'45',    type:'frac-rep', color:'#7c6af7',cells:22,sf:-4,st:0, sd:4.6,dl:0.6,sz:13,
+   tip:'5/11 = 0.4545... The block 45 repeats. 11 shares no factors with 10.'},
+
+  // LONG TERMINATING — flanking the repeating decimals
+  {lbl:'1/512', dec:'0.001953125',                  type:'frac-term',color:'#2ecc8e',cells:20,sf:-3,st:0, sd:5.2,dl:0.8,sz:12,
+   tip:'1/512 = 0.001953125. Terminates! 512 = 2⁹ — only factors of 2 → always terminates in base 10.'},
+  {lbl:'1/128', dec:'0.0078125',                    type:'frac-term',color:'#2ecc8e',cells:18,sf:-3,st:1, sd:4.8,dl:1.0,sz:13,
    tip:'1/128 = 0.0078125. Terminates. 128 = 2⁷. Powers of 2 always give terminating decimals.'},
-  {lbl:'1/64',  dec:'0.015625',            type:'frac-term',color:'#2ecc8e',sf:-4,st:-1,sd:4.4,dl:0.4, sz:13,
-   tip:'1/64 = 0.015625. Terminates. 64 = 2⁶. The decimal stops at the millionths place.'},
-  {lbl:'1/32',  dec:'0.03125',             type:'frac-term',color:'#2ecc8e',sf:-3,st:0, sd:3.9,dl:0.6, sz:14,
+  {lbl:'1/64',  dec:'0.015625',                     type:'frac-term',color:'#2ecc8e',cells:16,sf:-3,st:1, sd:4.4,dl:1.2,sz:13,
+   tip:'1/64 = 0.015625. Terminates. 64 = 2⁶. Six decimal digits, then nothing.'},
+  {lbl:'1/32',  dec:'0.03125',                      type:'frac-term',color:'#2ecc8e',cells:14,sf:-2,st:1, sd:3.9,dl:1.4,sz:14,
    tip:'1/32 = 0.03125. Terminates. 32 = 2⁵. Five digits after the decimal, then done.'},
-  // LEFT-CENTER — repeating
-  {lbl:'1/6',   dec:'0.1666666', repeat:'6',type:'frac-rep',color:'#7c6af7',sf:-3,st:1, sd:4.2,dl:0.8, sz:15,
-   tip:'1/6 = 0.1666... The 6 repeats forever. 6 = 2 × 3 — the factor of 3 makes it impossible to terminate.'},
-  {lbl:'1/3',   dec:'0.3333333', repeat:'3',type:'frac-rep',color:'#7c6af7',sf:-2,st:2, sd:3.6,dl:1.0, sz:16,
-   tip:'1/3 = 0.333... The classic repeating decimal. 3 shares no factors with 10, so long division never reaches remainder 0.'},
-  // CENTER — whole/short
-  {lbl:'√4',    dec:'2',                  type:'whole',   color:'#3d9fd6',sf:-3,st:3, sd:5.0,dl:1.2, sz:18,
-   tip:'√4 = 2 exactly. A perfect square root. Rational — it\'s a whole number.'},
-  {lbl:'0',     dec:'0',                  type:'whole',   color:'#3d9fd6',sf:-2,st:2, sd:4.5,dl:1.4, sz:18,
-   tip:'Zero is a whole number — and rational! 0 = 0/1.'},
-  {lbl:'1',     dec:'1',                  type:'whole',   color:'#3d9fd6',sf:-1,st:3, sd:3.8,dl:1.6, sz:18,
-   tip:'1 is a whole number. Rational. The multiplicative identity. A crowd favorite.'},
-  {lbl:'0.5',   dec:'0.5',                type:'frac-term',color:'#2ecc8e',sf:-2,st:2, sd:4.1,dl:1.8, sz:17,
-   tip:'0.5 = 1/2. Terminates after one digit. Rational.'},
-  {lbl:'√9',    dec:'3',                  type:'whole',   color:'#3d9fd6',sf:-1,st:3, sd:5.3,dl:2.0, sz:18,
-   tip:'√9 = 3. Perfect square. Rational whole number.'},
-  {lbl:'3/4',   dec:'0.75',               type:'frac-term',color:'#2ecc8e',sf:-2,st:1, sd:4.0,dl:2.2, sz:17,
+
+  // MEDIUM TERMINATING — stepping down toward center
+  {lbl:'9/16',  dec:'0.5625',                       type:'frac-term',color:'#2ecc8e',cells:11,sf:-2,st:2, sd:4.3,dl:1.6,sz:15,
+   tip:'9/16 = 0.5625. Terminates. 16 = 2⁴. Four decimal places, then silence.'},
+  {lbl:'3/4',   dec:'0.75',                         type:'frac-term',color:'#2ecc8e',cells:8, sf:-2,st:2, sd:4.0,dl:1.8,sz:16,
    tip:'3/4 = 0.75. Terminates at hundredths. Rational.'},
-  // RIGHT-CENTER — repeating
-  {lbl:'1/7',   dec:'0.142857', repeat:'142857',type:'frac-rep',color:'#7c6af7',sf:0,st:3,sd:4.7,dl:2.4,sz:15,
-   tip:'1/7 = 0.142857142857... A six-digit block repeats. 7 is prime and shares no factors with 10.'},
-  {lbl:'1/9',   dec:'0.1111111', repeat:'1',    type:'frac-rep',color:'#7c6af7',sf:1,st:4,sd:3.5,dl:2.6,sz:15,
-   tip:'1/9 = 0.111... The digit 1 repeats forever. All ninths repeat a single digit.'},
-  // RIGHT — long terminating (powers of 5)
-  {lbl:'1/25',  dec:'0.04',                type:'frac-term',color:'#2ecc8e',sf:1,st:4, sd:4.3,dl:2.8, sz:14,
-   tip:'1/25 = 0.04. Terminates. 25 = 5² — only 5s in denominator, always terminates.'},
-  {lbl:'1/125', dec:'0.008',               type:'frac-term',color:'#2ecc8e',sf:2,st:5, sd:4.9,dl:3.0, sz:13,
-   tip:'1/125 = 0.008. Terminates. 125 = 5³. Three decimal digits, then silence.'},
-  {lbl:'1/512', dec:'0.001953125',         type:'frac-term',color:'#2ecc8e',sf:2,st:5, sd:5.1,dl:3.2, sz:12,
-   tip:'1/512 = 0.001953125. Terminates. 512 = 2⁹. Long, but it ends.'},
-  {lbl:'1/3125',dec:'0.00032',             type:'frac-term',color:'#2ecc8e',sf:3,st:6, sd:4.6,dl:3.4, sz:12,
-   tip:'1/3125 = 0.00032. Terminates! 3125 = 5⁵. Only factors of 5 → always terminates.'},
-  // FAR RIGHT — irrationals
-  {lbl:'√11',   dec:'3.31662479035539',    type:'irr-sqrt',color:'#ff9f43',sf:3,st:6, sd:3.7,dl:3.6, sz:13,
+  {lbl:'1/25',  dec:'0.04',                         type:'frac-term',color:'#2ecc8e',cells:6, sf:-2,st:2, sd:3.5,dl:2.0,sz:16,
+   tip:'1/25 = 0.04. Terminates. 25 = 5². Only 5s → always terminates.'},
+
+  // LARGE INTEGERS — stepping down to center
+  {lbl:'1,048,576', dec:'1048576',                  type:'whole',    color:'#3d9fd6',cells:8, sf:-2,st:3, sd:5.0,dl:2.2,sz:14,
+   tip:'1,048,576 = 2²⁰. A whole number — rational. Also happens to be the number of bytes in a megabyte.'},
+  {lbl:'65,536',dec:'65536',                        type:'whole',    color:'#3d9fd6',cells:6, sf:-1,st:3, sd:4.5,dl:2.4,sz:15,
+   tip:'65,536 = 2¹⁶. A whole number — rational.'},
+  {lbl:'1,000', dec:'1000',                         type:'whole',    color:'#3d9fd6',cells:5, sf:-1,st:3, sd:4.1,dl:2.6,sz:16,
+   tip:'1,000 is a whole number — rational.'},
+  {lbl:'100',   dec:'100',                          type:'whole',    color:'#3d9fd6',cells:4, sf:-1,st:3, sd:3.8,dl:2.8,sz:17,
+   tip:'100 is a whole number — rational. Also the base of our percentage system.'},
+
+  // CENTER — shortest chains, single digits
+  {lbl:'7',     dec:'7',                            type:'whole',    color:'#3d9fd6',cells:2, sf:-2,st:3, sd:4.8,dl:3.0,sz:20,
+   tip:'7 is a whole number — rational. Also prime. Also Euler\'s favorite (allegedly).'},
+  {lbl:'0',     dec:'0',                            type:'whole',    color:'#3d9fd6',cells:1, sf:-3,st:3, sd:3.5,dl:3.2,sz:22,
+   tip:'Zero is a whole number — rational. 0 = 0/1.'},
+  {lbl:'1',     dec:'1',                            type:'whole',    color:'#3d9fd6',cells:1, sf:-3,st:4, sd:4.2,dl:3.4,sz:22,
+   tip:'1 is the multiplicative identity. A whole number. Rational.'},
+  {lbl:'9',     dec:'9',                            type:'whole',    color:'#3d9fd6',cells:2, sf:-2,st:4, sd:3.8,dl:3.6,sz:20,
+   tip:'9 is a whole number — rational. Also 3².'},
+  {lbl:'√4',    dec:'2',                            type:'whole',    color:'#3d9fd6',cells:2, sf:-2,st:4, sd:4.5,dl:3.8,sz:20,
+   tip:'√4 = 2 exactly. A perfect square root — rational.'},
+
+  // RIGHT LARGE INTEGERS — stepping back up
+  {lbl:'256',   dec:'256',                          type:'whole',    color:'#3d9fd6',cells:4, sf:-1,st:4, sd:4.0,dl:4.0,sz:17,
+   tip:'256 = 2⁸. A whole number — rational.'},
+  {lbl:'10,000',dec:'10000',                        type:'whole',    color:'#3d9fd6',cells:5, sf:0, st:4, sd:4.4,dl:4.2,sz:16,
+   tip:'10,000 is a whole number — rational.'},
+  {lbl:'1,000,000',dec:'1000000',                   type:'whole',    color:'#3d9fd6',cells:7, sf:0, st:5, sd:5.1,dl:4.4,sz:14,
+   tip:'1,000,000 — one million. Whole number. Rational.'},
+
+  // RIGHT MEDIUM TERMINATING — stepping back up
+  {lbl:'0.5',   dec:'0.5',                          type:'frac-term',color:'#2ecc8e',cells:5, sf:0, st:4, sd:3.7,dl:4.6,sz:17,
+   tip:'0.5 = 1/2. Terminates after one decimal place. Rational.'},
+  {lbl:'0.75',  dec:'0.75',                         type:'frac-term',color:'#2ecc8e',cells:7, sf:1, st:4, sd:4.2,dl:4.8,sz:16,
+   tip:'0.75 = 3/4. Terminates at hundredths. Rational.'},
+  {lbl:'1/8',   dec:'0.125',                        type:'frac-term',color:'#2ecc8e',cells:9, sf:1, st:4, sd:4.6,dl:5.0,sz:15,
+   tip:'1/8 = 0.125. Three decimal places, then done. 8 = 2³ — only 2s in denominator.'},
+
+  // RIGHT LONG TERMINATING — rising back up
+  {lbl:'1/16',  dec:'0.0625',                       type:'frac-term',color:'#2ecc8e',cells:12,sf:1, st:5, sd:4.1,dl:5.2,sz:14,
+   tip:'1/16 = 0.0625. Terminates. 16 = 2⁴.'},
+  {lbl:'1/625', dec:'0.0016',                       type:'frac-term',color:'#2ecc8e',cells:15,sf:2, st:5, sd:4.7,dl:5.4,sz:13,
+   tip:'1/625 = 0.0016. Terminates! 625 = 5⁴ — only 5s → always terminates.'},
+  {lbl:'1/3125',dec:'0.00032',                      type:'frac-term',color:'#2ecc8e',cells:18,sf:2, st:5, sd:5.0,dl:5.6,sz:12,
+   tip:'1/3125 = 0.00032. Terminates. 3125 = 5⁵. Only factors of 5 → always terminates.'},
+  {lbl:'1/4096',dec:'0.000244140625',               type:'frac-term',color:'#2ecc8e',cells:20,sf:2, st:5, sd:5.3,dl:5.8,sz:12,
+   tip:'1/4096 = 0.000244140625. Long but finite. 4096 = 2¹² — terminates.'},
+
+  // RIGHT REPEATING — rising curtain
+  {lbl:'4/9',   dec:'0.4444444',    repeat:'4',     type:'frac-rep', color:'#7c6af7',cells:22,sf:3, st:6, sd:3.6,dl:6.0,sz:14,
+   tip:'4/9 = 0.444... The digit 4 repeats endlessly. All ninths repeat a single digit.'},
+  {lbl:'2/3',   dec:'0.6666666',    repeat:'6',     type:'frac-rep', color:'#7c6af7',cells:24,sf:3, st:6, sd:4.4,dl:6.2,sz:14,
+   tip:'2/3 = 0.666... The 6 repeats forever. Rational — it equals exactly 2/3.'},
+  {lbl:'1/11',  dec:'0.090909',     repeat:'09',    type:'frac-rep', color:'#7c6af7',cells:26,sf:4, st:7, sd:4.9,dl:6.4,sz:13,
+   tip:'1/11 = 0.0909... Block 09 repeats. 11 is prime — its decimal always has period 2.'},
+  {lbl:'5/6',   dec:'0.833333',     repeat:'3',     type:'frac-rep', color:'#7c6af7',cells:26,sf:4, st:7, sd:5.4,dl:6.6,sz:13,
+   tip:'5/6 = 0.8333... The 3 repeats. 6 = 2 × 3 — the factor of 3 prevents termination.'},
+
+  // FAR RIGHT — irrationals, tallest curtain
+  {lbl:'√3',    dec:'1.73205080756887',              type:'irr-sqrt', color:'#ff9f43',cells:26,sf:4, st:7, sd:3.7,dl:6.8,sz:13,
+   tip:'√3 = 1.73205... Non-terminating, non-repeating. 3 is not a perfect square.'},
+  {lbl:'0.1121…',dec:'0.1121231234123451234561',pattern:true,type:'irr-dec',color:'#f76a8a',cells:26,sf:4,st:7,sd:4.8,dl:7.0,sz:13,
+   tip:'0.1121231234... Each group grows by one digit — never repeats a fixed block. Irrational.'},
+  {lbl:'π',     dec:'3.14159265358979323846',        type:'irr-dec', color:'#f76a8a',cells:26,sf:4, st:8, sd:3.4,dl:7.2,sz:14,
+   tip:'π = 3.14159265... The most famous irrational. Non-terminating, non-repeating. Proved irrational 1768.'},
+  {lbl:'√11',   dec:'3.31662479035539',              type:'irr-sqrt', color:'#ff9f43',cells:26,sf:5, st:8, sd:5.5,dl:7.4,sz:13,
    tip:'√11 = 3.31662479... goes on forever with no repeating block. 11 is not a perfect square.'},
-  {lbl:'0.1121…',dec:'0.1121231234123451234561',pattern:true,type:'irr-dec',color:'#f76a8a',sf:2,st:5,sd:4.8,dl:3.8,sz:13,
-   tip:'0.1121231234... Each group grows by one digit. The pattern evolves — it never settles into a repeating block.'},
-  {lbl:'π',     dec:'3.14159265358979323846',type:'irr-dec',color:'#f76a8a',sf:3,st:6, sd:3.4,dl:4.0, sz:15,
-   tip:'π = 3.14159265... The most famous irrational number. Non-terminating, non-repeating. Proved irrational in 1768.'},
 ];
 
-// target chain length in cells for all garland strings (uniform hang depth)
-const GARLAND_CHAIN_LEN=22;
-
+// target chain length — now per-string via num.cells
 function buildGarland(){
   const g=document.getElementById('garland');g.innerHTML='';
   GARLAND_DATA.forEach((num,i)=>{
+    const chainLen=num.cells||18;
     const wrap=document.createElement('div');
     wrap.className='gs';
     wrap.style.cssText=`--sf:${num.sf}deg;--st:${num.st}deg;--sd:${num.sd}s;--dl:${num.dl}s;`;
@@ -832,17 +903,16 @@ function buildGarland(){
       for(const c of before)chars.push({c,isD:true});
       chars.push({c:'.',isD:false});
       let s=afterGiven;
-      while(s.replace(/\./g,'').length<GARLAND_CHAIN_LEN+6)s+=num.repeat;
-      for(const c of s){if(chars.filter(x=>x.isD).length>=GARLAND_CHAIN_LEN)break;chars.push({c,isD:true});}
+      while(s.replace(/\./g,'').length<chainLen+6)s+=num.repeat;
+      for(const c of s){if(chars.filter(x=>x.isD).length>=chainLen)break;chars.push({c,isD:true});}
     } else {
       for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
     }
-    // pad terminating strings with ghost cells so all hang to same depth
     const isTermOrWhole=num.type==='frac-term'||num.type==='whole';
-    let dCount=chars.filter(x=>x.isD).length;
-    const needsEll=!isTermOrWhole||(dCount>=GARLAND_CHAIN_LEN);
+    const dCount=chars.filter(x=>x.isD).length;
+    const needsEll=!isTermOrWhole||(dCount>=chainLen);
     let trimmed=[];let dc2=0;
-    for(const s of chars){if(s.isD){if(dc2>=GARLAND_CHAIN_LEN)break;dc2++;}trimmed.push(s);}
+    for(const s of chars){if(s.isD){if(dc2>=chainLen)break;dc2++;}trimmed.push(s);}
 
     trimmed.forEach(s=>{
       if(!s.isD){const el=document.createElement('div');el.className='gdot';el.style.cssText=`font-size:${sz*0.048}rem;width:${sz}px;text-align:center;line-height:1.2;`;el.textContent='.';strip.appendChild(el);return;}
@@ -854,50 +924,36 @@ function buildGarland(){
       strip.appendChild(cell);
     });
 
-    // fading ellipsis block for repeating/irrational
     if(needsEll){
       const ellWrap=document.createElement('div');ellWrap.className='g-ellipsis';
-      [1,0.55,0.25].forEach((opacity,i)=>{
-        const dot=document.createElement('div');
-        dot.className='g-ell-dot';
-        const dsz=Math.max(4,sz*0.35-i*2);
+      [1,0.55,0.25].forEach((opacity)=>{
+        const dot=document.createElement('div');dot.className='g-ell-dot';
+        const dsz=Math.max(4,sz*0.35);
         dot.style.cssText=`width:${dsz}px;height:${dsz}px;opacity:${opacity};`;
         ellWrap.appendChild(dot);
       });
       strip.appendChild(ellWrap);
-    } else {
-      // terminating: pad with invisible spacer so chains reach same depth visually
-      const remaining=GARLAND_CHAIN_LEN-dc2;
-      for(let p=0;p<remaining;p++){
-        const spacer=document.createElement('div');
-        spacer.style.cssText=`width:${sz}px;height:${sz}px;opacity:0;flex-shrink:0;`;
-        strip.appendChild(spacer);
-      }
     }
+    // No invisible padding needed — each string is sized by its own cells count
 
     wrap.appendChild(strip);
 
-    // tooltip — triggered on mouseenter, positioned near cursor
-    wrap.addEventListener('mouseenter', e=>{
+    wrap.addEventListener('mouseenter',e=>{
       const tip=document.getElementById('gtip');
       document.getElementById('gtip-type').textContent=ZONE_NAMES[num.type]||num.type;
       document.getElementById('gtip-type').style.color=num.color;
       document.getElementById('gtip-body').textContent=num.tip;
-      // position near cursor
-      const x=Math.min(e.clientX+14, window.innerWidth-260);
-      const y=Math.min(e.clientY+14, window.innerHeight-160);
-      tip.style.left=x+'px'; tip.style.top=y+'px';
-      tip.classList.add('show');
+      const x=Math.min(e.clientX+14,window.innerWidth-260);
+      const y=Math.min(e.clientY+14,window.innerHeight-160);
+      tip.style.left=x+'px';tip.style.top=y+'px';tip.classList.add('show');
     });
     wrap.addEventListener('mousemove',e=>{
       const tip=document.getElementById('gtip');
-      const x=Math.min(e.clientX+14, window.innerWidth-260);
-      const y=Math.min(e.clientY+14, window.innerHeight-160);
-      tip.style.left=x+'px'; tip.style.top=y+'px';
+      const x=Math.min(e.clientX+14,window.innerWidth-260);
+      const y=Math.min(e.clientY+14,window.innerHeight-160);
+      tip.style.left=x+'px';tip.style.top=y+'px';
     });
-    wrap.addEventListener('mouseleave',()=>{
-      document.getElementById('gtip').classList.remove('show');
-    });
+    wrap.addEventListener('mouseleave',()=>document.getElementById('gtip').classList.remove('show'));
 
     g.appendChild(wrap);
   });
@@ -920,24 +976,24 @@ function resetLbRotate(){
   },7000);
 }
 function renderSplashLb(){
-  const ca=document.getElementById('lb-col-a');
-  const cb=document.getElementById('lb-col-b');
-  ca.innerHTML='';cb.innerHTML='';
+  const body=document.getElementById('lb-body');
+  if(!body)return;
+  body.innerHTML='';
   const lb=getLeaderboard();
-  const now=new Date(), weekAgo=new Date(now-7*24*60*60*1000);
+  const now=new Date(),weekAgo=new Date(now-7*24*60*60*1000);
   let entries=[];
   if(lbTab==='week') entries=lb.filter(e=>e.date&&new Date(e.date)>=weekAgo).sort((a,b)=>b.score-a.score).slice(0,10);
-  else if(lbTab==='all') entries=lb.sort((a,b)=>b.score-a.score).slice(0,10);
-  else entries=lb.sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,10);
+  else if(lbTab==='all') entries=[...lb].sort((a,b)=>b.score-a.score).slice(0,10);
+  else entries=[...lb].sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,10);
   if(!entries.length){
-    ca.innerHTML='<div class="lb-empty">NO SCORES YET<br>BE THE FIRST!</div>';return;
+    body.innerHTML='<div class="lb-empty">NO SCORES YET<br>BE THE FIRST!</div>';return;
   }
   const medals=['🥇','🥈','🥉'];
   entries.forEach((e,i)=>{
     const row=document.createElement('div');row.className='lb-row';
     const val=lbTab==='streak'?(e.streak||0):e.score;
     row.innerHTML=`<span class="lb-r">${medals[i]||i+1}</span><span class="lb-n">${e.name||'???'}</span><span class="lb-m ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-s">${val}</span>`;
-    (i<5?ca:cb).appendChild(row);
+    body.appendChild(row);
   });
 }
 
@@ -1267,63 +1323,47 @@ function updateStreak(val){
 // ── VOCAB WRONG POPUP ── 
 function showVocabPopup(wrongZoneId,rightZoneId,numDisplay){
   vocabAnswered=false;
-  const numDisplayHTML = current.displayHTML || null;
-
-  // juxtaposition
+  const numDisplayHTML=current.displayHTML||null;
   const wnEl=document.getElementById('vc-number-wrong');
   const rnEl=document.getElementById('vc-number-right');
   if(numDisplayHTML){wnEl.innerHTML=numDisplayHTML;rnEl.innerHTML=numDisplayHTML;}
   else{wnEl.textContent=numDisplay;rnEl.textContent=numDisplay;}
   document.getElementById('vc-cat-wrong').textContent=ZONE_NAMES[wrongZoneId]||wrongZoneId;
   document.getElementById('vc-cat-right').textContent=ZONE_NAMES[rightZoneId]||rightZoneId;
-
-  // get vocab question
   const key=wrongZoneId+'>'+rightZoneId;
   const qData=VOCAB_Q[key]||VOCAB_FALLBACK;
   document.getElementById('vocab-q').textContent=qData.q;
-
-  // render choices
   const choicesEl=document.getElementById('vocab-choices');choicesEl.innerHTML='';
   const keys=['A','B','C','D'];
   qData.choices.forEach((ch,i)=>{
     const btn=document.createElement('button');btn.className='vc-choice';
     btn.innerHTML=`<span class="vc-key">${keys[i]}.</span><span>${ch}</span>`;
-    btn.addEventListener('click',()=>handleVocabChoice(i,qData.correct,btn));
+    btn.addEventListener('click',()=>handleVocabChoice(i,qData.correct,btn,choicesEl));
     choicesEl.appendChild(btn);
   });
-
-  // hide continue btn
   document.getElementById('vocab-continue').style.display='none';
-
-  // countdown
-  let secs=8;
-  document.getElementById('vocab-clabel').textContent=secs+'s';
-  const cbar=document.getElementById('vocab-cbar');
-  cbar.style.transition='none';cbar.style.width='100%';
-  void cbar.offsetWidth;
-  cbar.style.transition=`width ${secs*1000}ms linear`;cbar.style.width='0%';
+  // auto-show continue after 6 seconds regardless
   if(vocabTimer)clearInterval(vocabTimer);
-  vocabTimer=setInterval(()=>{
-    secs--;
-    document.getElementById('vocab-clabel').textContent=secs+'s';
-    if(secs<=0){
-      clearInterval(vocabTimer);vocabTimer=null;
-      if(!vocabAnswered) document.getElementById('vocab-continue').style.display='block';
+  vocabTimer=setTimeout(()=>{
+    // highlight correct answer if not yet answered
+    if(!vocabAnswered){
+      const correctBtn=choicesEl.children[qData.correct];
+      if(correctBtn)correctBtn.classList.add('right-choice');
     }
-  },1000);
-
+    document.getElementById('vocab-continue').style.display='block';
+  },6000);
   document.getElementById('vocab-overlay').classList.add('show');
 }
 
-function handleVocabChoice(idx,correct,btn){
+function handleVocabChoice(idx,correct,btn,choicesEl){
   if(vocabAnswered)return;
   if(idx===correct){
     vocabAnswered=true;
     btn.classList.add('right-choice');
-    if(vocabTimer){clearInterval(vocabTimer);vocabTimer=null;}
-    setTimeout(()=>{
-      document.getElementById('vocab-continue').style.display='block';
-    },400);
+    // disable other buttons
+    Array.from(choicesEl.children).forEach(b=>b.disabled=true);
+    if(vocabTimer){clearTimeout(vocabTimer);vocabTimer=null;}
+    setTimeout(()=>document.getElementById('vocab-continue').style.display='block',600);
   } else {
     btn.classList.add('wrong-choice');
     setTimeout(()=>btn.classList.remove('wrong-choice'),400);
@@ -1366,12 +1406,25 @@ function triggerGameOver(finalScore){
   if(ds>topScore){topScore=ds;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
   document.getElementById('go-score').textContent=ds;
   document.getElementById('go-label').textContent=`${MODES[mode].name} mode · Best Streak: ${bestStreak}`;
+  // clear initials
+  ['ini-0','ini-1','ini-2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   renderGameOverLb(null);
   document.getElementById('gameover-overlay').classList.add('show');
-  document.getElementById('name-input').focus();
+  setTimeout(()=>document.getElementById('ini-0')?.focus(),300);
 }
+function initialNext(el,nextId){
+  el.value=el.value.toUpperCase();
+  if(el.value.length===1)document.getElementById(nextId)?.focus();
+}
+function initialBack(e,el,prevId){
+  if(e.key==='Backspace'&&!el.value)document.getElementById(prevId)?.focus();
+}
+function getInitials(){
+  return(['ini-0','ini-1','ini-2'].map(id=>(document.getElementById(id)?.value||'').toUpperCase()).join(''))||'???';
+}
+
 function saveScore(){
-  const name=(document.getElementById('name-input').value.trim().toUpperCase()||'???').slice(0,12);
+  const name=getInitials()||'???';
   const lb=getLeaderboard();
   const finalScore=parseInt(document.getElementById('go-score').textContent)||0;
   const entry={name,score:finalScore,mode,streak:bestStreak,date:new Date().toLocaleDateString()};
