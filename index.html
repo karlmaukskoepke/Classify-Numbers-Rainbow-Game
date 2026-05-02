@@ -38,39 +38,55 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   align-items:flex-start;
   justify-content:center;
   overflow:visible;
-  height:320px;
-  padding-top:8px;
+  height:300px;
+  padding-top:6px;
+  /* CRITICAL: let garland overflow without blocking clicks below */
+  pointer-events:none;
 }
-/* title box nestled just below the middle whole numbers */
+/* title — now horizontal, centered, nestled under short center chains */
 .title-box{
   position:absolute;
-  top:auto;
-  bottom:-10px;
+  bottom:-8px;
   left:50%;
   transform:translateX(-50%);
   z-index:10;
   background:rgba(13,13,20,0.95);
   border:2px solid var(--accent);
-  border-radius:20px;
-  padding:16px 24px;
+  border-radius:16px;
+  padding:14px 28px;
   text-align:center;
   box-shadow:0 0 40px rgba(108,99,255,0.35), inset 0 0 30px rgba(108,99,255,0.06);
   pointer-events:none;
   white-space:nowrap;
-  width:220px;
 }
 .title-main{
   font-family:'Orbitron',sans-serif;
-  font-size:1.3rem;font-weight:900;
+  font-size:1.5rem;font-weight:900;
   letter-spacing:0.04em;
-  line-height:1.4;
-  display:flex;flex-direction:column;gap:2px;
+  line-height:1;
+  display:flex;align-items:center;gap:10px;
 }
-.title-rational{color:var(--rational-glow);text-shadow:0 0 20px rgba(46,204,142,0.6);}
-.title-vs{color:var(--dim);font-size:0.8rem;letter-spacing:0.2em;}
-.title-irrational{color:var(--irrational-glow);text-shadow:0 0 20px rgba(247,37,133,0.6);}
+/* Rational — styled as a fraction to hint at its meaning */
+.title-rational{
+  color:var(--rational-glow);
+  text-shadow:0 0 20px rgba(46,204,142,0.5);
+  display:inline-flex;flex-direction:column;align-items:center;gap:0;
+  font-size:1rem;
+}
+.title-rational .t-top{font-size:1.1rem;font-weight:900;letter-spacing:0.04em;}
+.title-rational .t-line{width:100%;height:2px;background:var(--rational-glow);border-radius:1px;margin:2px 0;box-shadow:0 0 8px rgba(46,204,142,0.6);}
+.title-rational .t-bot{font-size:0.75rem;font-weight:700;opacity:0.8;}
+.title-vs{color:var(--dim);font-size:0.75rem;letter-spacing:0.2em;font-weight:400;}
+/* Irrational — each letter a different digit color */
+.title-irrational{
+  font-size:1.5rem;font-weight:900;
+  text-shadow:none;
+  display:inline-flex;gap:1px;
+  letter-spacing:0.02em;
+}
+.title-irrational span{display:inline-block;}
 .title-sub{
-  font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;
+  font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;
   color:var(--dim);margin-top:8px;font-family:'Syne',sans-serif;
   white-space:normal;line-height:1.4;
 }
@@ -82,8 +98,9 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   gap:0;
   width:100%;
   position:relative;
+  pointer-events:none;
 }
-.gs{/* garland string */
+.gs{
   display:inline-flex;flex-direction:column;align-items:center;
   align-self:flex-start;
   position:relative;
@@ -93,6 +110,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   cursor:pointer;
   padding:0 4px;
   flex-shrink:0;
+  /* re-enable pointer events only on actual chain elements */
+  pointer-events:auto;
 }
 .gs:hover{animation-play-state:paused;}
 @keyframes sway{
@@ -142,25 +161,70 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 
 /* ── SPLASH CENTER ── */
 .splash-center{
-  flex:1;display:flex;flex-direction:row;align-items:flex-start;justify-content:center;
-  gap:24px;padding:16px 24px 20px;
+  flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:28px;padding:12px 28px 16px;
   overflow:hidden;
 }
 .splash-main{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;flex-shrink:0;
+  gap:10px;flex-shrink:0;
 }
-.splash-hint{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);opacity:0.55;}
-.splash-sub{font-size:0.82rem;color:var(--dim);text-align:center;max-width:320px;line-height:1.6;}
+.splash-hint{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);opacity:0.55;}
 .play-btn{
-  padding:14px 48px;border-radius:14px;border:none;
+  padding:16px 52px;border-radius:14px;border:none;
   background:linear-gradient(135deg,var(--accent),#9580ff);
-  color:white;font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;
+  color:white;font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;
   cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;
   transition:all 0.2s;
   box-shadow:0 0 30px rgba(108,99,255,0.4);
+  position:relative;z-index:5;
 }
 .play-btn:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(108,99,255,0.7);}
+.how-to-play-btn{
+  font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--dim);background:none;border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px;cursor:pointer;
+  font-family:'Syne',sans-serif;transition:all 0.2s;
+}
+.how-to-play-btn:hover{color:var(--text);border-color:var(--dim);}
+
+/* instructions popup */
+.instructions-overlay{
+  position:fixed;inset:0;z-index:60;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.7);
+  opacity:0;pointer-events:none;transition:opacity 0.25s;
+}
+.instructions-overlay.show{opacity:1;pointer-events:all;}
+.instructions-box{
+  background:var(--surface);
+  border:2px solid var(--accent);
+  border-radius:20px;
+  padding:28px 36px;
+  max-width:480px;width:92%;
+  box-shadow:0 0 60px rgba(108,99,255,0.3);
+  animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);
+}
+.instructions-box h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--accent);margin-bottom:16px;text-align:center;}
+.instructions-box ol{padding-left:20px;display:flex;flex-direction:column;gap:10px;}
+.instructions-box li{font-size:0.85rem;color:var(--dim);line-height:1.55;}
+.instructions-box li strong{color:var(--text);}
+.instructions-close{
+  display:block;margin:20px auto 0;
+  padding:10px 32px;border-radius:10px;border:none;
+  background:var(--accent);color:white;
+  font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;
+}
+/* in-game help button */
+.help-btn{
+  position:absolute;bottom:14px;right:14px;z-index:20;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--dim);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.18s;font-family:'Syne',sans-serif;font-weight:700;
+}
+.help-btn:hover{border-color:var(--accent);color:var(--accent);}
 
 /* ── ARCADE LEADERBOARD ── */
 .splash-lb{
@@ -502,27 +566,31 @@ body.shake{animation:screenShake 0.5s ease;}
   <div class="garland-wrap">
     <div class="title-box">
       <div class="title-main">
-        <span class="title-rational">Rational</span>
+        <div class="title-rational">
+          <span class="t-top">Rational</span>
+          <div class="t-line"></div>
+          <span class="t-bot">p/q</span>
+        </div>
         <span class="title-vs">vs</span>
-        <span class="title-irrational">Irrational</span>
+        <div class="title-irrational" id="title-irrational-letters"></div>
       </div>
-      <div class="title-sub">hover any chain · click to learn</div>
+      <div class="title-sub">hover any chain · ? for help</div>
     </div>
     <div class="garland" id="garland"></div>
   </div>
   <div class="splash-center">
     <div class="splash-main">
-      <div class="splash-hint">↑ hover any chain to explore</div>
-      <div class="splash-sub">Can you classify every number? Drag it to its category — and survive as long as you can.</div>
-      <button class="play-btn" onclick="startGame()">Play →</button>
+      <div class="splash-hint">↑ hover any color chain to explore</div>
+      <button class="play-btn" id="play-btn" onclick="startGame()">▶ Play</button>
+      <button class="how-to-play-btn" onclick="showInstructions()">? How to Play</button>
     </div>
-    <div class="splash-lb">
+    <div class="splash-lb" onclick="cycleLbTab()" title="Click to cycle leaderboard">
       <div class="lb-header">
         <div class="lb-arcade-title">HIGH SCORES<span class="lb-cursor">_</span></div>
         <div class="lb-tabs">
-          <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">Week</button>
-          <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">All Time</button>
-          <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">Streak</button>
+          <button class="lb-tab active" id="tab-week" onclick="event.stopPropagation();switchLbTab('week')">Week</button>
+          <button class="lb-tab" id="tab-all" onclick="event.stopPropagation();switchLbTab('all')">All Time</button>
+          <button class="lb-tab" id="tab-streak" onclick="event.stopPropagation();switchLbTab('streak')">Streak</button>
         </div>
       </div>
       <div class="lb-body" id="lb-body"></div>
@@ -603,9 +671,26 @@ body.shake{animation:screenShake 0.5s ease;}
   </div>
 </div>
 </div><!-- end game-screen -->
+<button class="help-btn" id="help-btn" onclick="showInstructions()" style="display:none" title="How to Play">?</button>
 
 <!-- brief correct flash -->
 <div class="brief-flash" id="brief-flash">✓</div>
+
+<!-- INSTRUCTIONS POPUP -->
+<div class="instructions-overlay" id="instructions-overlay" onclick="hideInstructions()">
+  <div class="instructions-box" onclick="event.stopPropagation()">
+    <h2>How to Play</h2>
+    <ol>
+      <li><strong>A number appears at the top</strong> with its decimal expansion as color-coded squares — each digit has a unique color.</li>
+      <li><strong>Drag it down</strong> toward Rational or Irrational. Hovering either side reveals the subcategories.</li>
+      <li><strong>Drop it in the correct zone.</strong> Perfect placements (right side, first try) earn bonus 💎 points.</li>
+      <li><strong>You have 3 lives ❤️❤️❤️.</strong> Each wrong answer loses a life and resets your score to zero.</li>
+      <li><strong>Build a streak of 10</strong> to enter MEGA mode — colors disappear and your points multiply! Keep going for MONSTER ×3 and ULTRA ×5.</li>
+      <li><strong>Game over</strong> after 3 mistakes — enter your initials to save your score!</li>
+    </ol>
+    <button class="instructions-close" onclick="hideInstructions()">Got it — Let's Play!</button>
+  </div>
+</div>
 
 <!-- VOCAB WRONG POPUP -->
 <div class="vocab-overlay" id="vocab-overlay">
@@ -997,21 +1082,61 @@ function renderSplashLb(){
   });
 }
 
+// ── COLOR IRRATIONAL TITLE LETTERS ──
+function colorIrrationalTitle(){
+  const el=document.getElementById('title-irrational-letters');
+  if(!el)return;
+  const word='Irrational';
+  // assign each letter a digit color cycling through DC
+  el.innerHTML='';
+  [...word].forEach((ch,i)=>{
+    const span=document.createElement('span');
+    span.textContent=ch;
+    span.style.color=DC[i%DC.length];
+    span.style.textShadow=`0 0 10px ${DC[i%DC.length]}88`;
+    el.appendChild(span);
+  });
+}
+
+// ── INSTRUCTIONS ──
+let hasSeenInstructions=localStorage.getItem('nc-seen-instructions')==='1';
+function showInstructions(){
+  document.getElementById('instructions-overlay').classList.add('show');
+}
+function hideInstructions(){
+  document.getElementById('instructions-overlay').classList.remove('show');
+  if(!hasSeenInstructions){
+    hasSeenInstructions=true;
+    localStorage.setItem('nc-seen-instructions','1');
+  }
+}
+
+// ── LEADERBOARD CYCLE ON CLICK ──
+function cycleLbTab(){
+  const tabs=['week','all','streak'];
+  const next=tabs[(tabs.indexOf(lbTab)+1)%tabs.length];
+  switchLbTab(next);
+}
+
 // ── SCREEN SWITCHING ──
 let gameInitialized=false;
 function startGame(){
   document.getElementById('splash-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
   document.getElementById('gtip').classList.remove('show');
+  document.getElementById('help-btn').style.display='flex';
   if(lbRotateTimer){clearInterval(lbRotateTimer);lbRotateTimer=null;}
   if(!gameInitialized){
     gameInitialized=true;
     buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();nextNumber();
   }
+  // show instructions on first play
+  if(!hasSeenInstructions) setTimeout(showInstructions,400);
 }
 function goToSplash(){
   document.getElementById('game-screen').classList.add('hidden');
   document.getElementById('splash-screen').classList.remove('hidden');
+  document.getElementById('help-btn').style.display='none';
   renderSplashLb();resetLbRotate();
 }
 
@@ -1626,7 +1751,7 @@ function initDrag(){
 function closeCelebration(){document.getElementById('overlay').className='overlay';document.getElementById('modal').className='modal';nextNumber();}
 
 // ── INIT ──
-buildGarland();renderSplashLb();resetLbRotate();
+buildGarland();colorIrrationalTitle();renderSplashLb();resetLbRotate();
 </script>
 </body>
 </html>
