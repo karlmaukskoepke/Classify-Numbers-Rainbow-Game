@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Number Classifier</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>Rational vs Irrational</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Press+Start+2P&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0d0d14; --surface:#14141f; --surface2:#1c1c2e; --border:#26263a;
-  --text:#eeeef8; --dim:#7070a0; --accent:#6c63ff;
-  --green:#2ecc8e; --red:#ff5577; --gold:#ffd700;
-  --rational-bg:#071a14; --rational-glow:#2ecc8e;
-  --irrational-bg:#1a0710; --irrational-glow:#f72585;
-  --mode-color: var(--accent);
+:root{
+  --bg:#0d0d14;--surface:#14141f;--surface2:#1c1c2e;--border:#26263a;
+  --text:#eeeef8;--dim:#7070a0;--accent:#6c63ff;
+  --green:#2ecc8e;--red:#ff5577;--gold:#ffd700;
+  --rational-bg:#071a14;--rational-glow:#2ecc8e;
+  --irrational-bg:#1a0710;--irrational-glow:#f72585;
+  --mode-color:var(--accent);
   --d0:#aaaaaa;--d1:#ff3b3b;--d2:#ff8c00;--d3:#ffe600;
   --d4:#7ed321;--d5:#22c55e;--d6:#06c9c9;--d7:#3b82f6;
   --d8:#a855f7;--d9:#f72585;
@@ -20,48 +20,229 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-/* ── HEADER ── */
-header{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
-.logo{font-size:0.95rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
-.logo span{color:var(--accent);}
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity 0.5s;}
+.screen.hidden{opacity:0;pointer-events:none;}
+#game-screen{z-index:1;}
+#splash-screen{z-index:2;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;}
 
-/* mode badge in header */
-.mode-badge{
-  padding:3px 12px;border-radius:20px;font-size:0.68rem;font-weight:800;
-  letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;
-  background:var(--surface2);border:2px solid var(--mode-color);color:var(--mode-color);
-  transition:all 0.4s;
+/* ══════════════════════════════════════
+   SPLASH SCREEN
+══════════════════════════════════════ */
+
+/* ── GARLAND ── */
+.garland-wrap{
+  flex-shrink:0;
+  position:relative;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  overflow:visible;
+  height:320px;
+  padding-top:8px;
 }
+/* title box nestled in the middle of the garland */
+.title-box{
+  position:absolute;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  background:rgba(13,13,20,0.92);
+  border:2px solid var(--accent);
+  border-radius:18px;
+  padding:18px 32px;
+  text-align:center;
+  box-shadow:0 0 40px rgba(108,99,255,0.35), inset 0 0 30px rgba(108,99,255,0.06);
+  pointer-events:none;
+  white-space:nowrap;
+}
+.title-main{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.9rem;font-weight:900;
+  letter-spacing:0.06em;
+  line-height:1.1;
+}
+.title-rational{color:var(--rational-glow);text-shadow:0 0 20px rgba(46,204,142,0.6);}
+.title-vs{color:var(--dim);font-size:1.1rem;margin:0 8px;}
+.title-irrational{color:var(--irrational-glow);text-shadow:0 0 20px rgba(247,37,133,0.6);}
+.title-sub{
+  font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--dim);margin-top:6px;font-family:'Syne',sans-serif;
+}
+
+.garland{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:0;
+  width:100%;
+  position:relative;
+}
+.gs{/* garland string */
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+  transform-origin:top center;
+  animation:sway var(--sd,4s) ease-in-out infinite alternate;
+  animation-delay:var(--dl,0s);
+  cursor:pointer;
+  padding:0 5px;
+  flex-shrink:0;
+}
+.gs:hover{animation-play-state:paused;}
+@keyframes sway{
+  from{transform:rotate(var(--sf,-2deg));}
+  to{transform:rotate(var(--st,2deg));}
+}
+.g-hook{width:2px;height:18px;background:var(--border);border-radius:1px;}
+.g-lbl{
+  font-family:'Space Mono',monospace;font-size:0.58rem;font-weight:700;
+  color:var(--dim);white-space:nowrap;margin:2px 0;text-align:center;
+}
+.g-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.gcell{
+  border-radius:4px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-weight:800;
+  color:rgba(0,0,0,0.75);
+}
+.gcell.d0{color:rgba(0,0,0,0.45);}
+.gcell.d3,.gcell.d4{color:rgba(0,0,0,0.6);}
+.gdot{color:var(--dim);text-align:center;line-height:1;}
+/* fading ellipsis block */
+.g-ellipsis{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  margin-top:2px;
+}
+.g-ell-dot{
+  border-radius:3px;
+  background:var(--dim);
+}
+
+/* tooltip — positioned by JS near cursor */
+.gtip{
+  position:fixed;
+  background:var(--surface);
+  border:2px solid var(--border);
+  border-radius:14px;padding:14px 18px;
+  width:240px;z-index:100;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.18s;
+  box-shadow:0 12px 40px rgba(0,0,0,0.7);
+  text-align:left;
+}
+.gtip.show{opacity:1;}
+.gtip-type{font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:7px;}
+.gtip-body{font-size:0.82rem;color:var(--text);line-height:1.55;}
+
+/* ── SPLASH CENTER ── */
+.splash-center{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:0 20px;
+}
+.splash-hint{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);opacity:0.55;}
+.splash-sub{font-size:0.88rem;color:var(--dim);text-align:center;max-width:400px;line-height:1.6;}
+.play-btn{
+  padding:16px 56px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--accent),#9580ff);
+  color:white;font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;
+  transition:all 0.2s;
+  box-shadow:0 0 30px rgba(108,99,255,0.4);
+}
+.play-btn:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(108,99,255,0.7);}
+
+/* ── ARCADE LEADERBOARD ── */
+.splash-lb{
+  flex-shrink:0;
+  border-top:1px solid var(--border);
+  background:var(--surface);
+  padding:12px 24px 16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.lb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.lb-arcade-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:0.7rem;color:var(--gold);
+  letter-spacing:0.08em;
+  text-shadow:0 0 10px rgba(255,215,0,0.5);
+  animation:blink 1.4s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.lb-tabs{display:flex;gap:6px;}
+.lb-tab{
+  padding:4px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;
+  border:1px solid var(--border);color:var(--dim);background:transparent;
+  transition:all 0.2s;font-family:'Syne',sans-serif;
+}
+.lb-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
+
+/* scanlines effect on lb body */
+.lb-body{
+  position:relative;
+  display:flex;gap:16px;
+  overflow:hidden;
+}
+.lb-body::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
+}
+.lb-col{flex:1;display:flex;flex-direction:column;gap:3px;}
+.lb-row{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Press Start 2P',monospace;
+  font-size:0.55rem;letter-spacing:0.04em;
+  padding:4px 8px;border-radius:4px;
+  background:var(--surface2);
+  transition:background 0.2s;
+}
+.lb-row:first-child{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);}
+.lb-row:nth-child(2){background:rgba(200,200,200,0.06);border:1px solid rgba(200,200,200,0.15);}
+.lb-row:nth-child(3){background:rgba(205,127,50,0.06);border:1px solid rgba(205,127,50,0.2);}
+.lb-r{color:var(--dim);width:18px;flex-shrink:0;}
+.lb-n{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-s{color:var(--gold);}
+.lb-m{font-size:0.42rem;padding:2px 5px;border-radius:6px;font-weight:700;font-family:'Syne',sans-serif;}
+.lb-m.normal{background:rgba(108,99,255,0.2);color:var(--accent);}
+.lb-m.mega{background:rgba(255,215,0,0.2);color:var(--gold);}
+.lb-m.monster{background:rgba(255,140,0,0.2);color:#ff8c00;}
+.lb-m.ultra{background:rgba(247,37,133,0.2);color:#f72585;}
+.lb-empty{font-family:'Press Start 2P',monospace;font-size:0.52rem;color:var(--dim);padding:8px;text-align:center;}
+.lb-cursor{display:inline-block;animation:blink 0.8s step-end infinite;}
+
+/* ══════════════════════════════════════
+   GAME SCREEN
+══════════════════════════════════════ */
+header{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
+.logo{font-family:'Orbitron',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;cursor:pointer;}
+.logo span{color:var(--accent);}
+.mode-badge{padding:3px 12px;border-radius:20px;font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;background:var(--surface2);border:2px solid var(--mode-color);color:var(--mode-color);transition:all 0.4s;}
 .mode-badge.mega{--mode-color:#ffd700;}
 .mode-badge.monster{--mode-color:#ff8c00;}
 .mode-badge.ultra{--mode-color:#f72585;}
-
-/* timer bar */
 .timer-bar-wrap{flex:1;max-width:200px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:none;}
 .timer-bar-wrap.active{display:block;}
 .timer-bar{height:100%;border-radius:3px;background:var(--green);width:100%;transition:width linear,background 0.3s;}
 .timer-bar.urgent{background:var(--red);}
-
-/* lives */
 .lives{display:flex;gap:4px;align-items:center;}
 .heart{font-size:1.3rem;transition:all 0.3s;display:inline-block;}
 .heart.lost{filter:grayscale(1);opacity:0.35;animation:heartBreak 0.4s ease;}
 @keyframes heartBreak{0%{transform:scale(1.4)}50%{transform:scale(0.8) rotate(-10deg)}100%{transform:scale(1)}}
-
-/* multiplier */
 .multiplier{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--gold);white-space:nowrap;min-width:36px;text-align:right;}
 
-/* ── BODY ── */
 .body-row{flex:1;display:flex;overflow:hidden;}
 .center-col{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
-/* ── TILE PANEL ── */
+/* tile panel */
 .tile-panel{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:10px 20px 8px;background:var(--surface);border-bottom:2px solid var(--border);}
 .drag-tile{display:inline-flex;flex-direction:column;align-items:center;gap:6px;padding:12px 22px;background:var(--surface2);border:2px solid var(--border);border-radius:14px;cursor:grab;user-select:none;touch-action:none;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;}
 .drag-tile:hover{border-color:var(--accent);box-shadow:0 0 28px rgba(108,99,255,0.3);}
 .drag-tile.dragging{opacity:0.3;transform:scale(0.9);cursor:grabbing;}
 .drag-tile.gone{visibility:hidden;}
-/* in MEGA+ mode, tile has no color strip — number only */
 .drag-tile.no-colors .tile-strip{display:none;}
 .tile-number{font-family:'Space Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--text);line-height:1;white-space:nowrap;}
 .tile-hint{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);}
@@ -74,8 +255,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .tdot{font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--dim);flex-shrink:0;line-height:32px;padding:0 2px;}
 .tell{font-size:1.1rem;color:var(--dim);padding-left:4px;flex-shrink:0;}
 
-/* ── GALLERY ── */
+/* gallery */
 .gallery{flex:1;display:flex;overflow:hidden;position:relative;pointer-events:all;}
+.gallery-dead-zone{position:absolute;top:0;left:0;right:0;height:28px;z-index:10;pointer-events:all;background:transparent;}
 .parent-zone{display:flex;flex-direction:column;position:relative;transition:flex 0.4s cubic-bezier(0.4,0,0.2,1);overflow:hidden;pointer-events:all;min-height:0;}
 .parent-zone.rational{flex:1;background:var(--rational-bg);border-right:3px solid var(--border);}
 .parent-zone.irrational{flex:1;background:var(--irrational-bg);}
@@ -93,6 +275,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .parent-zone.drag-hover-irrational{box-shadow:inset 0 0 40px rgba(247,37,133,0.14);}
 .sub-row{display:flex;flex:1;opacity:0;transition:opacity 0.3s 0.15s;overflow:hidden;}
 .parent-zone.expanded .sub-row{opacity:1;}
+.parent-zone:not(.expanded):not(.collapsed) .sub-row{opacity:var(--hint-opacity,0);}
 
 .zone-col{flex:1;min-width:75px;display:flex;flex-direction:column;border-right:1px solid var(--border);cursor:pointer;transition:background 0.18s;overflow:hidden;}
 .zone-col:last-child{border-right:none;}
@@ -103,7 +286,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 @keyframes zFlashR{0%,100%{background:transparent}50%{background:rgba(255,85,119,0.2)}}
 .zone-col.correct-flash{animation:zFlashG 0.5s ease;}
 .zone-col.wrong-flash{animation:zFlashR 0.5s ease;}
-
 .zone-header{flex-shrink:0;text-align:center;padding:9px 5px 5px;border-bottom:2px solid var(--border);background:rgba(0,0,0,0.25);}
 .rational .zone-header{border-color:rgba(46,204,142,0.2);}
 .irrational .zone-header{border-color:rgba(247,37,133,0.2);}
@@ -128,7 +310,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .hell{font-size:0.72rem;color:var(--dim);text-align:center;line-height:1.3;}
 .hconn{width:2px;height:5px;background:var(--border);border-radius:1px;margin:0 auto;}
 
-/* ── SIDEBAR ── */
+/* sidebar */
 .sidebar{width:240px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:16px 14px;gap:14px;}
 .sb-section{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .sb-val{font-family:'Space Mono',monospace;font-size:2.8rem;font-weight:700;color:var(--accent);line-height:1;display:block;text-align:center;}
@@ -145,84 +327,137 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 @keyframes onFire{from{text-shadow:0 0 8px #ff8c00,0 0 20px #ff3b3b}to{text-shadow:0 0 18px #ffe600,0 0 45px #ff8c00}}
 .sb-label{font-size:0.62rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);font-weight:600;text-align:center;}
 .sb-divider{width:100%;height:1px;background:var(--border);margin:2px 0;}
-
-.badge-list{display:flex;flex-direction:column;gap:6px;width:100%;}
 .badge-section-title{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--border);padding-bottom:4px;width:100%;}
+.badge-list{display:flex;flex-direction:column;gap:6px;width:100%;}
 .badge{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);opacity:0;transform:scale(0.7) translateY(8px);transition:opacity 0.4s,transform 0.4s;}
 .badge.earned{opacity:1;transform:scale(1) translateY(0);animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1);}
 @keyframes badgePop{0%{transform:scale(0.5) translateY(10px);opacity:0}60%{transform:scale(1.1) translateY(-2px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
 .badge-icon{font-size:1.1rem;flex-shrink:0;}
 .badge-text{font-size:0.62rem;font-weight:700;color:var(--text);line-height:1.25;}
 
-/* ── POPUP ── */
-.popup-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);opacity:0;pointer-events:none;transition:opacity 0.2s;}
-.popup-overlay.show{opacity:1;pointer-events:all;}
-.popup{background:var(--surface);border-radius:22px;padding:32px 40px;text-align:center;max-width:400px;width:92%;transform:scale(0.7) translateY(30px);transition:transform 0.35s cubic-bezier(0.34,1.4,0.64,1);border:3px solid var(--border);box-shadow:0 20px 80px rgba(0,0,0,0.7);position:relative;overflow:hidden;}
-.popup::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,currentColor,transparent);opacity:0.6;}
-.popup-overlay.show .popup{transform:scale(1) translateY(0);}
-.popup.correct-popup{border-color:var(--green);color:var(--green);}
-.popup.wrong-popup{border-color:var(--red);color:var(--red);}
-.popup-icon{font-size:3.6rem;line-height:1;margin-bottom:10px;display:block;animation:iconBounce 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.1s both;}
-@keyframes iconBounce{0%{transform:scale(0) rotate(-15deg)}100%{transform:scale(1) rotate(0)}}
-.popup-body{font-size:1.1rem;font-weight:800;line-height:1.4;color:var(--text);margin-bottom:10px;animation:slideUp 0.4s ease 0.15s both;}
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.popup-pun{font-size:0.76rem;font-style:italic;color:var(--dim);line-height:1.4;animation:slideUp 0.4s ease 0.3s both;}
-.popup-bonus{font-size:0.8rem;color:#06c9c9;font-weight:800;margin-bottom:6px;display:none;animation:slideUp 0.4s ease 0.22s both;}
-.popup-bonus.show{display:block;}
-.popup-dismiss{font-size:0.6rem;color:var(--dim);margin-top:14px;letter-spacing:0.08em;animation:slideUp 0.4s ease 0.4s both;}
+/* ── CORRECT POPUP (brief) ── */
+.brief-flash{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:60;pointer-events:none;
+  font-size:4rem;line-height:1;
+  opacity:0;
+}
+.brief-flash.show{animation:briefFlash 0.7s ease forwards;}
+@keyframes briefFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-55%) scale(0.95)}}
 
-/* ── LEVEL UP OVERLAY ── */
+/* ── WRONG ANSWER VOCAB POPUP ── */
+.vocab-overlay{
+  position:fixed;inset:0;z-index:70;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.75);
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.vocab-overlay.show{opacity:1;pointer-events:all;}
+.vocab-box{
+  background:var(--surface);
+  border:3px solid var(--red);
+  border-radius:22px;
+  padding:28px 32px;
+  max-width:540px;width:94%;
+  box-shadow:0 0 60px rgba(255,85,119,0.3);
+  animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);
+}
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.vocab-header{font-size:1.4rem;font-weight:800;color:var(--red);margin-bottom:16px;text-align:center;}
+/* juxtaposition */
+.vocab-juxt{
+  display:flex;gap:12px;margin-bottom:20px;
+}
+.vocab-card{
+  flex:1;border-radius:12px;padding:12px 14px;text-align:center;
+  border:2px solid var(--border);
+}
+.vocab-card.wrong-card{background:rgba(255,85,119,0.08);border-color:var(--red);}
+.vocab-card.right-card{background:rgba(46,204,142,0.08);border-color:var(--green);}
+.vc-label{font-size:0.6rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
+.vc-label.wrong-lbl{color:var(--red);}
+.vc-label.right-lbl{color:var(--green);}
+.vc-number{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.vc-category{font-size:0.72rem;font-weight:700;line-height:1.3;}
+/* vocab question */
+.vocab-q{font-size:0.92rem;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.45;text-align:center;}
+.vocab-choices{display:flex;flex-direction:column;gap:8px;}
+.vc-choice{
+  padding:10px 16px;border-radius:10px;
+  border:2px solid var(--border);
+  background:var(--surface2);
+  color:var(--text);font-family:'Syne',sans-serif;font-size:0.84rem;font-weight:600;
+  cursor:pointer;text-align:left;transition:all 0.18s;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.vc-choice:hover{border-color:var(--accent);background:rgba(108,99,255,0.1);}
+.vc-choice.wrong-choice{border-color:var(--red);background:rgba(255,85,119,0.1);animation:choiceShake 0.3s ease;}
+@keyframes choiceShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.vc-choice.right-choice{border-color:var(--green);background:rgba(46,204,142,0.1);}
+.vc-key{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent);flex-shrink:0;font-size:0.8rem;}
+.vocab-countdown{
+  display:flex;align-items:center;gap:8px;margin-top:16px;
+}
+.vocab-countdown-bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;}
+.vocab-countdown-bar{height:100%;border-radius:2px;background:var(--red);width:100%;transition:width linear;}
+.vocab-countdown-label{font-size:0.6rem;color:var(--dim);white-space:nowrap;}
+.vocab-continue-btn{
+  display:none;margin-top:14px;width:100%;
+  padding:12px;border-radius:10px;border:none;
+  background:var(--green);color:white;
+  font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:800;
+  cursor:pointer;letter-spacing:0.04em;
+  transition:all 0.18s;
+}
+.vocab-continue-btn:hover{background:#27d88a;transform:translateY(-1px);}
+
+/* level up */
 .levelup-overlay{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;}
 .levelup-overlay.firing{animation:levelupFade 2.5s ease forwards;}
 @keyframes levelupFade{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{opacity:0}}
-.levelup-box{text-align:center;transform:scale(0.5);animation:levelupBox 2.5s cubic-bezier(0.34,1.3,0.64,1) forwards;}
+.levelup-box{text-align:center;}
 @keyframes levelupBox{0%{transform:scale(0.4) rotate(-6deg)}20%{transform:scale(1.08) rotate(1deg)}35%{transform:scale(1) rotate(0)}85%{transform:scale(1)}100%{transform:scale(0.8) translateY(-30px)}}
-.levelup-title{font-size:4rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;line-height:1;text-shadow:0 0 40px currentColor,0 0 80px currentColor;}
+.levelup-title{font-family:'Orbitron',sans-serif;font-size:4rem;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;line-height:1;text-shadow:0 0 40px currentColor,0 0 80px currentColor;}
 .levelup-sub{font-size:1.2rem;font-weight:700;margin-top:8px;opacity:0.85;}
-.levelup-mult{font-size:2.2rem;font-weight:800;margin-top:6px;}
+.levelup-mult{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:700;margin-top:6px;}
 
-/* screen flash */
+/* screen flash / shake */
 .screen-flash{position:fixed;inset:0;z-index:75;pointer-events:none;opacity:0;}
 .screen-flash.flash-red{animation:flashRed 0.4s ease;}
 @keyframes flashRed{0%{opacity:0;background:rgba(255,85,119,0.35)}50%{opacity:1}100%{opacity:0}}
 .screen-flash.flash-gold{animation:flashGold 0.6s ease;}
 @keyframes flashGold{0%{opacity:0;background:rgba(255,215,0,0.25)}40%{opacity:1}100%{opacity:0}}
-
-/* screen shake */
 @keyframes screenShake{0%,100%{transform:translate(0,0)}10%{transform:translate(-8px,-4px)}20%{transform:translate(8px,4px)}30%{transform:translate(-6px,6px)}40%{transform:translate(6px,-6px)}50%{transform:translate(-4px,2px)}60%{transform:translate(4px,-2px)}70%{transform:translate(-2px,4px)}80%{transform:translate(2px,-4px)}90%{transform:translate(-2px,2px)}}
 body.shake{animation:screenShake 0.5s ease;}
 
-/* ── GAME OVER ── */
+/* heart break */
+.heart-break-splash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:88;pointer-events:none;font-size:8rem;line-height:1;opacity:0;}
+.heart-break-splash.show{animation:heartSplash 1.4s cubic-bezier(0.34,1.2,0.64,1) forwards;}
+@keyframes heartSplash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.3) rotate(-20deg);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(5deg);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.0) rotate(0deg);}80%{opacity:0.8;transform:translate(-50%,-60%) scale(1.0);}100%{opacity:0;transform:translate(-50%,-80%) scale(0.8);}}
+
+/* game over */
 .gameover-overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s;}
 .gameover-overlay.show{opacity:1;pointer-events:all;}
-.gameover-box{background:var(--surface);border:2px solid var(--border);border-radius:24px;padding:36px 44px;text-align:center;max-width:460px;width:92%;box-shadow:0 0 100px rgba(255,85,119,0.3);animation:popIn 0.5s cubic-bezier(0.34,1.3,0.64,1);}
-@keyframes popIn{from{transform:scale(0.6);opacity:0}to{transform:scale(1);opacity:1}}
-.gameover-title{font-size:2.8rem;font-weight:800;color:var(--red);margin-bottom:4px;text-shadow:0 0 30px rgba(255,85,119,0.5);}
-.gameover-score{font-family:'Space Mono',monospace;font-size:3.5rem;font-weight:700;color:var(--gold);margin:12px 0;text-shadow:0 0 30px rgba(255,215,0,0.4);}
-.gameover-label{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:20px;}
-.name-input{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;text-align:center;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text);width:100%;margin-bottom:12px;outline:none;transition:border-color 0.2s;text-transform:uppercase;letter-spacing:0.1em;}
+.gameover-box{background:var(--surface);border:2px solid var(--border);border-radius:24px;padding:32px 40px;text-align:center;max-width:460px;width:92%;box-shadow:0 0 100px rgba(255,85,119,0.3);animation:popIn 0.5s cubic-bezier(0.34,1.3,0.64,1);}
+.gameover-title{font-family:'Orbitron',sans-serif;font-size:2.4rem;font-weight:900;color:var(--red);margin-bottom:4px;text-shadow:0 0 30px rgba(255,85,119,0.5);}
+.gameover-score{font-family:'Space Mono',monospace;font-size:3.2rem;font-weight:700;color:var(--gold);margin:10px 0;text-shadow:0 0 30px rgba(255,215,0,0.4);}
+.gameover-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:16px;}
+.name-input{font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;text-align:center;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text);width:100%;margin-bottom:10px;outline:none;transition:border-color 0.2s;text-transform:uppercase;letter-spacing:0.1em;}
 .name-input:focus{border-color:var(--accent);}
-.name-input::placeholder{color:var(--dim);letter-spacing:0.1em;}
-.go-btn{padding:12px 28px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all 0.18s;letter-spacing:0.04em;}
-.go-btn.primary{background:var(--accent);color:white;margin-right:10px;}
+.name-input::placeholder{color:var(--dim);}
+.go-btn{padding:11px 24px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;transition:all 0.18s;letter-spacing:0.04em;}
+.go-btn.primary{background:var(--accent);color:white;margin-right:8px;}
 .go-btn.primary:hover{background:#8b83ff;transform:translateY(-2px);}
 .go-btn.secondary{background:var(--surface2);color:var(--dim);border:1px solid var(--border);}
 .go-btn.secondary:hover{color:var(--text);}
-
-/* ── LEADERBOARD ── */
-.lb-title{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-top:20px;margin-bottom:8px;border-top:1px solid var(--border);padding-top:14px;}
-.lb-entry{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:8px;margin-bottom:4px;background:var(--surface2);}
+.lb-title-go{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-top:16px;margin-bottom:8px;border-top:1px solid var(--border);padding-top:12px;}
+.lb-entry{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;margin-bottom:3px;background:var(--surface2);}
 .lb-entry.highlight{border:1px solid var(--gold);background:rgba(255,215,0,0.06);}
-.lb-rank{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--dim);width:20px;text-align:center;flex-shrink:0;}
-.lb-name{font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;flex:1;text-align:left;letter-spacing:0.06em;}
-.lb-score{font-family:'Space Mono',monospace;font-size:0.85rem;color:var(--gold);font-weight:700;}
-.lb-mode{font-size:0.55rem;padding:2px 6px;border-radius:10px;font-weight:700;letter-spacing:0.05em;}
-.lb-mode.normal{background:rgba(108,99,255,0.2);color:var(--accent);}
-.lb-mode.mega{background:rgba(255,215,0,0.2);color:var(--gold);}
-.lb-mode.monster{background:rgba(255,140,0,0.2);color:#ff8c00;}
-.lb-mode.ultra{background:rgba(247,37,133,0.2);color:#f72585;}
+.lb-rank{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--dim);width:18px;text-align:center;flex-shrink:0;}
+.lb-name{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;flex:1;text-align:left;letter-spacing:0.06em;}
+.lb-score{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--gold);font-weight:700;}
 
-/* ── ALL MASTERED ── */
+/* all mastered */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;display:none;}
 .overlay.show{display:block;}
 .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--accent);border-radius:18px;padding:30px 40px;text-align:center;z-index:100;display:none;box-shadow:0 0 80px rgba(108,99,255,0.35);}
@@ -230,201 +465,58 @@ body.shake{animation:screenShake 0.5s ease;}
 .modal h2{font-size:1.7rem;color:var(--gold);margin-bottom:8px;}
 .modal p{color:var(--dim);font-size:0.85rem;margin-bottom:18px;line-height:1.5;}
 .modal-btn{padding:10px 24px;border-radius:8px;border:none;background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;}
-.modal-btn:hover{background:#8b83ff;}
 
-/* ── DEAD ZONE (prevents accidental zone trigger on drag start) ── */
-.gallery-dead-zone{
-  position:absolute;top:0;left:0;right:0;height:28px;
-  z-index:10;pointer-events:all;background:transparent;
-}
-
-/* ── SUB-ROW TRANSPARENCY (hint at Normal, hidden at Ultra) ── */
-/* Normal: subcategories faintly visible through label overlay */
-.parent-zone:not(.expanded):not(.collapsed) .sub-row { opacity:var(--hint-opacity, 0); }
-/* expanded/collapsed states override to full opacity */
-.parent-zone.expanded .sub-row { opacity:1; }
-
-/* ── HEART BREAK SPLASH ── */
-.heart-break-splash{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:88;pointer-events:none;
-  font-size:8rem;line-height:1;
-  opacity:0;transition:none;
-}
-.heart-break-splash.show{
-  animation:heartSplash 1.4s cubic-bezier(0.34,1.2,0.64,1) forwards;
-}
-@keyframes heartSplash{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(0.3) rotate(-20deg);}
-  20%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(5deg);}
-  50%{opacity:1;transform:translate(-50%,-50%) scale(1.0) rotate(0deg);}
-  80%{opacity:0.8;transform:translate(-50%,-60%) scale(1.0);}
-  100%{opacity:0;transform:translate(-50%,-80%) scale(0.8);}
-}
-
-/* ── OVERBAR for repeating decimals ── */
-.overbar{text-decoration:overline;text-decoration-color:currentColor;text-underline-offset:0;}
-
-/* ══════════════════════════════════════
-   SPLASH SCREEN
-══════════════════════════════════════ */
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity 0.4s,pointer-events 0s;}
-.screen.hidden{opacity:0;pointer-events:none;}
-#game-screen{z-index:1;}
-#splash-screen{z-index:2;background:var(--bg);overflow:hidden;}
-
-/* hanging garland across top */
-.garland{
-  position:relative;height:280px;flex-shrink:0;
-  display:flex;align-items:flex-start;justify-content:center;
-  gap:0;overflow:visible;
-}
-.garland-string{
-  display:flex;flex-direction:column;align-items:center;
-  position:relative;transform-origin:top center;
-  animation:sway var(--sway-dur,4s) ease-in-out infinite alternate;
-  cursor:pointer;
-  padding:0 6px;
-}
-.garland-string:hover{animation-play-state:paused;}
-@keyframes sway{
-  from{transform:rotate(var(--sway-from,-2deg));}
-  to{transform:rotate(var(--sway-to,2deg));}
-}
-.garland-hook{width:2px;height:20px;background:var(--border);border-radius:1px;margin-bottom:2px;}
-.garland-label{font-family:'Space Mono',monospace;font-size:0.62rem;font-weight:700;color:var(--dim);white-space:nowrap;margin-bottom:3px;text-align:center;}
-.garland-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.gcell{
-  border-radius:4px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Space Mono',monospace;font-weight:700;color:rgba(0,0,0,0.72);
-}
-.gcell.d0{color:rgba(0,0,0,0.45);}
-.gcell.d3,.gcell.d4{color:rgba(0,0,0,0.6);}
-.gdot{color:var(--dim);text-align:center;}
-.gell{color:var(--dim);text-align:center;font-size:0.85rem;}
-
-/* tooltip on hover */
-.garland-string .gtip{
-  position:absolute;top:105%;left:50%;transform:translateX(-50%);
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:12px 16px;
-  width:200px;z-index:20;
-  opacity:0;pointer-events:none;
-  transition:opacity 0.2s 0.15s;
-  box-shadow:0 8px 30px rgba(0,0,0,0.5);
-  text-align:center;
-}
-.garland-string:hover .gtip{opacity:1;}
-.gtip-type{font-size:0.7rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;}
-.gtip-body{font-size:0.72rem;color:var(--dim);line-height:1.45;}
-
-/* splash center */
-.splash-center{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;padding:0 20px;position:relative;z-index:5;
-}
-.splash-title{
-  font-size:3.2rem;font-weight:800;text-align:center;letter-spacing:0.04em;
-  line-height:1.1;
-}
-.splash-title .t-rational{color:var(--rational-glow);}
-.splash-title .t-irrational{color:var(--irrational-glow);}
-.splash-title .t-white{color:var(--text);}
-.splash-sub{font-size:0.85rem;color:var(--dim);text-align:center;max-width:380px;line-height:1.5;}
-.splash-hint{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);opacity:0.6;}
-.play-btn{
-  padding:16px 52px;border-radius:14px;border:none;
-  background:linear-gradient(135deg,var(--accent),#9580ff);
-  color:white;font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;
-  cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
-  transition:all 0.2s;
-  box-shadow:0 0 30px rgba(108,99,255,0.4);
-}
-.play-btn:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(108,99,255,0.6);}
-
-/* leaderboard at bottom */
-.splash-lb{
-  flex-shrink:0;padding:16px 32px 20px;
-  border-top:1px solid var(--border);
-  background:var(--surface);
-}
-.lb-tabs{display:flex;gap:8px;margin-bottom:12px;align-items:center;justify-content:center;}
-.lb-tab{
-  padding:4px 14px;border-radius:20px;font-size:0.65rem;font-weight:700;
-  letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;
-  border:1px solid var(--border);color:var(--dim);background:transparent;
-  transition:all 0.2s;font-family:'Syne',sans-serif;
-}
-.lb-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
-.lb-entries{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;min-height:38px;}
-.lb-pill{
-  display:flex;align-items:center;gap:7px;
-  padding:6px 14px;border-radius:20px;
-  background:var(--surface2);border:1px solid var(--border);
-}
-.lb-pill.gold{border-color:var(--gold);}
-.lb-pill.silver{border-color:#aaa;}
-.lb-pill.bronze{border-color:#cd7f32;}
-.lb-pill-rank{font-size:0.9rem;}
-.lb-pill-name{font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;}
-.lb-pill-score{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--gold);font-weight:700;}
-.lb-pill-mode{font-size:0.55rem;padding:2px 6px;border-radius:10px;font-weight:700;}
-.lb-pill-mode.normal{background:rgba(108,99,255,0.2);color:var(--accent);}
-.lb-pill-mode.mega{background:rgba(255,215,0,0.2);color:var(--gold);}
-.lb-pill-mode.monster{background:rgba(255,140,0,0.2);color:#ff8c00;}
-.lb-pill-mode.ultra{background:rgba(247,37,133,0.2);color:#f72585;}
-.lb-empty{font-size:0.72rem;color:var(--dim);font-style:italic;}
-
+.overbar{text-decoration:overline;}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-     SPLASH SCREEN
-══════════════════════════════════════ -->
+<!-- ══ SPLASH SCREEN ══ -->
 <div class="screen" id="splash-screen">
-
-  <!-- Hanging garland -->
-  <div class="garland" id="garland"></div>
-
-  <!-- Center content -->
-  <div class="splash-center">
-    <div class="splash-hint">↑ Click any color string to explore</div>
-    <div class="splash-title">
-      <span class="t-rational">Rational</span>
-      <span class="t-white"> vs </span>
-      <span class="t-irrational">Irrational</span>
+  <div class="garland-wrap">
+    <div class="title-box">
+      <div class="title-main">
+        <span class="title-rational">Rational</span>
+        <span class="title-vs">vs</span>
+        <span class="title-irrational">Irrational</span>
+      </div>
+      <div class="title-sub">↑ hover any number chain to explore · click to learn more</div>
     </div>
+    <div class="garland" id="garland"></div>
+  </div>
+  <div class="splash-center">
     <div class="splash-sub">Can you classify every number? Drag it to its category — and survive as long as you can.</div>
     <button class="play-btn" onclick="startGame()">Play →</button>
   </div>
-
-  <!-- Leaderboard -->
   <div class="splash-lb">
-    <div class="lb-tabs">
-      <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">This Week</button>
-      <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">All Time</button>
-      <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">Longest Streak</button>
+    <div class="lb-header">
+      <div class="lb-arcade-title">HIGH SCORES<span class="lb-cursor">_</span></div>
+      <div class="lb-tabs">
+        <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">This Week</button>
+        <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">All Time</button>
+        <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">Streak</button>
+      </div>
     </div>
-    <div class="lb-entries" id="splash-lb-entries"></div>
+    <div class="lb-body">
+      <div class="lb-col" id="lb-col-a"></div>
+      <div class="lb-col" id="lb-col-b"></div>
+    </div>
   </div>
-
+</div>
+<!-- global tooltip, positioned by JS -->
+<div class="gtip" id="gtip">
+  <div class="gtip-type" id="gtip-type"></div>
+  <div class="gtip-body" id="gtip-body"></div>
 </div>
 
-<!-- ══════════════════════════════════════
-     GAME SCREEN
-══════════════════════════════════════ -->
+<!-- ══ GAME SCREEN ══ -->
 <div class="screen hidden" id="game-screen">
-
 <header>
-  <div class="logo" style="cursor:pointer" onclick="goToSplash()" title="Back to home">Number <span>Classifier</span></div>
+  <div class="logo" onclick="goToSplash()" title="Home">Rational <span>vs</span> Irrational</div>
   <div class="mode-badge" id="mode-badge">Normal</div>
-  <div class="timer-bar-wrap" id="timer-bar-wrap">
-    <div class="timer-bar" id="timer-bar"></div>
-  </div>
+  <div class="timer-bar-wrap" id="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
   <div class="lives" id="lives">
     <span class="heart" id="h0">❤️</span>
     <span class="heart" id="h1">❤️</span>
@@ -432,7 +524,6 @@ body.shake{animation:screenShake 0.5s ease;}
   </div>
   <div class="multiplier" id="multiplier">×1</div>
 </header>
-
 <div class="body-row">
   <div class="center-col">
     <div class="tile-panel">
@@ -443,7 +534,6 @@ body.shake{animation:screenShake 0.5s ease;}
       </div>
     </div>
     <div class="gallery" id="gallery">
-      <!-- Dead zone: prevents accidental zone trigger when dragging down from tile -->
       <div class="gallery-dead-zone" id="gallery-dead-zone"></div>
       <div class="parent-zone rational" id="parent-rational">
         <div class="parent-label">
@@ -461,8 +551,6 @@ body.shake{animation:screenShake 0.5s ease;}
       </div>
     </div>
   </div>
-
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sb-section">
       <span class="sb-val streak-val" id="s-streak">0</span>
@@ -490,15 +578,34 @@ body.shake{animation:screenShake 0.5s ease;}
     <div class="badge-list" id="badge-list"></div>
   </div>
 </div>
+</div><!-- end game-screen -->
 
-<!-- POPUP -->
-<div class="popup-overlay" id="popup-overlay" onclick="dismissPopup()">
-  <div class="popup" id="popup">
-    <span class="popup-icon" id="popup-icon">✓</span>
-    <div class="popup-body" id="popup-body"></div>
-    <div class="popup-bonus" id="popup-bonus">💎 Perfect Placement! +bonus</div>
-    <div class="popup-pun" id="popup-pun"></div>
-    <div class="popup-dismiss">tap anywhere to continue</div>
+<!-- brief correct flash -->
+<div class="brief-flash" id="brief-flash">✓</div>
+
+<!-- VOCAB WRONG POPUP -->
+<div class="vocab-overlay" id="vocab-overlay">
+  <div class="vocab-box" id="vocab-box">
+    <div class="vocab-header">✗ Not quite — let's break it down</div>
+    <div class="vocab-juxt" id="vocab-juxt">
+      <div class="vocab-card wrong-card">
+        <div class="vc-label wrong-lbl">You chose</div>
+        <div class="vc-number" id="vc-number-wrong"></div>
+        <div class="vc-category" id="vc-cat-wrong" style="color:var(--red)"></div>
+      </div>
+      <div class="vocab-card right-card">
+        <div class="vc-label right-lbl">Correct answer</div>
+        <div class="vc-number" id="vc-number-right"></div>
+        <div class="vc-category" id="vc-cat-right" style="color:var(--green)"></div>
+      </div>
+    </div>
+    <div class="vocab-q" id="vocab-q"></div>
+    <div class="vocab-choices" id="vocab-choices"></div>
+    <div class="vocab-countdown">
+      <div class="vocab-countdown-bar-wrap"><div class="vocab-countdown-bar" id="vocab-cbar"></div></div>
+      <div class="vocab-countdown-label" id="vocab-clabel">8s</div>
+    </div>
+    <button class="vocab-continue-btn" id="vocab-continue" onclick="dismissVocab()">Got it — back to game →</button>
   </div>
 </div>
 
@@ -506,158 +613,455 @@ body.shake{animation:screenShake 0.5s ease;}
 <div class="levelup-overlay" id="levelup-overlay">
   <div class="levelup-box" id="levelup-box">
     <div class="levelup-title" id="levelup-title">MEGA</div>
-    <div class="levelup-sub" id="levelup-sub">Colors stripped. Stay sharp.</div>
-    <div class="levelup-mult" id="levelup-mult">×2 Points</div>
+    <div class="levelup-sub" id="levelup-sub"></div>
+    <div class="levelup-mult" id="levelup-mult"></div>
   </div>
 </div>
 
-</div><!-- end game-screen -->
-
-<!-- HEART BREAK SPLASH -->
+<div class="screen-flash" id="screen-flash"></div>
 <div class="heart-break-splash" id="heart-break-splash">💔</div>
 
-<!-- SCREEN FLASH -->
-<div class="screen-flash" id="screen-flash"></div>
-
-<!-- GAME OVER -->
 <div class="gameover-overlay" id="gameover-overlay">
   <div class="gameover-box">
     <div class="gameover-title">GAME OVER</div>
     <div class="gameover-score" id="go-score">0</div>
     <div class="gameover-label" id="go-label">Final Score</div>
-    <input class="name-input" id="name-input" maxlength="12" placeholder="Enter your initials" autocomplete="off" />
+    <input class="name-input" id="name-input" maxlength="12" placeholder="ENTER INITIALS" autocomplete="off"/>
     <div>
       <button class="go-btn primary" onclick="saveScore()">Save Score</button>
       <button class="go-btn secondary" onclick="restartGame()">Play Again</button>
     </div>
-    <div class="lb-title">🏆 Leaderboard</div>
+    <div class="lb-title-go">🏆 Leaderboard</div>
     <div id="leaderboard-list"></div>
   </div>
 </div>
 
-<!-- ALL MASTERED -->
 <div class="overlay" id="overlay" onclick="closeCelebration()"></div>
 <div class="modal" id="modal">
   <h2>👑 All Mastered!</h2>
-  <p>You've conquered every category.<br>Keep your streak alive!</p>
+  <p>Every category conquered.<br>Keep your streak alive!</p>
   <button class="modal-btn" onclick="closeCelebration()">Keep Going</button>
 </div>
 
 <script>
 const DC=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
 
-// ── GAME MODES ──
-const MODES = {
-  normal:  { name:'Normal',  mult:1, colors:true,  timer:0,    threshold:10,  next:'mega',    color:'var(--accent)' },
-  mega:    { name:'MEGA',    mult:2, colors:false, timer:0,    threshold:20,  next:'monster', color:'#ffd700' },
-  monster: { name:'MONSTER', mult:3, colors:false, timer:3000, threshold:35,  next:'ultra',   color:'#ff8c00' },
-  ultra:   { name:'ULTRA',   mult:5, colors:false, timer:2000, threshold:999, next:null,      color:'#f72585' },
+const MODES={
+  normal: {name:'Normal', mult:1,colors:true, timer:0,    threshold:10,next:'mega',   color:'var(--accent)'},
+  mega:   {name:'MEGA',   mult:2,colors:false,timer:0,    threshold:20,next:'monster',color:'#ffd700'},
+  monster:{name:'MONSTER',mult:3,colors:false,timer:3000, threshold:35,next:'ultra',  color:'#ff8c00'},
+  ultra:  {name:'ULTRA',  mult:5,colors:false,timer:2000, threshold:999,next:null,    color:'#f72585'},
 };
 
 const ZONE_PARENT={'whole':'rational','frac-term':'rational','frac-rep':'rational','irr-sqrt':'irrational','irr-dec':'irrational'};
+const ZONE_NAMES={
+  'whole':'Integer / Whole Number',
+  'frac-term':'Fraction: Terminating Decimal',
+  'frac-rep':'Fraction: Repeating Decimal',
+  'irr-sqrt':'Non-Perfect Square Root',
+  'irr-dec':'Non-Repeating, Non-Terminating Decimal',
+};
 const ZONES=[
-  {id:'whole',    parent:'rational',   color:'#3d9fd6',math:null,  name:'Integer or\nWhole Number',       sub:'includes √perfect squares'},
-  {id:'frac-term',parent:'rational',   color:'#2ecc8e',math:null,  name:'Fraction:\nTerminating Decimal', sub:null},
-  {id:'frac-rep', parent:'rational',   color:'#7c6af7',math:null,  name:'Fraction:\nRepeating Decimal',   sub:null},
-  {id:'irr-sqrt', parent:'irrational', color:'#ff9f43',math:'sqrt',name:'non-perfect square',             sub:null},
-  {id:'irr-dec',  parent:'irrational', color:'#f76a8a',math:null,  name:'Non-Repeating\nNon-Terminating', sub:null},
+  {id:'whole',    parent:'rational',  color:'#3d9fd6',math:null,  name:'Integer or\nWhole Number',      sub:'includes √perfect squares'},
+  {id:'frac-term',parent:'rational',  color:'#2ecc8e',math:null,  name:'Fraction:\nTerminating Decimal',sub:null},
+  {id:'frac-rep', parent:'rational',  color:'#7c6af7',math:null,  name:'Fraction:\nRepeating Decimal',  sub:null},
+  {id:'irr-sqrt', parent:'irrational',color:'#ff9f43',math:'sqrt',name:'non-perfect square',            sub:null},
+  {id:'irr-dec',  parent:'irrational',color:'#f76a8a',math:null,  name:'Non-Repeating\nNon-Terminating',sub:null},
 ];
 
 const BADGE_DEFS=[
-  {id:'first',      icon:'⭐',label:'First Answer',     check:s=>s.total>=1},
-  {id:'streak3',    icon:'🔥',label:'Streak Starter',   check:s=>s.streak>=3},
-  {id:'streak5',    icon:'💥',label:'On Fire!',         check:s=>s.streak>=5},
-  {id:'streak10',   icon:'🚀',label:'Unstoppable',      check:s=>s.streak>=10},
-  {id:'mega',       icon:'⚡',label:'Mega Mode',        check:s=>s.mode!=='normal'},
-  {id:'monster',    icon:'👹',label:'Monster Mode',     check:s=>s.mode==='monster'||s.mode==='ultra'},
-  {id:'ultra',      icon:'🌀',label:'Ultra Mode',       check:s=>s.mode==='ultra'},
+  {id:'first',      icon:'⭐',label:'First Answer',    check:s=>s.total>=1},
+  {id:'streak3',    icon:'🔥',label:'Streak Starter',  check:s=>s.streak>=3},
+  {id:'streak5',    icon:'💥',label:'On Fire!',        check:s=>s.streak>=5},
+  {id:'streak10',   icon:'🚀',label:'Unstoppable',     check:s=>s.streak>=10},
+  {id:'mega',       icon:'⚡',label:'Mega Mode',       check:s=>s.mode!=='normal'},
+  {id:'monster',    icon:'👹',label:'Monster Mode',    check:s=>s.mode==='monster'||s.mode==='ultra'},
+  {id:'ultra',      icon:'🌀',label:'Ultra Mode',      check:s=>s.mode==='ultra'},
   {id:'clean3',     icon:'💎',label:'Precision Thinker',check:s=>s.cleanStreak>=3},
-  {id:'frac-whiz',  icon:'🍕',label:'Fraction Whiz',   check:s=>s.masteryDone.has('frac-term')&&s.masteryDone.has('frac-rep')},
-  {id:'root-hunter',icon:'🌿',label:'Root Hunter',      check:s=>s.masteryDone.has('irr-sqrt')},
-  {id:'pi-curious', icon:'π', label:'Pi Curious',       check:s=>s.masteryDone.has('irr-dec')},
-  {id:'all-zones',  icon:'👑',label:'Number Master',    check:s=>s.masteryDone.size>=ZONES.length},
+  {id:'frac-whiz',  icon:'🍕',label:'Fraction Whiz',  check:s=>s.masteryDone.has('frac-term')&&s.masteryDone.has('frac-rep')},
+  {id:'root-hunter',icon:'🌿',label:'Root Hunter',    check:s=>s.masteryDone.has('irr-sqrt')},
+  {id:'pi-curious', icon:'π', label:'Pi Curious',     check:s=>s.masteryDone.has('irr-dec')},
+  {id:'all-zones',  icon:'👑',label:'Number Master',  check:s=>s.masteryDone.size>=ZONES.length},
 ];
 
-// Number bank — display uses HTML for overbar notation
-const BANK=[
-  // whole
-  {display:'7',    dec:'7',   cat:'whole',answer:'whole',fb:{y:"7 is an integer — whole numbers are always rational.",n:"Integers are whole numbers. All whole numbers are rational."},pun:{y:"Very rational of you. Pun intended.",n:"Even Cantor knew his integers. Keep going."}},
-  {display:'−12',  dec:'-12', cat:'whole',answer:'whole',fb:{y:"−12 is an integer — rational, even negative.",n:"Negative integers are still rational: −12 = −12/1."},pun:{y:"Negative, but rationally so.",n:"It's negative on the number line, not negative on you."}},
-  {display:'0',    dec:'0',   cat:'whole',answer:'whole',fb:{y:"Zero is a whole number — rational.",n:"Zero is a whole number. Whole numbers are always rational."},pun:{y:"Zero judgment. Full credit.",n:"Zero is rational. Your answer, less so."}},
-  {display:'√4',   dec:'2',   cat:'whole',answer:'whole',fb:{y:"√4 = 2 — a whole number, so rational.",n:"√4 = 2 exactly. When a square root is whole, it's rational."},pun:{y:"A perfect square root. Quite literally.",n:"4 is a perfect square. So √4 is a perfect integer."}},
-  {display:'√9',   dec:'3',   cat:'whole',answer:'whole',fb:{y:"√9 = 3 — a whole number, rational.",n:"√9 = 3 exactly. Rational."},pun:{y:"3 is a beautiful number. Euler agreed.",n:"9 = 3². Therefore √9 = 3. QED."}},
-  {display:'√25',  dec:'5',   cat:'whole',answer:'whole',fb:{y:"√25 = 5 — whole number, rational.",n:"√25 = 5 — a perfect result, rational."},pun:{y:"High five. Literally.",n:"5² = 25. So √25 = 5. Clean and rational."}},
-  {display:'√100', dec:'10',  cat:'whole',answer:'whole',fb:{y:"√100 = 10 — whole number, rational.",n:"√100 = 10 exactly. Rational."},pun:{y:"Base 10. How refreshingly decimal of you.",n:"10² = 100. √100 = 10. Rational."}},
-  {display:'√36',  dec:'6',   cat:'whole',answer:'whole',fb:{y:"√36 = 6 — whole number, rational.",n:"√36 = 6. A perfect square root — rational."},pun:{y:"6 is a perfect number, you know. Bonus trivia.",n:"6² = 36. √36 = 6. Rational and perfect."}},
+// ── VOCAB QUESTIONS (wrong→right) ──
+// key: wrongAnswer+'>'+rightAnswer
+const VOCAB_Q={
+  'irr-dec>frac-rep':{
+    q:'The number you saw has a pattern that repeats forever. What does "repeating decimal" mean?',
+    choices:['A. The decimal ends after a few digits','B. The same digit or block of digits repeats without end','C. The decimal goes on with no pattern at all','D. The number is a whole number'],
+    correct:1
+  },
+  'irr-sqrt>frac-rep':{
+    q:'What makes a decimal "repeating" rather than irrational?',
+    choices:['A. It never ends','B. It has a pattern of digits that cycles endlessly','C. It can only come from a square root','D. It is greater than 1'],
+    correct:1
+  },
+  'frac-term>frac-rep':{
+    q:'"Terminating" means the decimal ends. "Repeating" means it never ends. Which was this number?',
+    choices:['A. It ended — terminating decimal','B. It repeated a block forever — repeating decimal','C. It had no pattern — irrational','D. It was a whole number'],
+    correct:1
+  },
+  'frac-rep>frac-term':{
+    q:'A terminating decimal ends completely. Which description fits a terminating decimal?',
+    choices:['A. Digits that repeat in a cycle forever','B. Digits that go on with no pattern','C. The decimal stops — no more digits after a certain point','D. It must be less than 1'],
+    correct:2
+  },
+  'irr-sqrt>frac-term':{
+    q:'What makes a decimal "terminating"?',
+    choices:['A. It repeats the same block of digits','B. It never has a pattern','C. It ends — the decimal stops completely','D. It comes from a square root'],
+    correct:2
+  },
+  'irr-dec>frac-term':{
+    q:'A terminating decimal and an irrational decimal both go on — true or false?',
+    choices:['A. True — both go on forever','B. False — irrational decimals never end, but terminating ones stop','C. False — neither terminates','D. True — both repeat eventually'],
+    correct:1
+  },
+  'frac-rep>irr-dec':{
+    q:'What is the difference between a repeating decimal and an irrational one?',
+    choices:['A. Irrational decimals always repeat the same digit','B. Repeating decimals have a cycling block; irrational decimals never have any repeating block','C. There is no difference — both are irrational','D. Irrational decimals always terminate'],
+    correct:1
+  },
+  'frac-term>irr-dec':{
+    q:'An irrational decimal never repeats and never terminates. How does that differ from a terminating decimal?',
+    choices:['A. Terminating decimals also never end','B. A terminating decimal ends completely; an irrational one goes on forever with no pattern','C. They are the same — both are rational','D. Irrational decimals have a repeating block'],
+    correct:1
+  },
+  'whole>frac-rep':{
+    q:'How is a repeating decimal different from a whole number?',
+    choices:['A. Whole numbers have decimal parts','B. A repeating decimal has digits after the decimal point that cycle forever; whole numbers have no decimal part','C. They are both irrational','D. Repeating decimals always equal whole numbers'],
+    correct:1
+  },
+  'frac-term>whole':{
+    q:'What qualifies a number as an integer (whole number)?',
+    choices:['A. It has a decimal that terminates','B. It is a fraction','C. It has no fractional part — no digits after the decimal point','D. It is negative'],
+    correct:2
+  },
+  'irr-sqrt>whole':{
+    q:'When is the square root of a number a whole number?',
+    choices:['A. When it is any prime number','B. When the number under the root is a perfect square (like 4, 9, 25)','C. Always — all square roots are whole','D. When the number is odd'],
+    correct:1
+  },
+  'frac-rep>whole':{
+    q:'A repeating decimal like 0.333... is NOT a whole number because:',
+    choices:['A. It is negative','B. It has digits after the decimal that never stop','C. It is less than 10','D. It is irrational'],
+    correct:1
+  },
+};
 
-  // frac-term fractions
-  {display:'1/2',  dec:'0.5',   cat:'frac-term',answer:'frac-term',fb:{y:"1/2 = 0.5 — terminates after one place.",n:"1/2 = 0.5. It ends — terminating decimal."},pun:{y:"Half credit? No, full credit. You got it.",n:"Half right? Actually fully wrong. 1/2 terminates."}},
-  {display:'3/4',  dec:'0.75',  cat:'frac-term',answer:'frac-term',fb:{y:"3/4 = 0.75 — terminates at hundredths.",n:"3/4 = 0.75. Ends cleanly — terminating decimal."},pun:{y:"Three-quarters of the way there. Then done.",n:"0.75 and out. Short decimal."}},
-  {display:'5/8',  dec:'0.625', cat:'frac-term',answer:'frac-term',fb:{y:"5/8 = 0.625 — terminates at thousandths.",n:"5/8 = 0.625. Three places, then done."},pun:{y:"0.625 — tight, clean, terminates. Well played.",n:"Powers of 2 in the denominator → always terminates."}},
-  {display:'7/4',  dec:'1.75',  cat:'frac-term',answer:'frac-term',fb:{y:"7/4 = 1.75 — terminates.",n:"7/4 = 1.75. Ends at hundredths."},pun:{y:"1.75 and finished. Very tidy.",n:"7/4 terminates because 4 = 2². Short decimal."}},
-  {display:'1/25', dec:'0.04',  cat:'frac-term',answer:'frac-term',fb:{y:"1/25 = 0.04 — terminates.",n:"1/25 = 0.04. Ends cleanly."},pun:{y:"Two decimal places, then silence. Elegant.",n:"25 = 5². Still terminates — 5s and 2s only."}},
-  {display:'9/16', dec:'0.5625',cat:'frac-term',answer:'frac-term',fb:{y:"9/16 = 0.5625 — terminates at ten-thousandths.",n:"9/16 = 0.5625. Four places, then done."},pun:{y:"16 = 2⁴. Powers of 2 always terminate. Nice.",n:"Denominator is a power of 2 → terminates. Always."}},
+// fallback question for any combo not covered
+const VOCAB_FALLBACK={
+  q:'Which best describes what makes a number irrational?',
+  choices:['A. Its decimal terminates (ends)','B. Its decimal repeats in a pattern','C. Its decimal never terminates and never repeats','D. It is a fraction of two whole numbers'],
+  correct:2
+};
 
-  // frac-term bare decimals
-  {display:'0.5',  dec:'0.5',  cat:'frac-term',answer:'frac-term',fb:{y:"0.5 terminates — equals 1/2.",n:"0.5 ends after one decimal place."},pun:{y:"Short and rational. Like a good proof.",n:"Terminating decimals are always rational fractions."}},
-  {display:'0.75', dec:'0.75', cat:'frac-term',answer:'frac-term',fb:{y:"0.75 terminates — equals 3/4.",n:"0.75 ends at hundredths. It's 3/4."},pun:{y:"0.75 — done at hundredths. Very tidy.",n:"Two decimal places. Then nothing. Rational."}},
-  {display:'0.625',dec:'0.625',cat:'frac-term',answer:'frac-term',fb:{y:"0.625 terminates — equals 5/8.",n:"0.625 ends at thousandths."},pun:{y:"Three digits. Stops. Rational.",n:"Terminates → rational. Always."}},
-  {display:'3.125',dec:'3.125',cat:'frac-term',answer:'frac-term',fb:{y:"3.125 terminates — equals 25/8.",n:"3.125 ends at thousandths."},pun:{y:"4 digits total. Then silence. Rational.",n:"Finite decimal = rational fraction. QED."}},
-
-  // frac-rep fractions
-  {display:'1/3',  dec:'0.3333333333',   repeat:'3',     cat:'frac-rep',answer:'frac-rep',fb:{y:"1/3 = 0.3̄ — the digit 3 repeats forever. Repeating decimal.",n:"1/3 = 0.333... The 3 repeats without end."},pun:{y:"1 ÷ 3 = infinitely patient.",n:"0.333... It repeats. That's what repeating means."}},
-  {display:'2/3',  dec:'0.6666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',fb:{y:"2/3 = 0.6̄ — the 6 repeats. Repeating decimal.",n:"2/3 = 0.666... The 6 repeats."},pun:{y:"Twice the thirds, same infinite patience.",n:"0.666... repeating. Still rational — it's 2/3."}},
-  {display:'1/6',  dec:'0.1666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',fb:{y:"1/6 = 0.16̄ — the 6 repeats after the first digit.",n:"1/6 = 0.1666... The 6 repeats."},pun:{y:"Starts clean, then goes on forever. Relatable.",n:"6 in denominator → repeating decimal."}},
-  {display:'1/7',  dec:'0.142857142857', repeat:'142857',cat:'frac-rep',answer:'frac-rep',fb:{y:"1/7 = 0.1̄4̄2̄8̄5̄7̄ — the block 142857 repeats. Repeating decimal.",n:"1/7 = 0.142857142857... Six-digit block repeats."},pun:{y:"142857 — a cyclic number. Math's party trick.",n:"The block 142857 repeats every 6 digits. Fascinating."}},
-  {display:'1/9',  dec:'0.1111111111',   repeat:'1',     cat:'frac-rep',answer:'frac-rep',fb:{y:"1/9 = 0.1̄ — the digit 1 repeats forever.",n:"1/9 = 0.111... The digit 1 repeats."},pun:{y:"Nine times this repeats. Wait, all times.",n:"Ninths always repeat a single digit. Elegant."}},
-  {display:'1/11', dec:'0.090909090909', repeat:'09',    cat:'frac-rep',answer:'frac-rep',fb:{y:"1/11 = 0.0̄9̄ — block 09 repeats. Repeating decimal.",n:"1/11 = 0.0909... Block 09 repeats."},pun:{y:"09. 09. 09. Rhythmic. Rational.",n:"Elevenths repeat with period 2. Every time."}},
-  {display:'5/6',  dec:'0.833333',       repeat:'3',     cat:'frac-rep',answer:'frac-rep',fb:{y:"5/6 = 0.83̄ — the 3 repeats after the 8.",n:"5/6 = 0.8333... The 3 repeats."},pun:{y:"Starts specific, ends infinite. Story of mathematics.",n:"6 in denominator → repeating decimal."}},
-
-  // frac-rep bare decimals  
-  {display:'0.3̄',     displayHTML:'0.<span class="overbar">3</span>',      dec:'0.3333333333',   repeat:'3',     cat:'frac-rep',answer:'frac-rep',fb:{y:"0.3̄ repeats forever — equals 1/3.",n:"0.333... The 3 repeats without end — this is 1/3."},pun:{y:"One third. Three repeating. The universe is consistent.",n:"Repeating decimal → rational fraction. Always."}},
-  {display:'0.6̄',     displayHTML:'0.<span class="overbar">6</span>',      dec:'0.6666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... The 6 repeats. This is 2/3."},pun:{y:"Two thirds of the way to 1. Always repeating.",n:"0.666... = 2/3. A rational repeating decimal."}},
-  {display:'0.09̄',    displayHTML:'0.0<span class="overbar">9</span>',     dec:'0.090909090909', repeat:'09',    cat:'frac-rep',answer:'frac-rep',fb:{y:"0.09̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats. This is 1/11."},pun:{y:"09, eternally. Very on-brand for 1/11.",n:"Block 09 cycles. Repeating = rational."}},
-  {display:'0.142857̄', displayHTML:'0.<span class="overbar">142857</span>',dec:'0.142857142857',repeat:'142857',cat:'frac-rep',answer:'frac-rep',fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles. This is 1/7."},pun:{y:"142857 × 7 = 999999. I didn't make that up.",n:"Six-digit repeat = 1/7. Cyclic number. Very cool."}},
-
-  // irr-sqrt
-  {display:'√2',  dec:'1.41421356237309504880168872',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end. Irrational."},pun:{y:"The original irrational. Hippasus proved it and apparently paid dearly.",n:"Proof: assume √2 = p/q in lowest terms → contradiction."}},
-  {display:'√3',  dec:'1.73205080756887729352744634',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√3 is irrational — 3 is not a perfect square.",n:"√3 = 1.73205... No pattern, no end. Irrational."},pun:{y:"No pattern. No peace. No termination.",n:"3 is not a perfect square → √3 is irrational."}},
-  {display:'√5',  dec:'2.23606797749978969640917366',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√5 is irrational.",n:"5 isn't a perfect square — √5 is irrational."},pun:{y:"Golden ratio adjacent. Very aesthetically irrational.",n:"√5 appears in the golden ratio. Appropriately chaotic."}},
-  {display:'√7',  dec:'2.64575131106459059050161575',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√7 is irrational.",n:"√7 = 2.64575... Non-terminating, non-repeating."},pun:{y:"Seven is prime. Seven's root is irrational. Coincidence?",n:"Non-perfect-square → irrational root. Always."}},
-  {display:'√11', dec:'3.31662479035539984359271632',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√11 is irrational — 11 is not a perfect square.",n:"11 is not a perfect square — √11 is irrational."},pun:{y:"Prime number, irrational root. They travel together.",n:"11 is prime → not a perfect square → √11 irrational."}},
-  {display:'√13', dec:'3.60555127546398929311921607',cat:'irr-sqrt',answer:'irr-sqrt',fb:{y:"√13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating."},pun:{y:"Unlucky number, irrational decimal. Checks out.",n:"No perfect square between 9 and 16 → √13 irrational."}},
-
-  // irr-dec
-  {display:'π',          dec:'3.14159265358979323846264338',cat:'irr-dec',answer:'irr-dec',fb:{y:"π is irrational — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends. Irrational."},pun:{y:"π is so irrational it has its own holiday.",n:"Proved irrational by Lambert in 1768. We've been celebrating since."}},
-  {display:'2π',         dec:'6.28318530717958647692528676',cat:'irr-dec',answer:'irr-dec',fb:{y:"Rational × irrational = irrational. 2π is irrational.",n:"2π = 6.28318... Multiplying π by 2 stays irrational."},pun:{y:"Tau (τ = 2π). Some say it's the true circle constant. Irrational either way.",n:"Rational × irrational = irrational. The math is unambiguous."}},
-  {display:'π/2',        dec:'1.57079632679489661923132169',cat:'irr-dec',answer:'irr-dec',fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write it as p/q. Irrational."},pun:{y:"Half of irrational is still irrational. Sorry.",n:"Dividing an irrational by a rational stays irrational."}},
-  {display:'0.101001…',  dec:'0.101001000100001000010000010000001',pattern:true,cat:'irr-dec',answer:'irr-dec',fb:{y:"The pattern grows — no fixed repeating block. Irrational.",n:"Each group adds an extra zero — no repeating block. Irrational."},pun:{y:"Looks patterned. Isn't repeating. Sneaky irrational.",n:"A pattern ≠ a repeating block. Classic trap."}},
-  {display:'0.313113…',  dec:'0.31311311131111311113111131111131', pattern:true,cat:'irr-dec',answer:'irr-dec',fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles. Irrational."},pun:{y:"More 1s each time. Never the same block twice.",n:"Growing runs → no repeating period → irrational."}},
+// ── GARLAND DATA ──
+const GARLAND_DATA=[
+  // FAR LEFT — long terminating (powers of 2 denominators)
+  {lbl:'1/256', dec:'0.00390625',          type:'frac-term',color:'#2ecc8e',sf:-5,st:-2,sd:5.2,dl:0,   sz:12,
+   tip:'1/256 = 0.00390625. Terminates! 256 = 2⁸ — only 2s in the denominator, so it always terminates in base 10.'},
+  {lbl:'1/128', dec:'0.0078125',           type:'frac-term',color:'#2ecc8e',sf:-4,st:-1,sd:4.8,dl:0.2, sz:12,
+   tip:'1/128 = 0.0078125. Terminates. 128 = 2⁷. Powers of 2 always give terminating decimals.'},
+  {lbl:'1/64',  dec:'0.015625',            type:'frac-term',color:'#2ecc8e',sf:-4,st:-1,sd:4.4,dl:0.4, sz:13,
+   tip:'1/64 = 0.015625. Terminates. 64 = 2⁶. The decimal stops at the millionths place.'},
+  {lbl:'1/32',  dec:'0.03125',             type:'frac-term',color:'#2ecc8e',sf:-3,st:0, sd:3.9,dl:0.6, sz:14,
+   tip:'1/32 = 0.03125. Terminates. 32 = 2⁵. Five digits after the decimal, then done.'},
+  // LEFT-CENTER — repeating
+  {lbl:'1/6',   dec:'0.1666666', repeat:'6',type:'frac-rep',color:'#7c6af7',sf:-3,st:1, sd:4.2,dl:0.8, sz:15,
+   tip:'1/6 = 0.1666... The 6 repeats forever. 6 = 2 × 3 — the factor of 3 makes it impossible to terminate.'},
+  {lbl:'1/3',   dec:'0.3333333', repeat:'3',type:'frac-rep',color:'#7c6af7',sf:-2,st:2, sd:3.6,dl:1.0, sz:16,
+   tip:'1/3 = 0.333... The classic repeating decimal. 3 shares no factors with 10, so long division never reaches remainder 0.'},
+  // CENTER — whole/short
+  {lbl:'√4',    dec:'2',                  type:'whole',   color:'#3d9fd6',sf:-3,st:3, sd:5.0,dl:1.2, sz:18,
+   tip:'√4 = 2 exactly. A perfect square root. Rational — it\'s a whole number.'},
+  {lbl:'0',     dec:'0',                  type:'whole',   color:'#3d9fd6',sf:-2,st:2, sd:4.5,dl:1.4, sz:18,
+   tip:'Zero is a whole number — and rational! 0 = 0/1.'},
+  {lbl:'1',     dec:'1',                  type:'whole',   color:'#3d9fd6',sf:-1,st:3, sd:3.8,dl:1.6, sz:18,
+   tip:'1 is a whole number. Rational. The multiplicative identity. A crowd favorite.'},
+  {lbl:'0.5',   dec:'0.5',                type:'frac-term',color:'#2ecc8e',sf:-2,st:2, sd:4.1,dl:1.8, sz:17,
+   tip:'0.5 = 1/2. Terminates after one digit. Rational.'},
+  {lbl:'√9',    dec:'3',                  type:'whole',   color:'#3d9fd6',sf:-1,st:3, sd:5.3,dl:2.0, sz:18,
+   tip:'√9 = 3. Perfect square. Rational whole number.'},
+  {lbl:'3/4',   dec:'0.75',               type:'frac-term',color:'#2ecc8e',sf:-2,st:1, sd:4.0,dl:2.2, sz:17,
+   tip:'3/4 = 0.75. Terminates at hundredths. Rational.'},
+  // RIGHT-CENTER — repeating
+  {lbl:'1/7',   dec:'0.142857', repeat:'142857',type:'frac-rep',color:'#7c6af7',sf:0,st:3,sd:4.7,dl:2.4,sz:15,
+   tip:'1/7 = 0.142857142857... A six-digit block repeats. 7 is prime and shares no factors with 10.'},
+  {lbl:'1/9',   dec:'0.1111111', repeat:'1',    type:'frac-rep',color:'#7c6af7',sf:1,st:4,sd:3.5,dl:2.6,sz:15,
+   tip:'1/9 = 0.111... The digit 1 repeats forever. All ninths repeat a single digit.'},
+  // RIGHT — long terminating (powers of 5)
+  {lbl:'1/25',  dec:'0.04',                type:'frac-term',color:'#2ecc8e',sf:1,st:4, sd:4.3,dl:2.8, sz:14,
+   tip:'1/25 = 0.04. Terminates. 25 = 5² — only 5s in denominator, always terminates.'},
+  {lbl:'1/125', dec:'0.008',               type:'frac-term',color:'#2ecc8e',sf:2,st:5, sd:4.9,dl:3.0, sz:13,
+   tip:'1/125 = 0.008. Terminates. 125 = 5³. Three decimal digits, then silence.'},
+  {lbl:'1/512', dec:'0.001953125',         type:'frac-term',color:'#2ecc8e',sf:2,st:5, sd:5.1,dl:3.2, sz:12,
+   tip:'1/512 = 0.001953125. Terminates. 512 = 2⁹. Long, but it ends.'},
+  {lbl:'1/3125',dec:'0.00032',             type:'frac-term',color:'#2ecc8e',sf:3,st:6, sd:4.6,dl:3.4, sz:12,
+   tip:'1/3125 = 0.00032. Terminates! 3125 = 5⁵. Only factors of 5 → always terminates.'},
+  // FAR RIGHT — irrationals
+  {lbl:'√11',   dec:'3.31662479035539',    type:'irr-sqrt',color:'#ff9f43',sf:3,st:6, sd:3.7,dl:3.6, sz:13,
+   tip:'√11 = 3.31662479... goes on forever with no repeating block. 11 is not a perfect square.'},
+  {lbl:'0.1121…',dec:'0.1121231234123451234561',pattern:true,type:'irr-dec',color:'#f76a8a',sf:2,st:5,sd:4.8,dl:3.8,sz:13,
+   tip:'0.1121231234... Each group grows by one digit. The pattern evolves — it never settles into a repeating block.'},
+  {lbl:'π',     dec:'3.14159265358979323846',type:'irr-dec',color:'#f76a8a',sf:3,st:6, sd:3.4,dl:4.0, sz:15,
+   tip:'π = 3.14159265... The most famous irrational number. Non-terminating, non-repeating. Proved irrational in 1768.'},
 ];
 
-// ── STATE ──
-let score=0, topScore=0, streak=0, bestStreak=0, cleanStreak=0, total=0;
-let lives=3, mode='normal', modeTotalCorrect=0;
-let current=null, answered=false;
-let usedIdx=new Set(), masteryHits={}, masteryDone=new Set(), earnedBadges=new Set();
-let popupTimer=null, timerInterval=null, timerRemaining=0;
-let hoveredParents=new Set(), isDragging=false;
+// target chain length in cells for all garland strings (uniform hang depth)
+const GARLAND_CHAIN_LEN=22;
+
+function buildGarland(){
+  const g=document.getElementById('garland');g.innerHTML='';
+  GARLAND_DATA.forEach((num,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='gs';
+    wrap.style.cssText=`--sf:${num.sf}deg;--st:${num.st}deg;--sd:${num.sd}s;--dl:${num.dl}s;`;
+
+    const hook=document.createElement('div');hook.className='g-hook';wrap.appendChild(hook);
+    const lbl=document.createElement('div');lbl.className='g-lbl';lbl.style.color=num.color;lbl.textContent=num.lbl;wrap.appendChild(lbl);
+
+    const strip=document.createElement('div');strip.className='g-strip';
+    const sz=num.sz;
+    const abs=num.dec.replace('-','');
+    const dotIdx=abs.indexOf('.');
+    let chars=[];
+    if(num.repeat){
+      const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
+      const afterGiven=dotIdx>=0?abs.slice(dotIdx+1):'';
+      for(const c of before)chars.push({c,isD:true});
+      chars.push({c:'.',isD:false});
+      let s=afterGiven;
+      while(s.replace(/\./g,'').length<GARLAND_CHAIN_LEN+6)s+=num.repeat;
+      for(const c of s){if(chars.filter(x=>x.isD).length>=GARLAND_CHAIN_LEN)break;chars.push({c,isD:true});}
+    } else {
+      for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
+    }
+    // pad terminating strings with ghost cells so all hang to same depth
+    const isTermOrWhole=num.type==='frac-term'||num.type==='whole';
+    let dCount=chars.filter(x=>x.isD).length;
+    const needsEll=!isTermOrWhole||(dCount>=GARLAND_CHAIN_LEN);
+    let trimmed=[];let dc2=0;
+    for(const s of chars){if(s.isD){if(dc2>=GARLAND_CHAIN_LEN)break;dc2++;}trimmed.push(s);}
+
+    trimmed.forEach(s=>{
+      if(!s.isD){const el=document.createElement('div');el.className='gdot';el.style.cssText=`font-size:${sz*0.048}rem;width:${sz}px;text-align:center;line-height:1.2;`;el.textContent='.';strip.appendChild(el);return;}
+      const d=parseInt(s.c);
+      const cell=document.createElement('div');
+      cell.className=`gcell d${d}`;
+      cell.style.cssText=`width:${sz}px;height:${sz}px;background:${DC[d]};font-size:${Math.max(7,sz*0.4)}px;border-radius:${Math.max(2,sz*0.18)}px;`;
+      cell.textContent=s.c;
+      strip.appendChild(cell);
+    });
+
+    // fading ellipsis block for repeating/irrational
+    if(needsEll){
+      const ellWrap=document.createElement('div');ellWrap.className='g-ellipsis';
+      [1,0.55,0.25].forEach((opacity,i)=>{
+        const dot=document.createElement('div');
+        dot.className='g-ell-dot';
+        const dsz=Math.max(4,sz*0.35-i*2);
+        dot.style.cssText=`width:${dsz}px;height:${dsz}px;opacity:${opacity};`;
+        ellWrap.appendChild(dot);
+      });
+      strip.appendChild(ellWrap);
+    } else {
+      // terminating: pad with invisible spacer so chains reach same depth visually
+      const remaining=GARLAND_CHAIN_LEN-dc2;
+      for(let p=0;p<remaining;p++){
+        const spacer=document.createElement('div');
+        spacer.style.cssText=`width:${sz}px;height:${sz}px;opacity:0;flex-shrink:0;`;
+        strip.appendChild(spacer);
+      }
+    }
+
+    wrap.appendChild(strip);
+
+    // tooltip — triggered on mouseenter, positioned near cursor
+    wrap.addEventListener('mouseenter', e=>{
+      const tip=document.getElementById('gtip');
+      document.getElementById('gtip-type').textContent=ZONE_NAMES[num.type]||num.type;
+      document.getElementById('gtip-type').style.color=num.color;
+      document.getElementById('gtip-body').textContent=num.tip;
+      // position near cursor
+      const x=Math.min(e.clientX+14, window.innerWidth-260);
+      const y=Math.min(e.clientY+14, window.innerHeight-160);
+      tip.style.left=x+'px'; tip.style.top=y+'px';
+      tip.classList.add('show');
+    });
+    wrap.addEventListener('mousemove',e=>{
+      const tip=document.getElementById('gtip');
+      const x=Math.min(e.clientX+14, window.innerWidth-260);
+      const y=Math.min(e.clientY+14, window.innerHeight-160);
+      tip.style.left=x+'px'; tip.style.top=y+'px';
+    });
+    wrap.addEventListener('mouseleave',()=>{
+      document.getElementById('gtip').classList.remove('show');
+    });
+
+    g.appendChild(wrap);
+  });
+}
+
+// ── LEADERBOARD ──
+let lbTab='week';let lbRotateTimer=null;
+function getLeaderboard(){try{return JSON.parse(localStorage.getItem('nc-lb')||'[]');}catch{return[];}}
+function saveLeaderboard(lb){localStorage.setItem('nc-lb',JSON.stringify(lb));}
+function switchLbTab(tab){
+  lbTab=tab;
+  ['week','all','streak'].forEach(t=>document.getElementById('tab-'+t).className='lb-tab'+(t===tab?' active':''));
+  renderSplashLb();resetLbRotate();
+}
+function resetLbRotate(){
+  if(lbRotateTimer)clearInterval(lbRotateTimer);
+  lbRotateTimer=setInterval(()=>{
+    const tabs=['week','all','streak'];
+    switchLbTab(tabs[(tabs.indexOf(lbTab)+1)%tabs.length]);
+  },7000);
+}
+function renderSplashLb(){
+  const ca=document.getElementById('lb-col-a');
+  const cb=document.getElementById('lb-col-b');
+  ca.innerHTML='';cb.innerHTML='';
+  const lb=getLeaderboard();
+  const now=new Date(), weekAgo=new Date(now-7*24*60*60*1000);
+  let entries=[];
+  if(lbTab==='week') entries=lb.filter(e=>e.date&&new Date(e.date)>=weekAgo).sort((a,b)=>b.score-a.score).slice(0,10);
+  else if(lbTab==='all') entries=lb.sort((a,b)=>b.score-a.score).slice(0,10);
+  else entries=lb.sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,10);
+  if(!entries.length){
+    ca.innerHTML='<div class="lb-empty">NO SCORES YET<br>BE THE FIRST!</div>';return;
+  }
+  const medals=['🥇','🥈','🥉'];
+  entries.forEach((e,i)=>{
+    const row=document.createElement('div');row.className='lb-row';
+    const val=lbTab==='streak'?(e.streak||0):e.score;
+    row.innerHTML=`<span class="lb-r">${medals[i]||i+1}</span><span class="lb-n">${e.name||'???'}</span><span class="lb-m ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-s">${val}</span>`;
+    (i<5?ca:cb).appendChild(row);
+  });
+}
+
+// ── SCREEN SWITCHING ──
+let gameInitialized=false;
+function startGame(){
+  document.getElementById('splash-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  document.getElementById('gtip').classList.remove('show');
+  if(lbRotateTimer){clearInterval(lbRotateTimer);lbRotateTimer=null;}
+  if(!gameInitialized){
+    gameInitialized=true;
+    buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();nextNumber();
+  }
+}
+function goToSplash(){
+  document.getElementById('game-screen').classList.add('hidden');
+  document.getElementById('splash-screen').classList.remove('hidden');
+  renderSplashLb();resetLbRotate();
+}
+
+// ══════════════════════════════════════
+// GAME LOGIC
+// ══════════════════════════════════════
+let score=0,topScore=0,streak=0,bestStreak=0,cleanStreak=0,total=0;
+let lives=3,mode='normal',modeTotalCorrect=0;
+let current=null,answered=false;
+let usedIdx=new Set(),masteryHits={},masteryDone=new Set(),earnedBadges=new Set();
+let timerInterval=null,timerRemaining=0;
+let hoveredParents=new Set(),isDragging=false;
 let gameActive=true;
+let vocabTimer=null,vocabAnswered=false;
 ZONES.forEach(z=>masteryHits[z.id]=0);
-
-// Load top score from localStorage
 topScore=parseInt(localStorage.getItem('nc-topscore')||'0');
 document.getElementById('s-top').textContent=topScore;
 
-// Load leaderboard
-function getLeaderboard(){ try{return JSON.parse(localStorage.getItem('nc-lb')||'[]');}catch{return[];} }
-function saveLeaderboard(lb){ localStorage.setItem('nc-lb',JSON.stringify(lb)); }
+// BANK — tier 1=early game, 2=mid, 3=full variety
+const BANK=[
+  // WHOLE NUMBERS
+  {display:'7',   dec:'7',  cat:'whole',answer:'whole',tier:1,fb:{y:"7 is an integer — whole numbers are always rational.",n:"Integers like 7 are whole numbers. All whole numbers are rational."},pun:{y:"Very rational of you. Literally.",n:"Even Cantor knew his integers."}},
+  {display:'0',   dec:'0',  cat:'whole',answer:'whole',tier:1,fb:{y:"Zero is a whole number — rational.",n:"Zero is a whole number, and whole numbers are always rational."},pun:{y:"Zero judgment. Full credit.",n:"Zero is rational: 0 = 0/1."}},
+  {display:'1',   dec:'1',  cat:'whole',answer:'whole',tier:1,fb:{y:"1 is a whole number — rational.",n:"1 is the simplest whole number. Rational."},pun:{y:"The multiplicative identity. Classic.",n:"1 = 1/1. Rational."}},
+  {display:'−5',  dec:'-5', cat:'whole',answer:'whole',tier:1,fb:{y:"−5 is an integer — rational.",n:"Negative integers are rational too: −5 = −5/1."},pun:{y:"Negative but rational. Relatable.",n:"All integers, positive or negative, are rational."}},
+  {display:'−12', dec:'-12',cat:'whole',answer:'whole',tier:2,fb:{y:"−12 is an integer — rational.",n:"−12 is an integer. Integers are rational."},pun:{y:"Negative, but rationally so.",n:"−12 = −12/1. Rational."}},
+  {display:'100', dec:'100',cat:'whole',answer:'whole',tier:2,fb:{y:"100 is a whole number — rational.",n:"100 is a whole number. All whole numbers are rational."},pun:{y:"Base 10. How refreshingly decimal of you.",n:"100 = 100/1. Rational."}},
+  {display:'√4',  dec:'2',  cat:'whole',answer:'whole',tier:1,fb:{y:"√4 = 2 — a whole number, so rational.",n:"√4 = 2 exactly. When a square root is a whole number, it's rational."},pun:{y:"A perfect square root. Quite literally.",n:"4 = 2². So √4 = 2. Rational."}},
+  {display:'√9',  dec:'3',  cat:'whole',answer:'whole',tier:1,fb:{y:"√9 = 3 — a whole number, rational.",n:"√9 = 3 exactly. Rational."},pun:{y:"3. Beautiful number. Euler agreed.",n:"9 = 3². So √9 = 3. Rational."}},
+  {display:'√25', dec:'5',  cat:'whole',answer:'whole',tier:2,fb:{y:"√25 = 5 — whole number, rational.",n:"√25 = 5 — a perfect result. Rational."},pun:{y:"High five. Literally.",n:"5² = 25. So √25 = 5. Rational."}},
+  {display:'√100',dec:'10', cat:'whole',answer:'whole',tier:2,fb:{y:"√100 = 10 — whole number, rational.",n:"√100 = 10 exactly. Rational."},pun:{y:"Base 10. How fitting.",n:"10² = 100. √100 = 10. Rational."}},
+  {display:'√36', dec:'6',  cat:'whole',answer:'whole',tier:3,fb:{y:"√36 = 6 — whole number, rational.",n:"√36 = 6. Perfect square root. Rational."},pun:{y:"6 is a perfect number, you know. Bonus trivia.",n:"6² = 36. √36 = 6. Rational."}},
+  {display:'√49', dec:'7',  cat:'whole',answer:'whole',tier:3,fb:{y:"√49 = 7 — whole number, rational.",n:"√49 = 7. A perfect square root. Rational."},pun:{y:"Lucky number. Lucky root.",n:"7² = 49. √49 = 7. Rational."}},
+
+  // TERMINATING FRACTIONS (notation)
+  {display:'1/2',  dec:'0.5',   cat:'frac-term',answer:'frac-term',tier:1,fb:{y:"1/2 = 0.5 — terminates after one place.",n:"1/2 = 0.5. It ends — terminating decimal."},pun:{y:"Half credit? No, full credit.",n:"1/2 terminates. 2 is a factor of 10."}},
+  {display:'3/4',  dec:'0.75',  cat:'frac-term',answer:'frac-term',tier:1,fb:{y:"3/4 = 0.75 — terminates at hundredths.",n:"3/4 = 0.75. Ends cleanly."},pun:{y:"Three-quarters done. Then nothing.",n:"4 = 2². Terminates."}},
+  {display:'5/8',  dec:'0.625', cat:'frac-term',answer:'frac-term',tier:2,fb:{y:"5/8 = 0.625 — terminates at thousandths.",n:"5/8 = 0.625. Three places, then done."},pun:{y:"0.625. Tight, clean, gone.",n:"8 = 2³. Terminates."}},
+  {display:'7/4',  dec:'1.75',  cat:'frac-term',answer:'frac-term',tier:2,fb:{y:"7/4 = 1.75 — terminates.",n:"7/4 = 1.75. Ends at hundredths."},pun:{y:"1.75 and finished. Very tidy.",n:"4 = 2². Terminates."}},
+  {display:'1/25', dec:'0.04',  cat:'frac-term',answer:'frac-term',tier:2,fb:{y:"1/25 = 0.04 — terminates.",n:"1/25 = 0.04. Ends cleanly. 25 = 5²."},pun:{y:"Two places, then silence. Elegant.",n:"25 = 5². Only 5s and 2s → terminates."}},
+  {display:'9/16', dec:'0.5625',cat:'frac-term',answer:'frac-term',tier:3,fb:{y:"9/16 = 0.5625 — terminates at ten-thousandths.",n:"9/16 = 0.5625. Four places, done."},pun:{y:"16 = 2⁴. Powers of 2 always terminate. Nice.",n:"Denominator is power of 2 → terminates."}},
+  {display:'1/32', dec:'0.03125',cat:'frac-term',answer:'frac-term',tier:3,fb:{y:"1/32 = 0.03125 — terminates.",n:"1/32 = 0.03125. 32 = 2⁵. Terminates."},pun:{y:"Five decimal places. Then silence.",n:"32 = 2⁵. Terminates."}},
+  {display:'1/64', dec:'0.015625',cat:'frac-term',answer:'frac-term',tier:3,fb:{y:"1/64 = 0.015625 — terminates.",n:"1/64 terminates. 64 = 2⁶."},pun:{y:"Six digits. The end.",n:"64 = 2⁶. Terminates."}},
+
+  // TERMINATING BARE DECIMALS
+  {display:'0.5',  dec:'0.5',  cat:'frac-term',answer:'frac-term',tier:1,fb:{y:"0.5 terminates — equals 1/2.",n:"0.5 ends after one decimal place."},pun:{y:"Short and rational. Like a good proof.",n:"Terminates → rational."}},
+  {display:'0.75', dec:'0.75', cat:'frac-term',answer:'frac-term',tier:1,fb:{y:"0.75 terminates — equals 3/4.",n:"0.75 ends at hundredths. It's 3/4."},pun:{y:"Done at hundredths. Very tidy.",n:"Two decimal places. Rational."}},
+  {display:'0.625',dec:'0.625',cat:'frac-term',answer:'frac-term',tier:2,fb:{y:"0.625 terminates — equals 5/8.",n:"0.625 ends at thousandths."},pun:{y:"Three digits. Stops. Rational.",n:"Terminates → rational. Always."}},
+  {display:'3.125',dec:'3.125',cat:'frac-term',answer:'frac-term',tier:2,fb:{y:"3.125 terminates — equals 25/8.",n:"3.125 ends at thousandths."},pun:{y:"4 digits total. Then silence.",n:"Finite decimal = rational fraction."}},
+  {display:'0.04', dec:'0.04', cat:'frac-term',answer:'frac-term',tier:3,fb:{y:"0.04 terminates — equals 1/25.",n:"0.04 ends at hundredths."},pun:{y:"Two places after the decimal. Done.",n:"Terminates → rational."}},
+
+  // REPEATING FRACTIONS (notation)
+  {display:'1/3',  dec:'0.3333333333',   repeat:'3',     cat:'frac-rep',answer:'frac-rep',tier:1,fb:{y:"1/3 = 0.3̄ — the 3 repeats forever.",n:"1/3 = 0.333... The digit 3 repeats without end."},pun:{y:"1 ÷ 3 = infinitely patient.",n:"3 divides into 10 with remainder 1, forever."}},
+  {display:'2/3',  dec:'0.6666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',tier:1,fb:{y:"2/3 = 0.6̄ — the 6 repeats.",n:"2/3 = 0.666... The 6 repeats."},pun:{y:"Twice the thirds, same infinite patience.",n:"0.666... = 2/3. Rational."}},
+  {display:'1/6',  dec:'0.1666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',tier:2,fb:{y:"1/6 = 0.16̄ — the 6 repeats.",n:"1/6 = 0.1666... The 6 repeats."},pun:{y:"Starts clean, then infinite. Relatable.",n:"6 = 2 × 3. The 3 causes the repeat."}},
+  {display:'1/7',  dec:'0.142857142857', repeat:'142857',cat:'frac-rep',answer:'frac-rep',tier:2,fb:{y:"1/7 — block 142857 repeats.",n:"1/7 = 0.142857142857... Six-digit block repeats."},pun:{y:"142857 — a cyclic number. Math's party trick.",n:"142857 × 7 = 999999. Really."}},
+  {display:'1/9',  dec:'0.1111111111',   repeat:'1',     cat:'frac-rep',answer:'frac-rep',tier:2,fb:{y:"1/9 = 0.1̄ — the digit 1 repeats.",n:"1/9 = 0.111... The 1 repeats."},pun:{y:"Nine times this repeats. All times.",n:"Ninths always repeat a single digit."}},
+  {display:'1/11', dec:'0.090909090909', repeat:'09',    cat:'frac-rep',answer:'frac-rep',tier:2,fb:{y:"1/11 = 0.09̄ — block 09 repeats.",n:"1/11 = 0.0909... Block 09 repeats."},pun:{y:"09. 09. 09. Rhythmic. Rational.",n:"Elevenths repeat with period 2."}},
+  {display:'5/6',  dec:'0.833333',       repeat:'3',     cat:'frac-rep',answer:'frac-rep',tier:3,fb:{y:"5/6 = 0.83̄ — the 3 repeats.",n:"5/6 = 0.8333... The 3 repeats."},pun:{y:"Starts specific, ends infinite.",n:"6 = 2 × 3. The 3 causes the repeat."}},
+  {display:'4/9',  dec:'0.4444444444',   repeat:'4',     cat:'frac-rep',answer:'frac-rep',tier:3,fb:{y:"4/9 = 0.4̄ — the 4 repeats.",n:"4/9 = 0.444... The digit 4 repeats."},pun:{y:"Four ninths. Infinitely four.",n:"Ninths always repeat a single digit."}},
+  {display:'5/11', dec:'0.454545454545', repeat:'45',    cat:'frac-rep',answer:'frac-rep',tier:3,fb:{y:"5/11 — block 45 repeats.",n:"5/11 = 0.4545... Block 45 repeats."},pun:{y:"45. 45. 45. Eternal rhythm.",n:"Elevenths always repeat with period 2."}},
+  {display:'1/12', dec:'0.083333333',    repeat:'3',     cat:'frac-rep',answer:'frac-rep',tier:3,fb:{y:"1/12 = 0.083̄ — the 3 repeats.",n:"1/12 = 0.0833... The 3 repeats. 12 = 4×3."},pun:{y:"Starts clean, then the 3 takes over.",n:"12 = 2² × 3. The factor of 3 causes the repeat."}},
+
+  // REPEATING BARE DECIMALS
+  {display:'0.3̄',     displayHTML:'0.<span class="overbar">3</span>',      dec:'0.3333333333',   repeat:'3',     cat:'frac-rep',answer:'frac-rep',tier:2,fb:{y:"0.3̄ repeats — equals 1/3.",n:"0.333... The 3 repeats without end."},pun:{y:"One third. Three repeating. The universe is consistent.",n:"Repeating decimal → rational fraction."}},
+  {display:'0.6̄',     displayHTML:'0.<span class="overbar">6</span>',      dec:'0.6666666666',   repeat:'6',     cat:'frac-rep',answer:'frac-rep',tier:2,fb:{y:"0.6̄ repeats — equals 2/3.",n:"0.666... = 2/3. Repeating decimal."},pun:{y:"Two thirds of the way to 1. Always.",n:"0.666... = 2/3. Rational."}},
+  {display:'0.09̄',    displayHTML:'0.0<span class="overbar">9</span>',     dec:'0.090909090909', repeat:'09',    cat:'frac-rep',answer:'frac-rep',tier:3,fb:{y:"0.09̄ — block 09 repeats. Equals 1/11.",n:"0.0909... Block 09 repeats."},pun:{y:"09, eternally. Very 1/11.",n:"Block 09 cycles. Rational."}},
+  {display:'0.142857̄', displayHTML:'0.<span class="overbar">142857</span>',dec:'0.142857142857', repeat:'142857',cat:'frac-rep',answer:'frac-rep',tier:3,fb:{y:"Block 142857 repeats — this is 1/7.",n:"0.142857142857... Six-digit block cycles."},pun:{y:"142857 × 7 = 999999. Really.",n:"Six-digit repeat = 1/7. Cyclic number."}},
+
+  // IRRATIONAL SQUARE ROOTS
+  {display:'√2',  dec:'1.41421356237309504880168872',cat:'irr-sqrt',answer:'irr-sqrt',tier:1,fb:{y:"√2 is irrational — non-terminating, non-repeating.",n:"√2 = 1.41421356... No repeating block, no end."},pun:{y:"The original irrational. Hippasus proved it.",n:"Proof by contradiction: assume p/q → contradiction."}},
+  {display:'√3',  dec:'1.73205080756887729352744634',cat:'irr-sqrt',answer:'irr-sqrt',tier:1,fb:{y:"√3 is irrational — 3 is not a perfect square.",n:"√3 = 1.73205... No pattern, no end."},pun:{y:"No pattern. No peace. No termination.",n:"3 is not a perfect square → √3 irrational."}},
+  {display:'√5',  dec:'2.23606797749978969640917366',cat:'irr-sqrt',answer:'irr-sqrt',tier:2,fb:{y:"√5 is irrational.",n:"5 isn't a perfect square — √5 is irrational."},pun:{y:"Golden ratio adjacent. Appropriately irrational.",n:"√5 appears in the golden ratio. Fitting."}},
+  {display:'√7',  dec:'2.64575131106459059050161575',cat:'irr-sqrt',answer:'irr-sqrt',tier:2,fb:{y:"√7 is irrational.",n:"√7 = 2.64575... Non-terminating, non-repeating."},pun:{y:"Seven is prime. Seven's root is irrational.",n:"Non-perfect-square → irrational root."}},
+  {display:'√11', dec:'3.31662479035539984359271632',cat:'irr-sqrt',answer:'irr-sqrt',tier:2,fb:{y:"√11 is irrational — 11 is not a perfect square.",n:"11 is not a perfect square — √11 is irrational."},pun:{y:"Prime number, irrational root.",n:"11 is prime → not a perfect square → irrational."}},
+  {display:'√13', dec:'3.60555127546398929311921607',cat:'irr-sqrt',answer:'irr-sqrt',tier:3,fb:{y:"√13 is irrational.",n:"√13 = 3.60555... Non-terminating, non-repeating."},pun:{y:"Unlucky number, irrational decimal.",n:"No perfect square between 9 and 16."}},
+  {display:'√6',  dec:'2.44948974278317809819728407',cat:'irr-sqrt',answer:'irr-sqrt',tier:3,fb:{y:"√6 is irrational.",n:"√6 = 2.44948... 6 is not a perfect square."},pun:{y:"Between √4 and √9. Belonging nowhere.",n:"6 = 2 × 3. Not a perfect square → irrational."}},
+  {display:'√15', dec:'3.87298334620741688517926539',cat:'irr-sqrt',answer:'irr-sqrt',tier:3,fb:{y:"√15 is irrational.",n:"15 is not a perfect square → √15 is irrational."},pun:{y:"Between 3 and 4. Forever between.",n:"15 = 3 × 5. Not a perfect square."}},
+
+  // IRRATIONAL DECIMALS
+  {display:'π',       dec:'3.14159265358979323846264338',cat:'irr-dec',answer:'irr-dec',tier:1,fb:{y:"π is irrational — non-repeating, non-terminating.",n:"π = 3.14159265... never repeats or ends."},pun:{y:"π is so irrational it has its own holiday.",n:"Proved irrational by Lambert in 1768."}},
+  {display:'2π',      dec:'6.28318530717958647692528676',cat:'irr-dec',answer:'irr-dec',tier:2,fb:{y:"2π is irrational — rational × irrational = irrational.",n:"2π = 6.28318... Multiplying π by 2 stays irrational."},pun:{y:"Tau (τ = 2π). Irrational either way.",n:"Rational × irrational = irrational. Always."}},
+  {display:'π/2',     dec:'1.57079632679489661923132169',cat:'irr-dec',answer:'irr-dec',tier:2,fb:{y:"π/2 is still irrational.",n:"π/2 = 1.5707... Can't write as p/q."},pun:{y:"Half of irrational is still irrational.",n:"Dividing irrational by rational stays irrational."}},
+  {display:'π/4',     dec:'0.78539816339744830961566084',cat:'irr-dec',answer:'irr-dec',tier:3,fb:{y:"π/4 is irrational.",n:"π/4 = 0.78539... Still irrational."},pun:{y:"A quarter of π. Still infinite, still irrational.",n:"π/4 is irrational — rational multiple of irrational."}},
+  {display:'0.101001…',dec:'0.101001000100001000010000010000001',pattern:true,cat:'irr-dec',answer:'irr-dec',tier:2,fb:{y:"The pattern grows — no fixed repeating block. Irrational.",n:"Each group adds an extra zero — no repeating block."},pun:{y:"Looks patterned. Isn't repeating. Sneaky irrational.",n:"A pattern ≠ a repeating block."}},
+  {display:'0.313113…',dec:'0.31311311131111311113111131111131',pattern:true,cat:'irr-dec',answer:'irr-dec',tier:2,fb:{y:"The 1-runs keep growing — no repeating block. Irrational.",n:"The 1s multiply each time — never settles."},pun:{y:"More 1s each time. Never the same block twice.",n:"Growing runs → no period → irrational."}},
+  {display:'0.1221221…',dec:'0.12212211222112221222212222122222',pattern:true,cat:'irr-dec',answer:'irr-dec',tier:3,fb:{y:"The groups grow — no repeating block. Irrational.",n:"1s and 2s in groups that keep growing — irrational."},pun:{y:"Orderly chaos. Irrational beauty.",n:"No finite repeating block → irrational."}},
+];
+
+// progressive pool: returns indices eligible at current streak
+function getPool(){
+  const tier = streak<6?1:streak<16?2:3;
+  let pool=BANK.map((_,i)=>i).filter(i=>!usedIdx.has(i)&&BANK[i].tier<=tier);
+  if(!pool.length){
+    // recycle used but keep tier filter
+    const tierPool=BANK.map((_,i)=>i).filter(i=>BANK[i].tier<=tier);
+    tierPool.forEach(i=>usedIdx.delete(i));
+    pool=tierPool;
+  }
+  return pool;
+}
 
 // ── BUILD GALLERY ──
 function buildGallery(){
   ['rational','irrational'].forEach(pid=>{
-    const subRow=document.getElementById('sub-'+pid);
-    subRow.innerHTML='';
+    const subRow=document.getElementById('sub-'+pid);subRow.innerHTML='';
     ZONES.filter(z=>z.parent===pid).forEach(z=>{
       const col=document.createElement('div');col.className='zone-col';col.dataset.zoneId=z.id;
       const hdr=document.createElement('div');hdr.className='zone-header';
@@ -678,8 +1082,7 @@ function buildGallery(){
       hdr.appendChild(nameWrap);hdr.appendChild(pips);
       const chain=document.createElement('div');chain.className='chain-area';chain.id='chain-'+z.id;
       const empty=document.createElement('div');empty.className='chain-empty';empty.id='empty-'+z.id;empty.textContent='drop here';
-      chain.appendChild(empty);
-      col.appendChild(hdr);col.appendChild(chain);
+      chain.appendChild(empty);col.appendChild(hdr);col.appendChild(chain);
       col.addEventListener('dragenter',e=>{e.preventDefault();if(!answered)col.classList.add('drag-over');});
       col.addEventListener('dragover',e=>{e.preventDefault();if(!answered)col.classList.add('drag-over');});
       col.addEventListener('dragleave',e=>{if(!col.contains(e.relatedTarget))col.classList.remove('drag-over');});
@@ -690,7 +1093,6 @@ function buildGallery(){
   });
 }
 
-// ── BUILD BADGES ──
 function buildBadgeList(){
   const bl=document.getElementById('badge-list');bl.innerHTML='';
   BADGE_DEFS.forEach(b=>{
@@ -713,18 +1115,12 @@ function checkBadges(){
 // ── TILE STRIP ──
 function renderTileStrip(num){
   const strip=document.getElementById('tile-strip');strip.innerHTML='';
-  const modeData=MODES[mode];
-  if(!modeData.colors){
-    // In higher modes, no color strip shown
-    document.getElementById('drag-tile').classList.add('no-colors');
-    return;
-  }
+  if(!MODES[mode].colors){document.getElementById('drag-tile').classList.add('no-colors');return;}
   document.getElementById('drag-tile').classList.remove('no-colors');
   const raw=num.dec,isNeg=raw.startsWith('-'),abs=raw.replace('-','');
   const MAX=12;
   if(isNeg){const n=document.createElement('div');n.className='tdot';n.textContent='−';strip.appendChild(n);}
-  let chars=[];
-  const dotIdx=abs.indexOf('.');
+  let chars=[];const dotIdx=abs.indexOf('.');
   if(num.repeat){
     const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
     const afterGiven=dotIdx>=0?abs.slice(dotIdx+1):'';
@@ -748,7 +1144,6 @@ function renderTileStrip(num){
   if(needsEll){const el=document.createElement('div');el.className='tell';el.textContent='…';strip.appendChild(el);}
 }
 
-// ── HANG ITEM ──
 function buildHangItem(num){
   const item=document.createElement('div');item.className='hang-item';item.title=num.display;
   const lbl=document.createElement('div');lbl.className='hang-label';lbl.textContent=num.display;
@@ -784,24 +1179,17 @@ function buildHangItem(num){
 
 // ── TIMER ──
 function startTimer(){
-  const modeData=MODES[mode];
-  if(!modeData.timer) return;
-  stopTimer();
-  timerRemaining=modeData.timer;
+  const md=MODES[mode];if(!md.timer)return;
+  stopTimer();timerRemaining=md.timer;
   const bar=document.getElementById('timer-bar');
   bar.style.transition='none';bar.style.width='100%';bar.classList.remove('urgent');
   void bar.offsetWidth;
-  bar.style.transition=`width ${modeData.timer}ms linear`;
-  bar.style.width='0%';
-  const warnAt=modeData.timer*0.35;
+  bar.style.transition=`width ${md.timer}ms linear`;bar.style.width='0%';
+  const warnAt=md.timer*0.35;
   timerInterval=setInterval(()=>{
     timerRemaining-=100;
     if(timerRemaining<=warnAt)bar.classList.add('urgent');
-    if(timerRemaining<=0){
-      stopTimer();
-      // Time's up = wrong answer
-      handleWrong(null, true);
-    }
+    if(timerRemaining<=0){stopTimer();handleWrong(null,true);}
   },100);
 }
 function stopTimer(){
@@ -812,161 +1200,211 @@ function stopTimer(){
 
 // ── LEVEL UP ──
 function triggerLevelUp(newMode){
-  const modeData=MODES[newMode];
-  stopTimer();
-  answered=true; // freeze interaction during animation
+  const md=MODES[newMode];stopTimer();answered=true;
   document.getElementById('drag-tile').classList.add('gone');
-
   const overlay=document.getElementById('levelup-overlay');
   const box=document.getElementById('levelup-box');
-  document.getElementById('levelup-title').textContent=modeData.name;
-  document.getElementById('levelup-mult').textContent=`×${modeData.mult} Points`;
-
+  document.getElementById('levelup-title').textContent=md.name;
+  document.getElementById('levelup-mult').textContent=`×${md.mult} Points`;
   const subs={mega:'Colors stripped. Trust yourself.',monster:'3 seconds. No colors. Go.',ultra:'2 seconds. Pure instinct.'};
   document.getElementById('levelup-sub').textContent=subs[newMode]||'';
-
   const colors={mega:'#ffd700',monster:'#ff8c00',ultra:'#f72585'};
   const col=colors[newMode]||'var(--accent)';
   document.getElementById('levelup-title').style.color=col;
   document.getElementById('levelup-mult').style.color=col;
-  overlay.style.background=`radial-gradient(ellipse at center, ${col}22 0%, transparent 70%)`;
-
-  // screen flash gold
+  overlay.style.background=`radial-gradient(ellipse at center,${col}22 0%,transparent 70%)`;
   flashScreen('flash-gold');
-
-  // force re-animation
   overlay.className='levelup-overlay';box.style.animation='none';
   void overlay.offsetWidth;
   overlay.classList.add('firing');
   box.style.animation='levelupBox 2.5s cubic-bezier(0.34,1.3,0.64,1) forwards';
-
-  // update mode after animation
   setTimeout(()=>{
-    mode=newMode;
-    updateModeUI();
-    overlay.className='levelup-overlay';
-    answered=false;
-    document.getElementById('drag-tile').classList.remove('gone');
-    if(MODES[newMode].timer) startTimer();
+    mode=newMode;updateModeUI();overlay.className='levelup-overlay';
+    answered=false;document.getElementById('drag-tile').classList.remove('gone');
+    if(MODES[newMode].timer)startTimer();
   },2500);
 }
-
 function updateModeUI(){
-  const modeData=MODES[mode];
+  const md=MODES[mode];
   const badge=document.getElementById('mode-badge');
-  badge.textContent=modeData.name+' ×'+modeData.mult;
-  badge.className='mode-badge '+(mode==='normal'?'':mode);
-  document.getElementById('multiplier').textContent='×'+modeData.mult;
-  document.getElementById('timer-bar-wrap').className='timer-bar-wrap'+(modeData.timer?' active':'');
+  badge.textContent=md.name+' ×'+md.mult;badge.className='mode-badge '+(mode==='normal'?'':mode);
+  document.getElementById('multiplier').textContent='×'+md.mult;
+  document.getElementById('timer-bar-wrap').className='timer-bar-wrap'+(md.timer?' active':'');
   const hints={normal:'Drag to Rational or Irrational ↓',mega:'No colors — classify by sight! ↓',monster:'3 seconds! Classify now! ↓',ultra:'2 seconds! GO! ↓'};
   document.getElementById('tile-hint').textContent=hints[mode];
-
-  // Set subcategory hint transparency — Normal=20% visible, Mega=8%, Monster/Ultra=0%
   const hintOpacity={normal:'0.20',mega:'0.08',monster:'0',ultra:'0'};
-  document.querySelectorAll('.parent-zone').forEach(pz=>{
-    pz.style.setProperty('--hint-opacity', hintOpacity[mode]||'0');
-  });
+  document.querySelectorAll('.parent-zone').forEach(pz=>pz.style.setProperty('--hint-opacity',hintOpacity[mode]||'0'));
 }
 
-// ── SCREEN FLASH ──
-function flashScreen(cls){
-  const el=document.getElementById('screen-flash');
-  el.className='screen-flash';void el.offsetWidth;el.className='screen-flash '+cls;
+// ── SCREEN EFFECTS ──
+function flashScreen(cls){const el=document.getElementById('screen-flash');el.className='screen-flash';void el.offsetWidth;el.className='screen-flash '+cls;}
+function shakeScreen(){document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake');setTimeout(()=>document.body.classList.remove('shake'),500);}
+function showBriefFlash(text,color){
+  const el=document.getElementById('brief-flash');
+  el.textContent=text;el.style.color=color||'var(--green)';
+  el.className='brief-flash';void el.offsetWidth;el.className='brief-flash show';
 }
-function shakeScreen(){
-  document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake');
-  setTimeout(()=>document.body.classList.remove('shake'),500);
+function showHeartBreak(){
+  const el=document.getElementById('heart-break-splash');
+  el.className='heart-break-splash';void el.offsetWidth;el.className='heart-break-splash show';
+  setTimeout(()=>el.className='heart-break-splash',1400);
+}
+
+// ── SIDEBAR ──
+function popVal(id,extraClass){
+  const el=document.getElementById(id);if(!el)return;
+  el.classList.remove('pop','flash-green','on-fire','shake');void el.offsetWidth;
+  el.classList.add('pop');if(extraClass)el.classList.add(extraClass);
+}
+function updateStreak(val){
+  const el=document.getElementById('s-streak');
+  el.textContent=val;el.classList.remove('pop','flash-green','on-fire','shake');void el.offsetWidth;
+  if(val===0){el.classList.add('shake');return;}
+  el.classList.add('pop');
+  if(val>=5)el.classList.add('on-fire');else el.classList.add('flash-green');
+}
+
+// ── VOCAB WRONG POPUP ── 
+function showVocabPopup(wrongZoneId,rightZoneId,numDisplay){
+  vocabAnswered=false;
+  const numDisplayHTML = current.displayHTML || null;
+
+  // juxtaposition
+  const wnEl=document.getElementById('vc-number-wrong');
+  const rnEl=document.getElementById('vc-number-right');
+  if(numDisplayHTML){wnEl.innerHTML=numDisplayHTML;rnEl.innerHTML=numDisplayHTML;}
+  else{wnEl.textContent=numDisplay;rnEl.textContent=numDisplay;}
+  document.getElementById('vc-cat-wrong').textContent=ZONE_NAMES[wrongZoneId]||wrongZoneId;
+  document.getElementById('vc-cat-right').textContent=ZONE_NAMES[rightZoneId]||rightZoneId;
+
+  // get vocab question
+  const key=wrongZoneId+'>'+rightZoneId;
+  const qData=VOCAB_Q[key]||VOCAB_FALLBACK;
+  document.getElementById('vocab-q').textContent=qData.q;
+
+  // render choices
+  const choicesEl=document.getElementById('vocab-choices');choicesEl.innerHTML='';
+  const keys=['A','B','C','D'];
+  qData.choices.forEach((ch,i)=>{
+    const btn=document.createElement('button');btn.className='vc-choice';
+    btn.innerHTML=`<span class="vc-key">${keys[i]}.</span><span>${ch}</span>`;
+    btn.addEventListener('click',()=>handleVocabChoice(i,qData.correct,btn));
+    choicesEl.appendChild(btn);
+  });
+
+  // hide continue btn
+  document.getElementById('vocab-continue').style.display='none';
+
+  // countdown
+  let secs=8;
+  document.getElementById('vocab-clabel').textContent=secs+'s';
+  const cbar=document.getElementById('vocab-cbar');
+  cbar.style.transition='none';cbar.style.width='100%';
+  void cbar.offsetWidth;
+  cbar.style.transition=`width ${secs*1000}ms linear`;cbar.style.width='0%';
+  if(vocabTimer)clearInterval(vocabTimer);
+  vocabTimer=setInterval(()=>{
+    secs--;
+    document.getElementById('vocab-clabel').textContent=secs+'s';
+    if(secs<=0){
+      clearInterval(vocabTimer);vocabTimer=null;
+      if(!vocabAnswered) document.getElementById('vocab-continue').style.display='block';
+    }
+  },1000);
+
+  document.getElementById('vocab-overlay').classList.add('show');
+}
+
+function handleVocabChoice(idx,correct,btn){
+  if(vocabAnswered)return;
+  if(idx===correct){
+    vocabAnswered=true;
+    btn.classList.add('right-choice');
+    if(vocabTimer){clearInterval(vocabTimer);vocabTimer=null;}
+    setTimeout(()=>{
+      document.getElementById('vocab-continue').style.display='block';
+    },400);
+  } else {
+    btn.classList.add('wrong-choice');
+    setTimeout(()=>btn.classList.remove('wrong-choice'),400);
+  }
+}
+
+function dismissVocab(){
+  if(vocabTimer){clearInterval(vocabTimer);vocabTimer=null;}
+  document.getElementById('vocab-overlay').classList.remove('show');
+  if(gameActive)nextNumber();
+}
+
+// ── PUNS ──
+const PUNS={
+  correct_clean:["Very rational of you. Pun intended.","Dropped straight in. Euler would nod.","No detours. A direct proof.","Clean and precise. You absolute integer.","Closed-form solution. Elegant."],
+  correct_normal:["Limit of hesitation → zero. 😄","A little exploration — very Gauss of you.","Correct! Even if the path was non-linear.","You found it. Like π, you got there.","Methodical. Acceptable. ✓"],
+  correct_streak:[s=>`${s} in a row. Accuracy approaching 1.`,s=>`${s} straight. New number line required.`,s=>`${s} in a row. Statistically beautiful.`,s=>`${s} correct! Euler is watching.`],
+};
+function getPun(isClean,streakVal){
+  if(streakVal>=5){const fn=PUNS.correct_streak[Math.floor(Math.random()*PUNS.correct_streak.length)];return fn(streakVal);}
+  if(isClean)return PUNS.correct_clean[Math.floor(Math.random()*PUNS.correct_clean.length)];
+  return PUNS.correct_normal[Math.floor(Math.random()*PUNS.correct_normal.length)];
 }
 
 // ── LIVES ──
 function loseLife(scoreAtMistake){
-  if(lives<=0)return;
-  lives--;
-  const h=document.getElementById('h'+lives);
-  h.classList.add('lost');h.textContent='💔';
-  shakeScreen();flashScreen('flash-red');
-  showHeartBreak();
-  if(lives===0) setTimeout(()=>triggerGameOver(scoreAtMistake||0),1800);
+  if(lives<=0)return;lives--;
+  const h=document.getElementById('h'+lives);h.classList.add('lost');h.textContent='💔';
+  shakeScreen();flashScreen('flash-red');showHeartBreak();
+  if(lives===0)setTimeout(()=>triggerGameOver(scoreAtMistake||0),1800);
 }
 function updateHearts(){
-  for(let i=0;i<3;i++){
-    const h=document.getElementById('h'+i);
-    if(i<lives){h.className='heart';h.textContent='❤️';}
-    else{h.className='heart lost';h.textContent='💔';}
-  }
-}
-
-// Big heart break in center of screen
-function showHeartBreak(){
-  const el=document.getElementById('heart-break-splash');
-  el.className='heart-break-splash';void el.offsetWidth;
-  el.className='heart-break-splash show';
-  setTimeout(()=>el.className='heart-break-splash',1400);
+  for(let i=0;i<3;i++){const h=document.getElementById('h'+i);if(i<lives){h.className='heart';h.textContent='❤️';}else{h.className='heart lost';h.textContent='💔';}}
 }
 
 // ── GAME OVER ──
 function triggerGameOver(finalScore){
-  gameActive=false;
-  stopTimer();
-  const displayScore=finalScore!==undefined?finalScore:score;
-  if(displayScore>topScore){topScore=displayScore;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
-  document.getElementById('go-score').textContent=displayScore;
+  gameActive=false;stopTimer();
+  const ds=finalScore!==undefined?finalScore:score;
+  if(ds>topScore){topScore=ds;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
+  document.getElementById('go-score').textContent=ds;
   document.getElementById('go-label').textContent=`${MODES[mode].name} mode · Best Streak: ${bestStreak}`;
-  renderLeaderboard(null);
+  renderGameOverLb(null);
   document.getElementById('gameover-overlay').classList.add('show');
   document.getElementById('name-input').focus();
 }
-
 function saveScore(){
   const name=(document.getElementById('name-input').value.trim().toUpperCase()||'???').slice(0,12);
   const lb=getLeaderboard();
-  const entry={name,score,mode,streak:bestStreak,date:new Date().toLocaleDateString()};
-  lb.push(entry);
-  lb.sort((a,b)=>b.score-a.score);
-  lb.splice(10); // keep top 10
-  saveLeaderboard(lb);
-  renderLeaderboard(entry);
+  const finalScore=parseInt(document.getElementById('go-score').textContent)||0;
+  const entry={name,score:finalScore,mode,streak:bestStreak,date:new Date().toLocaleDateString()};
+  lb.push(entry);lb.sort((a,b)=>b.score-a.score);lb.splice(10);
+  saveLeaderboard(lb);renderGameOverLb(entry);
 }
-
-function renderLeaderboard(highlight){
-  const lb=getLeaderboard();
-  const container=document.getElementById('leaderboard-list');
-  container.innerHTML='';
-  if(!lb.length){container.innerHTML='<div style="font-size:0.7rem;color:var(--dim);padding:8px;">No scores yet. Be the first!</div>';return;}
+function renderGameOverLb(highlight){
+  const lb=getLeaderboard();const container=document.getElementById('leaderboard-list');container.innerHTML='';
+  if(!lb.length){container.innerHTML='<div style="font-size:0.7rem;color:var(--dim);padding:8px;">No scores yet.</div>';return;}
+  const medals=['🥇','🥈','🥉'];
   lb.slice(0,8).forEach((e,i)=>{
-    const div=document.createElement('div');
-    div.className='lb-entry'+(highlight&&e===highlight?' highlight':'');
-    const medals=['🥇','🥈','🥉'];
-    div.innerHTML=`<span class="lb-rank">${medals[i]||i+1}</span><span class="lb-name">${e.name}</span><span class="lb-mode ${e.mode}">${MODES[e.mode]?.name||e.mode}</span><span class="lb-score">${e.score}</span>`;
+    const div=document.createElement('div');div.className='lb-entry'+(highlight&&e===highlight?' highlight':'');
+    div.innerHTML=`<span class="lb-rank">${medals[i]||i+1}</span><span class="lb-name">${e.name||'???'}</span><span class="lb-score">${e.score}</span>`;
     container.appendChild(div);
   });
 }
-
 function restartGame(){
   document.getElementById('gameover-overlay').classList.remove('show');
   score=0;streak=0;bestStreak=0;cleanStreak=0;total=0;
-  lives=3;mode='normal';modeTotalCorrect=0;correctPopupCount=0;
+  lives=3;mode='normal';modeTotalCorrect=0;
   answered=false;gameActive=true;
-  usedIdx.clear();masteryHits={};masteryDone.clear();
-  earnedBadges.clear();
+  usedIdx.clear();masteryHits={};masteryDone.clear();earnedBadges.clear();
   ZONES.forEach(z=>masteryHits[z.id]=0);
   updateHearts();updateModeUI();
-  document.getElementById('s-streak').textContent=0;
-  document.getElementById('s-best').textContent=0;
-  document.getElementById('s-score').textContent=0;
-  document.getElementById('s-clean').textContent=0;
-  stopTimer();
-  buildGallery();buildBadgeList();
-  nextNumber();
-  goToSplash();
+  ['s-streak','s-best','s-score','s-clean'].forEach(id=>document.getElementById(id).textContent=0);
+  stopTimer();buildGallery();buildBadgeList();nextNumber();goToSplash();
 }
 
 // ── HOVER REVEAL ──
 function expandParent(pid){
-  const pRat=document.getElementById('parent-rational');
-  const pIrr=document.getElementById('parent-irrational');
-  if(pid==='rational'){pRat.classList.remove('collapsed');pRat.classList.add('expanded');pIrr.classList.remove('expanded');pIrr.classList.add('collapsed');}
-  else{pIrr.classList.remove('collapsed');pIrr.classList.add('expanded');pRat.classList.remove('expanded');pRat.classList.add('collapsed');}
+  const pR=document.getElementById('parent-rational');const pI=document.getElementById('parent-irrational');
+  if(pid==='rational'){pR.classList.remove('collapsed');pR.classList.add('expanded');pI.classList.remove('expanded');pI.classList.add('collapsed');}
+  else{pI.classList.remove('collapsed');pI.classList.add('expanded');pR.classList.remove('expanded');pR.classList.add('collapsed');}
   if(isDragging)hoveredParents.add(pid);
 }
 function collapseAll(){
@@ -985,159 +1423,76 @@ function initParentHover(){
   });
 }
 
-// ── SIDEBAR ANIMATIONS ──
-function popVal(id,extraClass){
-  const el=document.getElementById(id);if(!el)return;
-  el.classList.remove('pop','flash-green','on-fire','shake');void el.offsetWidth;
-  el.classList.add('pop');if(extraClass)el.classList.add(extraClass);
-}
-function updateStreak(val){
-  const el=document.getElementById('s-streak');
-  el.textContent=val;el.classList.remove('pop','flash-green','on-fire','shake');void el.offsetWidth;
-  if(val===0){el.classList.add('shake');return;}
-  el.classList.add('pop');
-  if(val>=5)el.classList.add('on-fire');else el.classList.add('flash-green');
-}
-
-// ── PUNS ──
-const PUNS={
-  correct_clean:["Very rational of you. Pun intended.","Dropped straight in. Euler would nod.","No detours. A direct proof.","Clean and precise. You absolute integer.","That's what we call a closed-form solution."],
-  correct_normal:["The limit of your hesitation approached zero. 😄","A little exploration — very Gauss of you.","Correct! Even if the path was non-linear.","You found it. Like π, you got there in the end.","Methodical. Acceptable. ✓"],
-  correct_streak:[s=>`${s} in a row. Your accuracy approaches 1. From below.`,s=>`${s} straight. At this rate you'll need a new number line.`,s=>`${s} in a row. Statistically improbable. Mathematically beautiful.`,s=>`${s} correct! Euler is watching. Approvingly.`],
-  wrong:["About as rational as √−1. 😬","Close, but no π.","That's irrational. Ironically.","Asymptotically approaching the right answer.","Mmm. Too complex, actually.","Interesting hypothesis. Disproven.","The number line called. It said no."],
-};
-function getPun(correct,isClean,streakVal){
-  if(!correct)return PUNS.wrong[Math.floor(Math.random()*PUNS.wrong.length)];
-  if(streakVal>=5){const fn=PUNS.correct_streak[Math.floor(Math.random()*PUNS.correct_streak.length)];return fn(streakVal);}
-  if(isClean)return PUNS.correct_clean[Math.floor(Math.random()*PUNS.correct_clean.length)];
-  return PUNS.correct_normal[Math.floor(Math.random()*PUNS.correct_normal.length)];
-}
-
-// ── POPUP ──
-function showPopup(correct,message,pun,isClean){
-  const overlay=document.getElementById('popup-overlay');
-  const popup=document.getElementById('popup');
-  popup.className='popup '+(correct?'correct-popup':'wrong-popup');
-  document.getElementById('popup-icon').textContent=correct?'✓':'✗';
-  document.getElementById('popup-body').textContent=message;
-  document.getElementById('popup-pun').textContent=pun;
-  document.getElementById('popup-bonus').className='popup-bonus'+(isClean?' show':'');
-  overlay.classList.add('show');
-  if(popupTimer)clearTimeout(popupTimer);
-  popupTimer=setTimeout(dismissPopup,correct?2400:3800);
-}
-function dismissPopup(){
-  if(popupTimer){clearTimeout(popupTimer);popupTimer=null;}
-  document.getElementById('popup-overlay').classList.remove('show');
-  if(gameActive)nextNumber();
-}
-
-// ── HANDLE WRONG (shared between classify and timer) ──
-function handleWrong(zoneId, timedOut){
+// ── HANDLE WRONG ──
+function handleWrong(zoneId,timedOut){
   if(!gameActive)return;
-  answered=true;
-  document.getElementById('drag-tile').classList.add('gone');
-  stopTimer();
-
+  answered=true;document.getElementById('drag-tile').classList.add('gone');stopTimer();
   if(zoneId){
     const wchain=document.getElementById('chain-'+zoneId);
     const we=document.getElementById('empty-'+zoneId);if(we)we.remove();
-    const ghost=buildHangItem(current);
-    ghost.style.opacity='0.25';ghost.style.filter='grayscale(0.9)';
+    const ghost=buildHangItem(current);ghost.style.opacity='0.25';ghost.style.filter='grayscale(0.9)';
     wchain.appendChild(ghost);
     document.getElementById('chain-'+zoneId).closest('.zone-col').classList.add('wrong-flash');
     setTimeout(()=>ghost.remove(),700);
     const chain=document.getElementById('chain-'+current.answer);
     const emptyEl=document.getElementById('empty-'+current.answer);if(emptyEl)emptyEl.remove();
-    const item=buildHangItem(current);chain.appendChild(item);chain.scrollLeft=chain.scrollWidth;
+    chain.appendChild(buildHangItem(current));chain.scrollLeft=chain.scrollWidth;
   }
-
-  // Record score BEFORE zeroing it
   const scoreAtMistake=score;
-  score=0; streak=0; cleanStreak=0;
+  score=0;streak=0;cleanStreak=0;
   document.getElementById('s-score').textContent=0;
   document.getElementById('s-clean').textContent=0;
   updateStreak(0);
-
   loseLife(scoreAtMistake);
   if(!gameActive)return;
-
-  correctPopupCount=0; // reset so next correct streak shows popups again
-  const msg=timedOut?"Time's up! "+current.fb.n:current.fb.n;
-  const pun=timedOut?"Time flies. Unlike irrational numbers, it does terminate.":getPun(false,false,0);
-  setTimeout(()=>showPopup(false,msg,pun,false),800); // delay to let heart animation breathe
+  // show vocab popup with 1.8s delay (let heart animation breathe)
+  setTimeout(()=>{
+    if(gameActive&&zoneId)showVocabPopup(zoneId,current.answer,current.display);
+    else if(gameActive)showVocabPopup('irr-dec',current.answer,current.display);
+  },1800);
 }
 
 // ── CLASSIFY ──
 function classify(zoneId){
   if(answered||!gameActive)return;
-  stopTimer();
-  answered=true;total++;
-
+  stopTimer();answered=true;total++;
   const correct=zoneId===current.answer;
   const correctParent=ZONE_PARENT[current.answer];
   const isClean=correct&&!hoveredParents.has(correctParent==='rational'?'irrational':'rational');
-
-  // place hang item
   const targetId=correct?zoneId:current.answer;
   const chain=document.getElementById('chain-'+targetId);
   const emptyEl=document.getElementById('empty-'+targetId);if(emptyEl)emptyEl.remove();
-  const item=buildHangItem(current);chain.appendChild(item);chain.scrollLeft=chain.scrollWidth;
+  chain.appendChild(buildHangItem(current));chain.scrollLeft=chain.scrollWidth;
   document.getElementById('chain-'+targetId).closest('.zone-col').classList.add('correct-flash');
-
-  if(!correct){
-    handleWrong(zoneId,false);
-    return;
-  }
-
+  if(!correct){handleWrong(zoneId,false);return;}
   document.getElementById('drag-tile').classList.add('gone');
-
-  // Correct!
   const mult=MODES[mode].mult;
-  const points=mult+(isClean?1:0);
-  score+=points;streak++;modeTotalCorrect++;
+  score+=mult+(isClean?1:0);streak++;modeTotalCorrect++;
   if(isClean)cleanStreak++;else cleanStreak=0;
   if(streak>bestStreak){bestStreak=streak;document.getElementById('s-best').textContent=bestStreak;popVal('s-best','flash-green');}
   document.getElementById('s-score').textContent=score;popVal('s-score','flash-green');
   updateStreak(streak);
   if(isClean){document.getElementById('s-clean').textContent=cleanStreak;popVal('s-clean','flash-green');}
   if(score>topScore){topScore=score;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;popVal('s-top','flash-green');}
-
   // mastery
   const aid=current.answer;
   if(!masteryDone.has(aid)){
-    masteryHits[aid]=(masteryHits[aid]||0)+1;
-    const hits=masteryHits[aid];
+    masteryHits[aid]=(masteryHits[aid]||0)+1;const hits=masteryHits[aid];
     const zc=ZONES.find(z=>z.id===aid)?.color||'var(--green)';
     for(let i=0;i<Math.min(hits,3);i++){const pip=document.getElementById(`pip-${aid}-${i}`);if(pip)setTimeout(()=>{pip.classList.add('filled');pip.style.background=zc;pip.style.borderColor=zc;pip.style.boxShadow=`0 0 5px ${zc}99`;},i*180);}
     if(hits>=3){masteryDone.add(aid);setTimeout(()=>{for(let i=0;i<3;i++){const p=document.getElementById(`pip-${aid}-${i}`);if(p)p.style.display='none';}const crown=document.getElementById('crown-'+aid);if(crown)crown.classList.add('show');if(masteryDone.size===ZONES.length){setTimeout(()=>{document.getElementById('overlay').className='overlay show';document.getElementById('modal').className='modal show';},700);}},650);}
   }
-
   checkBadges();
-
-  // Check mode threshold
+  // level up check
   const modeData=MODES[mode];
-  if(modeData.next&&streak>=modeData.threshold){
-    // Level up!
-    setTimeout(()=>triggerLevelUp(modeData.next),200);
-    return; // don't show popup, level-up takes over
-  }
-
+  if(modeData.next&&streak>=modeData.threshold){setTimeout(()=>triggerLevelUp(modeData.next),200);return;}
+  // brief correct flash, then auto-advance
   flashScreen('flash-gold');
-
-  // Show popup for first 5 correct answers, then only on wrong
-  correctPopupCount++;
-  if(correctPopupCount<=5){
-    setTimeout(()=>showPopup(true,current.fb.y,getPun(true,isClean,streak),isClean),150);
-  } else {
-    // Brief flash auto-advance without popup
-    setTimeout(nextNumber, 600);
-  }
+  showBriefFlash(isClean?'💎':'✓',isClean?'#06c9c9':'var(--green)');
+  setTimeout(nextNumber,700);
 }
 
 // ── NEXT NUMBER ──
-let correctPopupCount=0; // track how many correct popups shown so far
-
 function nextNumber(){
   if(!gameActive)return;
   answered=false;isDragging=false;hoveredParents.clear();
@@ -1145,20 +1500,14 @@ function nextNumber(){
   document.getElementById('drag-tile').classList.remove('gone','no-colors');
   document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('correct-flash','wrong-flash','drag-over'));
   document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('drag-hover-rational','drag-hover-irrational'));
-
-  let pool=BANK.map((_,i)=>i).filter(i=>!usedIdx.has(i));
-  if(!pool.length){usedIdx.clear();pool=BANK.map((_,i)=>i);}
+  const pool=getPool();
   const unmastered=ZONES.filter(z=>!masteryDone.has(z.id)).map(z=>z.id);
   const preferred=pool.filter(i=>unmastered.includes(BANK[i].answer));
   const finalPool=preferred.length?preferred:pool;
   const idx=finalPool[Math.floor(Math.random()*finalPool.length)];
   usedIdx.add(idx);current=BANK[idx];
-
-  // Use displayHTML if available (for overbar notation), else plain text
   const numEl=document.getElementById('tile-number');
-  if(current.displayHTML){numEl.innerHTML=current.displayHTML;}
-  else{numEl.textContent=current.display;}
-
+  if(current.displayHTML)numEl.innerHTML=current.displayHTML;else numEl.textContent=current.display;
   renderTileStrip(current);
   if(MODES[mode].timer)startTimer();
 }
@@ -1170,7 +1519,10 @@ function makeCompactGhost(x,y){
   if(isLong||!MODES[mode].colors){
     ghost=document.createElement('div');
     ghost.style.cssText=`position:fixed;z-index:200;opacity:0.88;pointer-events:none;transition:none;font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text);background:var(--surface2);border:2px solid var(--accent);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;white-space:nowrap;`;
-    const numSpan=document.createElement('span');numSpan.textContent=document.getElementById('tile-number').textContent;ghost.appendChild(numSpan);
+    const numSpan=document.createElement('span');
+    if(current.displayHTML)numSpan.innerHTML=current.displayHTML;
+    else numSpan.textContent=document.getElementById('tile-number').textContent;
+    ghost.appendChild(numSpan);
     if(MODES[mode].colors){
       const miniStrip=document.createElement('div');miniStrip.style.cssText='display:flex;gap:2px;align-items:center;';
       let shown=0;
@@ -1197,13 +1549,11 @@ function initDrag(){
   tile.addEventListener('dragend',()=>{tile.classList.remove('dragging');isDragging=false;if(!answered)collapseAll();});
   let clone=null,touchZone=null;
   tile.addEventListener('touchstart',e=>{
-    if(answered||!gameActive)return;
-    const t=e.touches[0];isDragging=true;hoveredParents.clear();
+    if(answered||!gameActive)return;const t=e.touches[0];isDragging=true;hoveredParents.clear();
     clone=makeCompactGhost(t.clientX,t.clientY);document.body.appendChild(clone);tile.classList.add('dragging');
   },{passive:true});
   tile.addEventListener('touchmove',e=>{
-    if(!clone)return;e.preventDefault();
-    const t=e.touches[0];
+    if(!clone)return;e.preventDefault();const t=e.touches[0];
     clone.style.top=(t.clientY-30)+'px';clone.style.left=(t.clientX-60)+'px';
     clone.style.display='none';const el=document.elementFromPoint(t.clientX,t.clientY);clone.style.display='';
     document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('drag-over'));
@@ -1214,198 +1564,16 @@ function initDrag(){
     else touchZone=null;
   },{passive:false});
   tile.addEventListener('touchend',()=>{
-    if(clone){clone.remove();clone=null;}
-    tile.classList.remove('dragging');isDragging=false;
+    if(clone){clone.remove();clone=null;}tile.classList.remove('dragging');isDragging=false;
     document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('drag-over'));
-    if(touchZone&&!answered)classify(touchZone);else if(!answered)collapseAll();
-    touchZone=null;
+    if(touchZone&&!answered)classify(touchZone);else if(!answered)collapseAll();touchZone=null;
   });
 }
-
-// ══════════════════════════════════════
-// SPLASH SCREEN
-// ══════════════════════════════════════
-
-const GARLAND_NUMBERS = [
-  // Far left — long repeating (rational)
-  { label:'1/3', dec:'0.3333333333', repeat:'3', type:'Fraction: Repeating Decimal', color:'#7c6af7',
-    tip:'1 ÷ 3 = 0.333... The digit 3 repeats forever. Any fraction whose denominator has factors other than 2 and 5 will repeat.',
-    size:16, cells:22, swayFrom:-4, swayTo:-1, dur:4.2 },
-  { label:'1/6', dec:'0.1666666666', repeat:'6', type:'Fraction: Repeating Decimal', color:'#7c6af7',
-    tip:'1 ÷ 6 = 0.1666... After the first digit, the 6 repeats endlessly. Still rational — still a fraction.',
-    size:16, cells:20, swayFrom:-3, swayTo:0, dur:3.8 },
-  { label:'1/7', dec:'0.142857', repeat:'142857', type:'Fraction: Repeating Decimal', color:'#7c6af7',
-    tip:'1 ÷ 7 = 0.142857142857... A six-digit block repeats. 142857 is called a cyclic number — multiply it by 2 through 6 and you get the same digits rearranged!',
-    size:14, cells:18, swayFrom:-2, swayTo:1, dur:5.1 },
-  // Left-center — terminating (rational)
-  { label:'3/4', dec:'0.75', type:'Fraction: Terminating Decimal', color:'#2ecc8e',
-    tip:'3 ÷ 4 = 0.75. Done! Fractions whose denominators only have factors of 2 and 5 always terminate.',
-    size:18, cells:3, swayFrom:-2, swayTo:2, dur:3.5 },
-  { label:'√4', dec:'2', type:'Integer / Whole Number', color:'#3d9fd6',
-    tip:'√4 = 2 exactly. When a square root lands on a whole number, it\'s rational. 4 is a perfect square.',
-    size:18, cells:2, swayFrom:-1, swayTo:3, dur:4.8 },
-  // Center — terminating
-  { label:'0.5', dec:'0.5', type:'Fraction: Terminating Decimal', color:'#2ecc8e',
-    tip:'0.5 = 1/2. It ends after one decimal place. All terminating decimals are rational — they can be written as a fraction.',
-    size:20, cells:2, swayFrom:-3, swayTo:3, dur:3.2 },
-  // Right-center
-  { label:'√9', dec:'3', type:'Integer / Whole Number', color:'#3d9fd6',
-    tip:'√9 = 3. A perfect square root. Rational — it\'s a whole number.',
-    size:18, cells:2, swayFrom:-2, swayTo:2, dur:4.4 },
-  { label:'1/25', dec:'0.04', type:'Fraction: Terminating Decimal', color:'#2ecc8e',
-    tip:'1 ÷ 25 = 0.04. Terminates cleanly because 25 = 5². Only 2s and 5s in the denominator → always terminates.',
-    size:16, cells:3, swayFrom:-1, swayTo:3, dur:3.9 },
-  // Far right — irrational
-  { label:'√11', dec:'3.31662479035539984', type:'Non-Perfect Square Root', color:'#ff9f43',
-    tip:'√11 = 3.31662... goes on forever with no repeating block. 11 is not a perfect square, so its square root is irrational.',
-    size:14, cells:16, swayFrom:-1, swayTo:3, dur:5.3 },
-  { label:'0.112123…', dec:'0.1121231234123451234561', pattern:true, type:'Non-Repeating Decimal', color:'#f76a8a',
-    tip:'0.112123... Each group grows by one digit. It never settles into a repeating block — so it\'s irrational. Patterned but not periodic.',
-    size:14, cells:18, swayFrom:0, swayTo:4, dur:4.6 },
-  { label:'π', dec:'3.14159265358979323846264', type:'Non-Repeating Decimal', color:'#f76a8a',
-    tip:'π = 3.14159265... The most famous irrational number. Proved irrational by Lambert in 1768. Its digits go on forever with no repeating block.',
-    size:16, cells:20, swayFrom:1, swayTo:4, dur:3.7 },
-];
-
-const DC_SPLASH=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
-
-function buildGarland(){
-  const g=document.getElementById('garland');g.innerHTML='';
-  GARLAND_NUMBERS.forEach((num,i)=>{
-    const wrap=document.createElement('div');
-    wrap.className='garland-string';
-    wrap.style.cssText=`--sway-from:${num.swayFrom}deg;--sway-to:${num.swayTo}deg;--sway-dur:${num.dur}s;animation-delay:${i*0.3}s;`;
-
-    // hook
-    const hook=document.createElement('div');hook.className='garland-hook';wrap.appendChild(hook);
-
-    // label
-    const lbl=document.createElement('div');lbl.className='garland-label';lbl.style.color=num.color;lbl.textContent=num.label;wrap.appendChild(lbl);
-
-    // color strip
-    const strip=document.createElement('div');strip.className='garland-strip';
-    const sz=num.size;
-    const abs=num.dec.replace('-','');
-    const dotIdx=abs.indexOf('.');
-    let chars=[];
-    if(num.repeat){
-      const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
-      const afterGiven=dotIdx>=0?abs.slice(dotIdx+1):'';
-      for(const c of before)chars.push({c,isD:true});
-      chars.push({c:'.',isD:false});
-      let s=afterGiven;
-      while(s.replace(/\./g,'').length<num.cells+4)s+=num.repeat;
-      for(const c of s){if(chars.filter(x=>x.isD).length>=num.cells)break;chars.push({c,isD:true});}
-    } else {
-      for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
-    }
-    const needsEll=num.repeat||num.pattern||chars.filter(x=>x.isD).length>=num.cells;
-    let dCount=0,trimmed=[];
-    for(const s of chars){if(s.isD){if(dCount>=num.cells)break;dCount++;}trimmed.push(s);}
-    trimmed.forEach(s=>{
-      if(!s.isD){const el=document.createElement('div');el.className='gdot';el.style.cssText=`font-size:${sz*0.05}rem;width:${sz}px;text-align:center;`;el.textContent='.';strip.appendChild(el);return;}
-      const d=parseInt(s.c);
-      const cell=document.createElement('div');
-      cell.className=`gcell d${d}`;
-      cell.style.cssText=`width:${sz}px;height:${sz}px;background:${DC_SPLASH[d]};font-size:${Math.max(8,sz*0.42)}px;border-radius:${Math.max(2,sz*0.18)}px;`;
-      cell.textContent=s.c;
-      strip.appendChild(cell);
-    });
-    if(needsEll){const el=document.createElement('div');el.className='gell';el.style.cssText=`font-size:${sz*0.055}rem;`;el.textContent='…';strip.appendChild(el);}
-    wrap.appendChild(strip);
-
-    // tooltip
-    const tip=document.createElement('div');tip.className='gtip';
-    tip.innerHTML=`<div class="gtip-type" style="color:${num.color}">${num.type}</div><div class="gtip-body">${num.tip}</div>`;
-    wrap.appendChild(tip);
-
-    g.appendChild(wrap);
-  });
-}
-
-// ── LEADERBOARD TABS ──
-let lbTab='week';
-let lbRotateTimer=null;
-
-function switchLbTab(tab){
-  lbTab=tab;
-  ['week','all','streak'].forEach(t=>{
-    document.getElementById('tab-'+t).className='lb-tab'+(t===tab?' active':'');
-  });
-  renderSplashLb();
-  resetLbRotate();
-}
-
-function resetLbRotate(){
-  if(lbRotateTimer)clearInterval(lbRotateTimer);
-  lbRotateTimer=setInterval(()=>{
-    const tabs=['week','all','streak'];
-    const next=tabs[(tabs.indexOf(lbTab)+1)%tabs.length];
-    switchLbTab(next);
-  },6000);
-}
-
-function renderSplashLb(){
-  const container=document.getElementById('splash-lb-entries');
-  container.innerHTML='';
-  const lb=getLeaderboard();
-  if(!lb.length){
-    container.innerHTML='<span class="lb-empty">No scores yet — be the first!</span>';return;
-  }
-
-  let entries=[];
-  const now=new Date();
-  const weekAgo=new Date(now-7*24*60*60*1000);
-
-  if(lbTab==='week'){
-    entries=lb.filter(e=>e.date&&new Date(e.date)>=weekAgo).sort((a,b)=>b.score-a.score).slice(0,5);
-    if(!entries.length){container.innerHTML='<span class="lb-empty">No scores this week yet!</span>';return;}
-  } else if(lbTab==='all'){
-    entries=lb.sort((a,b)=>b.score-a.score).slice(0,5);
-  } else {
-    entries=lb.sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,5);
-  }
-
-  const medals=['🥇','🥈','🥉'];
-  const pillColors=['gold','silver','bronze'];
-  entries.forEach((e,i)=>{
-    const pill=document.createElement('div');
-    pill.className='lb-pill '+(pillColors[i]||'');
-    const val=lbTab==='streak'?(e.streak||0):e.score;
-    pill.innerHTML=`<span class="lb-pill-rank">${medals[i]||i+1}</span><span class="lb-pill-name">${e.name||'???'}</span><span class="lb-pill-mode ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-pill-score">${val}</span>`;
-    container.appendChild(pill);
-  });
-}
-
-// ── SCREEN SWITCHING ──
-function startGame(){
-  document.getElementById('splash-screen').classList.add('hidden');
-  document.getElementById('game-screen').classList.remove('hidden');
-  if(lbRotateTimer){clearInterval(lbRotateTimer);lbRotateTimer=null;}
-  // init game if not yet started
-  if(!gameInitialized){
-    gameInitialized=true;
-    buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();nextNumber();
-  }
-}
-
-function goToSplash(){
-  document.getElementById('game-screen').classList.add('hidden');
-  document.getElementById('splash-screen').classList.remove('hidden');
-  renderSplashLb();
-  resetLbRotate();
-}
-
-let gameInitialized=false;
-
-// ══════════════════════════════════════
 
 function closeCelebration(){document.getElementById('overlay').className='overlay';document.getElementById('modal').className='modal';nextNumber();}
 
 // ── INIT ──
-buildGarland();
-renderSplashLb();
-resetLbRotate();
+buildGarland();renderSplashLb();resetLbRotate();
 </script>
 </body>
 </html>
