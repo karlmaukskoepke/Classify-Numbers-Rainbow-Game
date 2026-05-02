@@ -65,14 +65,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .drag-tile.no-colors .tile-strip{display:none;}
 .tile-number{font-family:'Space Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--text);line-height:1;white-space:nowrap;}
 .tile-hint{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);}
-.tile-strip{display:flex;flex-wrap:nowrap;align-items:center;gap:2px;}
-.tc{width:24px;height:24px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.6rem;font-weight:700;color:rgba(0,0,0,0.75);opacity:0;transform:scale(0.5);transition:opacity 0.12s,transform 0.12s;}
+.tile-strip{display:flex;flex-wrap:nowrap;align-items:center;gap:3px;}
+.tc{width:32px;height:32px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.82rem;font-weight:700;color:rgba(0,0,0,0.75);opacity:0;transform:scale(0.5);transition:opacity 0.12s,transform 0.12s;}
 .tc.vis{opacity:1;transform:scale(1);}
 .tc.d0,.hcell.d0{color:rgba(0,0,0,0.45);}
 .tc.d3,.hcell.d3{color:rgba(0,0,0,0.6);}
 .tc.d4,.hcell.d4{color:rgba(0,0,0,0.6);}
-.tdot{font-family:'Space Mono',monospace;font-size:0.9rem;color:var(--dim);flex-shrink:0;line-height:24px;padding:0 1px;}
-.tell{font-size:0.9rem;color:var(--dim);padding-left:3px;flex-shrink:0;}
+.tdot{font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--dim);flex-shrink:0;line-height:32px;padding:0 2px;}
+.tell{font-size:1.1rem;color:var(--dim);padding-left:4px;flex-shrink:0;}
 
 /* ── GALLERY ── */
 .gallery{flex:1;display:flex;overflow:hidden;position:relative;pointer-events:all;}
@@ -121,12 +121,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .chain-empty{font-size:0.5rem;color:var(--border);text-align:center;padding:14px 4px;pointer-events:none;letter-spacing:0.04em;width:100%;}
 .hang-item{display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;animation:hangDrop 0.4s cubic-bezier(0.34,1.2,0.64,1);}
 @keyframes hangDrop{0%{transform:translateY(-16px);opacity:0}100%{transform:translateY(0);opacity:1}}
-.hang-label{font-family:'Space Mono',monospace;font-size:0.44rem;color:var(--dim);white-space:nowrap;text-align:center;max-width:56px;overflow:hidden;text-overflow:ellipsis;}
-.hang-strip{display:flex;flex-direction:column;align-items:center;gap:1px;}
-.hcell{width:11px;height:11px;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.36rem;font-weight:700;color:rgba(0,0,0,0.7);}
-.hdot{font-size:0.52rem;color:var(--dim);line-height:10px;text-align:center;width:11px;}
-.hell{font-size:0.55rem;color:var(--dim);text-align:center;line-height:1.2;}
-.hconn{width:2px;height:4px;background:var(--border);border-radius:1px;margin:0 auto;}
+.hang-label{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--dim);white-space:nowrap;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;}
+.hang-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hcell{width:18px;height:18px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.55rem;font-weight:700;color:rgba(0,0,0,0.7);}
+.hdot{font-size:0.7rem;color:var(--dim);line-height:14px;text-align:center;width:18px;}
+.hell{font-size:0.72rem;color:var(--dim);text-align:center;line-height:1.3;}
+.hconn{width:2px;height:5px;background:var(--border);border-radius:1px;margin:0 auto;}
 
 /* ── SIDEBAR ── */
 .sidebar{width:240px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:16px 14px;gap:14px;}
@@ -265,14 +265,162 @@ body.shake{animation:screenShake 0.5s ease;}
 /* ── OVERBAR for repeating decimals ── */
 .overbar{text-decoration:overline;text-decoration-color:currentColor;text-underline-offset:0;}
 
+/* ══════════════════════════════════════
+   SPLASH SCREEN
+══════════════════════════════════════ */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity 0.4s,pointer-events 0s;}
+.screen.hidden{opacity:0;pointer-events:none;}
+#game-screen{z-index:1;}
+#splash-screen{z-index:2;background:var(--bg);overflow:hidden;}
+
+/* hanging garland across top */
+.garland{
+  position:relative;height:280px;flex-shrink:0;
+  display:flex;align-items:flex-start;justify-content:center;
+  gap:0;overflow:visible;
+}
+.garland-string{
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;transform-origin:top center;
+  animation:sway var(--sway-dur,4s) ease-in-out infinite alternate;
+  cursor:pointer;
+  padding:0 6px;
+}
+.garland-string:hover{animation-play-state:paused;}
+@keyframes sway{
+  from{transform:rotate(var(--sway-from,-2deg));}
+  to{transform:rotate(var(--sway-to,2deg));}
+}
+.garland-hook{width:2px;height:20px;background:var(--border);border-radius:1px;margin-bottom:2px;}
+.garland-label{font-family:'Space Mono',monospace;font-size:0.62rem;font-weight:700;color:var(--dim);white-space:nowrap;margin-bottom:3px;text-align:center;}
+.garland-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.gcell{
+  border-radius:4px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-weight:700;color:rgba(0,0,0,0.72);
+}
+.gcell.d0{color:rgba(0,0,0,0.45);}
+.gcell.d3,.gcell.d4{color:rgba(0,0,0,0.6);}
+.gdot{color:var(--dim);text-align:center;}
+.gell{color:var(--dim);text-align:center;font-size:0.85rem;}
+
+/* tooltip on hover */
+.garland-string .gtip{
+  position:absolute;top:105%;left:50%;transform:translateX(-50%);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;
+  width:200px;z-index:20;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s 0.15s;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  text-align:center;
+}
+.garland-string:hover .gtip{opacity:1;}
+.gtip-type{font-size:0.7rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;}
+.gtip-body{font-size:0.72rem;color:var(--dim);line-height:1.45;}
+
+/* splash center */
+.splash-center{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:0 20px;position:relative;z-index:5;
+}
+.splash-title{
+  font-size:3.2rem;font-weight:800;text-align:center;letter-spacing:0.04em;
+  line-height:1.1;
+}
+.splash-title .t-rational{color:var(--rational-glow);}
+.splash-title .t-irrational{color:var(--irrational-glow);}
+.splash-title .t-white{color:var(--text);}
+.splash-sub{font-size:0.85rem;color:var(--dim);text-align:center;max-width:380px;line-height:1.5;}
+.splash-hint{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);opacity:0.6;}
+.play-btn{
+  padding:16px 52px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--accent),#9580ff);
+  color:white;font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;
+  cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
+  transition:all 0.2s;
+  box-shadow:0 0 30px rgba(108,99,255,0.4);
+}
+.play-btn:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(108,99,255,0.6);}
+
+/* leaderboard at bottom */
+.splash-lb{
+  flex-shrink:0;padding:16px 32px 20px;
+  border-top:1px solid var(--border);
+  background:var(--surface);
+}
+.lb-tabs{display:flex;gap:8px;margin-bottom:12px;align-items:center;justify-content:center;}
+.lb-tab{
+  padding:4px 14px;border-radius:20px;font-size:0.65rem;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;
+  border:1px solid var(--border);color:var(--dim);background:transparent;
+  transition:all 0.2s;font-family:'Syne',sans-serif;
+}
+.lb-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
+.lb-entries{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;min-height:38px;}
+.lb-pill{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:20px;
+  background:var(--surface2);border:1px solid var(--border);
+}
+.lb-pill.gold{border-color:var(--gold);}
+.lb-pill.silver{border-color:#aaa;}
+.lb-pill.bronze{border-color:#cd7f32;}
+.lb-pill-rank{font-size:0.9rem;}
+.lb-pill-name{font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;}
+.lb-pill-score{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--gold);font-weight:700;}
+.lb-pill-mode{font-size:0.55rem;padding:2px 6px;border-radius:10px;font-weight:700;}
+.lb-pill-mode.normal{background:rgba(108,99,255,0.2);color:var(--accent);}
+.lb-pill-mode.mega{background:rgba(255,215,0,0.2);color:var(--gold);}
+.lb-pill-mode.monster{background:rgba(255,140,0,0.2);color:#ff8c00;}
+.lb-pill-mode.ultra{background:rgba(247,37,133,0.2);color:#f72585;}
+.lb-empty{font-size:0.72rem;color:var(--dim);font-style:italic;}
+
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
 
+<!-- ══════════════════════════════════════
+     SPLASH SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="splash-screen">
+
+  <!-- Hanging garland -->
+  <div class="garland" id="garland"></div>
+
+  <!-- Center content -->
+  <div class="splash-center">
+    <div class="splash-hint">↑ Click any color string to explore</div>
+    <div class="splash-title">
+      <span class="t-rational">Rational</span>
+      <span class="t-white"> vs </span>
+      <span class="t-irrational">Irrational</span>
+    </div>
+    <div class="splash-sub">Can you classify every number? Drag it to its category — and survive as long as you can.</div>
+    <button class="play-btn" onclick="startGame()">Play →</button>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="splash-lb">
+    <div class="lb-tabs">
+      <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">This Week</button>
+      <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">All Time</button>
+      <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">Longest Streak</button>
+    </div>
+    <div class="lb-entries" id="splash-lb-entries"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     GAME SCREEN
+══════════════════════════════════════ -->
+<div class="screen hidden" id="game-screen">
+
 <header>
-  <div class="logo">Number <span>Classifier</span></div>
+  <div class="logo" style="cursor:pointer" onclick="goToSplash()" title="Back to home">Number <span>Classifier</span></div>
   <div class="mode-badge" id="mode-badge">Normal</div>
   <div class="timer-bar-wrap" id="timer-bar-wrap">
     <div class="timer-bar" id="timer-bar"></div>
@@ -362,6 +510,8 @@ body.shake{animation:screenShake 0.5s ease;}
     <div class="levelup-mult" id="levelup-mult">×2 Points</div>
   </div>
 </div>
+
+</div><!-- end game-screen -->
 
 <!-- HEART BREAK SPLASH -->
 <div class="heart-break-splash" id="heart-break-splash">💔</div>
@@ -798,6 +948,7 @@ function restartGame(){
   lives=3;mode='normal';modeTotalCorrect=0;correctPopupCount=0;
   answered=false;gameActive=true;
   usedIdx.clear();masteryHits={};masteryDone.clear();
+  earnedBadges.clear();
   ZONES.forEach(z=>masteryHits[z.id]=0);
   updateHearts();updateModeUI();
   document.getElementById('s-streak').textContent=0;
@@ -805,9 +956,9 @@ function restartGame(){
   document.getElementById('s-score').textContent=0;
   document.getElementById('s-clean').textContent=0;
   stopTimer();
-  // rebuild gallery
   buildGallery();buildBadgeList();
   nextNumber();
+  goToSplash();
 }
 
 // ── HOVER REVEAL ──
@@ -1071,9 +1222,190 @@ function initDrag(){
   });
 }
 
+// ══════════════════════════════════════
+// SPLASH SCREEN
+// ══════════════════════════════════════
+
+const GARLAND_NUMBERS = [
+  // Far left — long repeating (rational)
+  { label:'1/3', dec:'0.3333333333', repeat:'3', type:'Fraction: Repeating Decimal', color:'#7c6af7',
+    tip:'1 ÷ 3 = 0.333... The digit 3 repeats forever. Any fraction whose denominator has factors other than 2 and 5 will repeat.',
+    size:16, cells:22, swayFrom:-4, swayTo:-1, dur:4.2 },
+  { label:'1/6', dec:'0.1666666666', repeat:'6', type:'Fraction: Repeating Decimal', color:'#7c6af7',
+    tip:'1 ÷ 6 = 0.1666... After the first digit, the 6 repeats endlessly. Still rational — still a fraction.',
+    size:16, cells:20, swayFrom:-3, swayTo:0, dur:3.8 },
+  { label:'1/7', dec:'0.142857', repeat:'142857', type:'Fraction: Repeating Decimal', color:'#7c6af7',
+    tip:'1 ÷ 7 = 0.142857142857... A six-digit block repeats. 142857 is called a cyclic number — multiply it by 2 through 6 and you get the same digits rearranged!',
+    size:14, cells:18, swayFrom:-2, swayTo:1, dur:5.1 },
+  // Left-center — terminating (rational)
+  { label:'3/4', dec:'0.75', type:'Fraction: Terminating Decimal', color:'#2ecc8e',
+    tip:'3 ÷ 4 = 0.75. Done! Fractions whose denominators only have factors of 2 and 5 always terminate.',
+    size:18, cells:3, swayFrom:-2, swayTo:2, dur:3.5 },
+  { label:'√4', dec:'2', type:'Integer / Whole Number', color:'#3d9fd6',
+    tip:'√4 = 2 exactly. When a square root lands on a whole number, it\'s rational. 4 is a perfect square.',
+    size:18, cells:2, swayFrom:-1, swayTo:3, dur:4.8 },
+  // Center — terminating
+  { label:'0.5', dec:'0.5', type:'Fraction: Terminating Decimal', color:'#2ecc8e',
+    tip:'0.5 = 1/2. It ends after one decimal place. All terminating decimals are rational — they can be written as a fraction.',
+    size:20, cells:2, swayFrom:-3, swayTo:3, dur:3.2 },
+  // Right-center
+  { label:'√9', dec:'3', type:'Integer / Whole Number', color:'#3d9fd6',
+    tip:'√9 = 3. A perfect square root. Rational — it\'s a whole number.',
+    size:18, cells:2, swayFrom:-2, swayTo:2, dur:4.4 },
+  { label:'1/25', dec:'0.04', type:'Fraction: Terminating Decimal', color:'#2ecc8e',
+    tip:'1 ÷ 25 = 0.04. Terminates cleanly because 25 = 5². Only 2s and 5s in the denominator → always terminates.',
+    size:16, cells:3, swayFrom:-1, swayTo:3, dur:3.9 },
+  // Far right — irrational
+  { label:'√11', dec:'3.31662479035539984', type:'Non-Perfect Square Root', color:'#ff9f43',
+    tip:'√11 = 3.31662... goes on forever with no repeating block. 11 is not a perfect square, so its square root is irrational.',
+    size:14, cells:16, swayFrom:-1, swayTo:3, dur:5.3 },
+  { label:'0.112123…', dec:'0.1121231234123451234561', pattern:true, type:'Non-Repeating Decimal', color:'#f76a8a',
+    tip:'0.112123... Each group grows by one digit. It never settles into a repeating block — so it\'s irrational. Patterned but not periodic.',
+    size:14, cells:18, swayFrom:0, swayTo:4, dur:4.6 },
+  { label:'π', dec:'3.14159265358979323846264', type:'Non-Repeating Decimal', color:'#f76a8a',
+    tip:'π = 3.14159265... The most famous irrational number. Proved irrational by Lambert in 1768. Its digits go on forever with no repeating block.',
+    size:16, cells:20, swayFrom:1, swayTo:4, dur:3.7 },
+];
+
+const DC_SPLASH=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
+
+function buildGarland(){
+  const g=document.getElementById('garland');g.innerHTML='';
+  GARLAND_NUMBERS.forEach((num,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='garland-string';
+    wrap.style.cssText=`--sway-from:${num.swayFrom}deg;--sway-to:${num.swayTo}deg;--sway-dur:${num.dur}s;animation-delay:${i*0.3}s;`;
+
+    // hook
+    const hook=document.createElement('div');hook.className='garland-hook';wrap.appendChild(hook);
+
+    // label
+    const lbl=document.createElement('div');lbl.className='garland-label';lbl.style.color=num.color;lbl.textContent=num.label;wrap.appendChild(lbl);
+
+    // color strip
+    const strip=document.createElement('div');strip.className='garland-strip';
+    const sz=num.size;
+    const abs=num.dec.replace('-','');
+    const dotIdx=abs.indexOf('.');
+    let chars=[];
+    if(num.repeat){
+      const before=dotIdx>=0?abs.slice(0,dotIdx):abs;
+      const afterGiven=dotIdx>=0?abs.slice(dotIdx+1):'';
+      for(const c of before)chars.push({c,isD:true});
+      chars.push({c:'.',isD:false});
+      let s=afterGiven;
+      while(s.replace(/\./g,'').length<num.cells+4)s+=num.repeat;
+      for(const c of s){if(chars.filter(x=>x.isD).length>=num.cells)break;chars.push({c,isD:true});}
+    } else {
+      for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
+    }
+    const needsEll=num.repeat||num.pattern||chars.filter(x=>x.isD).length>=num.cells;
+    let dCount=0,trimmed=[];
+    for(const s of chars){if(s.isD){if(dCount>=num.cells)break;dCount++;}trimmed.push(s);}
+    trimmed.forEach(s=>{
+      if(!s.isD){const el=document.createElement('div');el.className='gdot';el.style.cssText=`font-size:${sz*0.05}rem;width:${sz}px;text-align:center;`;el.textContent='.';strip.appendChild(el);return;}
+      const d=parseInt(s.c);
+      const cell=document.createElement('div');
+      cell.className=`gcell d${d}`;
+      cell.style.cssText=`width:${sz}px;height:${sz}px;background:${DC_SPLASH[d]};font-size:${Math.max(8,sz*0.42)}px;border-radius:${Math.max(2,sz*0.18)}px;`;
+      cell.textContent=s.c;
+      strip.appendChild(cell);
+    });
+    if(needsEll){const el=document.createElement('div');el.className='gell';el.style.cssText=`font-size:${sz*0.055}rem;`;el.textContent='…';strip.appendChild(el);}
+    wrap.appendChild(strip);
+
+    // tooltip
+    const tip=document.createElement('div');tip.className='gtip';
+    tip.innerHTML=`<div class="gtip-type" style="color:${num.color}">${num.type}</div><div class="gtip-body">${num.tip}</div>`;
+    wrap.appendChild(tip);
+
+    g.appendChild(wrap);
+  });
+}
+
+// ── LEADERBOARD TABS ──
+let lbTab='week';
+let lbRotateTimer=null;
+
+function switchLbTab(tab){
+  lbTab=tab;
+  ['week','all','streak'].forEach(t=>{
+    document.getElementById('tab-'+t).className='lb-tab'+(t===tab?' active':'');
+  });
+  renderSplashLb();
+  resetLbRotate();
+}
+
+function resetLbRotate(){
+  if(lbRotateTimer)clearInterval(lbRotateTimer);
+  lbRotateTimer=setInterval(()=>{
+    const tabs=['week','all','streak'];
+    const next=tabs[(tabs.indexOf(lbTab)+1)%tabs.length];
+    switchLbTab(next);
+  },6000);
+}
+
+function renderSplashLb(){
+  const container=document.getElementById('splash-lb-entries');
+  container.innerHTML='';
+  const lb=getLeaderboard();
+  if(!lb.length){
+    container.innerHTML='<span class="lb-empty">No scores yet — be the first!</span>';return;
+  }
+
+  let entries=[];
+  const now=new Date();
+  const weekAgo=new Date(now-7*24*60*60*1000);
+
+  if(lbTab==='week'){
+    entries=lb.filter(e=>e.date&&new Date(e.date)>=weekAgo).sort((a,b)=>b.score-a.score).slice(0,5);
+    if(!entries.length){container.innerHTML='<span class="lb-empty">No scores this week yet!</span>';return;}
+  } else if(lbTab==='all'){
+    entries=lb.sort((a,b)=>b.score-a.score).slice(0,5);
+  } else {
+    entries=lb.sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,5);
+  }
+
+  const medals=['🥇','🥈','🥉'];
+  const pillColors=['gold','silver','bronze'];
+  entries.forEach((e,i)=>{
+    const pill=document.createElement('div');
+    pill.className='lb-pill '+(pillColors[i]||'');
+    const val=lbTab==='streak'?(e.streak||0):e.score;
+    pill.innerHTML=`<span class="lb-pill-rank">${medals[i]||i+1}</span><span class="lb-pill-name">${e.name||'???'}</span><span class="lb-pill-mode ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-pill-score">${val}</span>`;
+    container.appendChild(pill);
+  });
+}
+
+// ── SCREEN SWITCHING ──
+function startGame(){
+  document.getElementById('splash-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  if(lbRotateTimer){clearInterval(lbRotateTimer);lbRotateTimer=null;}
+  // init game if not yet started
+  if(!gameInitialized){
+    gameInitialized=true;
+    buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();nextNumber();
+  }
+}
+
+function goToSplash(){
+  document.getElementById('game-screen').classList.add('hidden');
+  document.getElementById('splash-screen').classList.remove('hidden');
+  renderSplashLb();
+  resetLbRotate();
+}
+
+let gameInitialized=false;
+
+// ══════════════════════════════════════
+
 function closeCelebration(){document.getElementById('overlay').className='overlay';document.getElementById('modal').className='modal';nextNumber();}
 
-buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();nextNumber();
+// ── INIT ──
+buildGarland();
+renderSplashLb();
+resetLbRotate();
 </script>
 </body>
 </html>
