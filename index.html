@@ -62,17 +62,16 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .g-ellipsis{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:2px;}
 .g-ell-dot{border-radius:3px;background:var(--dim);}
 
-/* splash-stage: fills screen, pointer-events passthrough */
+/* splash-stage: fills screen */
 .splash-stage{
   flex:1;display:flex;flex-direction:column;
   position:relative;width:100%;
-  pointer-events:none;
 }
 
 /* splash-content: all clicks work here, pushed below short chains */
 .splash-content{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  padding-top:180px; /* fallback — overridden by JS after garland renders */
+  padding-top:33vh;
   padding-bottom:16px;
   gap:10px;
   position:relative;z-index:2;
@@ -541,14 +540,8 @@ body.shake{animation:screenShake 0.5s ease;}
     <!-- Content: overlaid on top via absolute positioning -->
     <div class="splash-content">
 
-      <!-- Billboard -->
-      <div class="splash-billboard">
-        <span class="billboard-text">Move cursor over any string to learn about that number</span>
-        <span class="billboard-arrow">↑</span>
-      </div>
-
       <!-- Title -->
-      <div class="title-box" id="title-box" onclick="toggleTitleMenu(event)">
+      <div class="title-box" id="title-box" onclick="console.log('TITLE CLICKED');toggleTitleMenu(event)">
         <div class="title-main">
           <div class="title-rational">
             <span class="t-top">Rational</span>
@@ -559,6 +552,12 @@ body.shake{animation:screenShake 0.5s ease;}
           <div class="title-irrational" id="title-irrational-letters"></div>
         </div>
         <div class="title-click-hint">click to play</div>
+      </div>
+
+      <!-- Billboard BELOW title, arrow points up at chains -->
+      <div class="splash-billboard">
+        <span class="billboard-arrow">↑</span>
+        <span class="billboard-text">Move cursor over any string to learn about that number</span>
       </div>
 
       <!-- Leaderboard -->
@@ -2055,27 +2054,7 @@ function keepTraining(){
   nextNumber();
 }
 
-function positionSplashContent(){
-  // Find the bottom of the shortest garland string (the center ones)
-  const strings=document.querySelectorAll('.gs');
-  if(!strings.length)return;
-  let minBottom=Infinity;
-  strings.forEach(gs=>{
-    const r=gs.getBoundingClientRect();
-    if(r.bottom<minBottom)minBottom=r.bottom;
-  });
-  // splashScreen top
-  const splashTop=document.getElementById('splash-screen').getBoundingClientRect().top;
-  const shortestBottom=minBottom-splashTop;
-  // Set padding-top to just below the shortest chain + small gap
-  const content=document.querySelector('.splash-content');
-  if(content)content.style.paddingTop=(shortestBottom+12)+'px';
-}
-
 buildGarland();colorIrrationalTitle();renderSplashLb();resetLbRotate();
-// Position after a brief delay so garland has rendered and sway animation settled
-setTimeout(positionSplashContent,100);
-window.addEventListener('resize',positionSplashContent);
 </script>
 </body>
 </html>
