@@ -142,7 +142,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 
 /* ── GARLAND STRINGS ── */
 .garland{display:flex;align-items:flex-start;justify-content:center;gap:0;width:100%;position:absolute;top:4px;left:0;right:0;pointer-events:none;}
-.gs{display:inline-flex;flex-direction:column;align-items:center;align-self:flex-start;position:relative;transform-origin:top center;animation:sway var(--sd,4s) ease-in-out infinite alternate;animation-delay:var(--dl,0s);cursor:pointer;padding:0 4px;flex-shrink:0;pointer-events:auto;}
+.gs{display:inline-flex;flex-direction:column;align-items:center;align-self:flex-start;position:relative;transform-origin:top center;animation:sway var(--sd,4s) ease-in-out infinite alternate;animation-delay:var(--dl,0s);cursor:pointer;padding:0 4px;flex-shrink:0;pointer-events:none;}
 .gs:hover{animation-play-state:paused;}
 @keyframes sway{from{transform:rotate(var(--sf,-2deg));}to{transform:rotate(var(--st,2deg));}}
 .g-hook{width:2px;height:18px;background:var(--border);border-radius:1px;}
@@ -759,6 +759,7 @@ body.shake{animation:screenShake 0.5s ease;}
 
 <script>
 const DC=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
+let garlandStrings=null; // cached for tooltip hit-testing
 
 const MODES={
   normal: {name:'Normal', mult:1,colors:true, timer:0,    threshold:10,next:'mega',   color:'var(--accent)'},
@@ -1058,6 +1059,7 @@ const GARLAND_DATA=[
 
 // target chain length — now per-string via num.cells
 function buildGarland(){
+  garlandStrings=null; // reset cache
   const g=document.getElementById('garland');g.innerHTML='';
   GARLAND_DATA.forEach((num,i)=>{
     const chainLen=num.cells||18;
@@ -1116,25 +1118,40 @@ function buildGarland(){
 
     wrap.appendChild(strip);
 
-    wrap.addEventListener('mouseenter',e=>{
-      const tip=document.getElementById('gtip');
-      document.getElementById('gtip-type').textContent=ZONE_NAMES[num.type]||num.type;
-      document.getElementById('gtip-type').style.color=num.color;
-      document.getElementById('gtip-body').textContent=num.tip;
-      const x=Math.min(e.clientX+14,window.innerWidth-260);
-      const y=Math.min(e.clientY+14,window.innerHeight-160);
-      tip.style.left=x+'px';tip.style.top=y+'px';tip.classList.add('show');
-    });
-    wrap.addEventListener('mousemove',e=>{
-      const tip=document.getElementById('gtip');
-      const x=Math.min(e.clientX+14,window.innerWidth-260);
-      const y=Math.min(e.clientY+14,window.innerHeight-160);
-      tip.style.left=x+'px';tip.style.top=y+'px';
-    });
-    wrap.addEventListener('mouseleave',()=>document.getElementById('gtip').classList.remove('show'));
+    // Store tooltip data as attributes
+    wrap.dataset.tipType=num.type;
+    wrap.dataset.tipColor=num.color;
+    wrap.dataset.tipBody=num.tip;
 
     g.appendChild(wrap);
   });
+
+  // Delegated tooltip: scan all .gs rects on mousemove (pointer-events:none safe)
+  const splash=document.getElementById('splash-screen');
+  let garlandStrings=null;
+  splash.addEventListener('mousemove',e=>{
+    const tip=document.getElementById('gtip');
+    if(document.getElementById('splash-screen').classList.contains('hidden')){tip.classList.remove('show');return;}
+    if(!garlandStrings) garlandStrings=Array.from(document.querySelectorAll('.gs'));
+    const mx=e.clientX,my=e.clientY;
+    let found=null;
+    for(const gs of garlandStrings){
+      const r=gs.getBoundingClientRect();
+      if(mx>=r.left&&mx<=r.right&&my>=r.top&&my<=r.bottom){found=gs;break;}
+    }
+    if(found){
+      document.getElementById('gtip-type').textContent=ZONE_NAMES[found.dataset.tipType]||found.dataset.tipType;
+      document.getElementById('gtip-type').style.color=found.dataset.tipColor;
+      document.getElementById('gtip-body').textContent=found.dataset.tipBody;
+      const x=Math.min(mx+14,window.innerWidth-260);
+      const y=Math.min(my+14,window.innerHeight-160);
+      tip.style.left=x+'px';tip.style.top=y+'px';
+      tip.classList.add('show');
+    } else {
+      tip.classList.remove('show');
+    }
+  });
+  splash.addEventListener('mouseleave',()=>document.getElementById('gtip').classList.remove('show'));
 }
 
 // ── LEADERBOARD ──
