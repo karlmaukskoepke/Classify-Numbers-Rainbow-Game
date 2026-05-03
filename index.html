@@ -1154,10 +1154,43 @@ function buildGarland(){
   splash.addEventListener('mouseleave',()=>document.getElementById('gtip').classList.remove('show'));
 }
 
+// ── SUPABASE BACKEND ──
+const SB_URL='https://zxbdumfcfsntgsslehyf.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4YmR1bWZjZnNudGdzc2xlaHlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MjM0NDYsImV4cCI6MjA5MzM5OTQ0Nn0.B85fy0vMI1B2wUKlQ305nfWoJWeuPiagG73BbNIF5-0';
+const SB_HEADERS={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+
+async function sbFetch(path,opts={}){
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{headers:SB_HEADERS,...opts});
+  if(!res.ok){console.error('Supabase error:',res.status,await res.text());return null;}
+  return res.json();
+}
+
+async function sbInsertScore(name,score,mode,streak){
+  return sbFetch('scores',{
+    method:'POST',
+    headers:{...SB_HEADERS,'Prefer':'return=representation'},
+    body:JSON.stringify({name,score,mode,streak})
+  });
+}
+
+async function sbGetScores(tab){
+  let query='scores?select=*&limit=10';
+  if(tab==='week'){
+    const weekAgo=new Date(Date.now()-7*24*60*60*1000).toISOString();
+    query+=`&created_at=gte.${weekAgo}`;
+  }
+  if(tab==='streak') query+='&order=streak.desc';
+  else query+='&order=score.desc';
+  return sbFetch(query)||[];
+}
+
 // ── LEADERBOARD ──
 let lbTab='week';let lbRotateTimer=null;
+
+// Keep localStorage as fallback cache
 function getLeaderboard(){try{return JSON.parse(localStorage.getItem('nc-lb')||'[]');}catch{return[];}}
 function saveLeaderboard(lb){localStorage.setItem('nc-lb',JSON.stringify(lb));}
+
 function switchLbTab(tab){
   lbTab=tab;
   ['week','all','streak'].forEach(t=>document.getElementById('tab-'+t).className='lb-tab'+(t===tab?' active':''));
@@ -1170,16 +1203,23 @@ function resetLbRotate(){
     switchLbTab(tabs[(tabs.indexOf(lbTab)+1)%tabs.length]);
   },7000);
 }
-function renderSplashLb(){
+
+async function renderSplashLb(){
   const container=document.getElementById('lb-cols');
   if(!container)return;
-  container.innerHTML='';
-  const lb=getLeaderboard();
-  const now=new Date(),weekAgo=new Date(now-7*24*60*60*1000);
+  container.innerHTML='<div class="arcade-empty">LOADING...</div>';
   let entries=[];
-  if(lbTab==='week') entries=lb.filter(e=>e.date&&new Date(e.date)>=weekAgo).sort((a,b)=>b.score-a.score).slice(0,10);
-  else if(lbTab==='all') entries=[...lb].sort((a,b)=>b.score-a.score).slice(0,10);
-  else entries=[...lb].sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,10);
+  try{
+    entries=await sbGetScores(lbTab)||[];
+  } catch(e){
+    // fallback to localStorage
+    const lb=getLeaderboard();
+    const now=new Date(),weekAgo=new Date(now-7*24*60*60*1000);
+    if(lbTab==='week') entries=lb.filter(e=>e.date&&new Date(e.date)>=weekAgo).sort((a,b)=>b.score-a.score).slice(0,10);
+    else if(lbTab==='all') entries=[...lb].sort((a,b)=>b.score-a.score).slice(0,10);
+    else entries=[...lb].sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,10);
+  }
+  container.innerHTML='';
   if(!entries.length){
     container.innerHTML='<div class="arcade-empty">NO SCORES YET<br>BE THE FIRST!</div>';return;
   }
@@ -1188,7 +1228,7 @@ function renderSplashLb(){
     const row=document.createElement('div');
     row.className='arcade-row';
     const val=lbTab==='streak'?(e.streak||0):e.score;
-    row.innerHTML=`<span class="arcade-rank">${ordinals[i]||i+1}</span><span class="arcade-score">${val}</span><span class="arcade-name">${(e.name||'???').slice(0,3)}</span>`;
+    row.innerHTML=`<span class="arcade-rank">${ordinals[i]||i+1}</span><span class="arcade-score">${val}</span><span class="arcade-name">${(e.name||'???').slice(0,3).toUpperCase()}</span>`;
     container.appendChild(row);
   });
 }
@@ -1699,25 +1739,22 @@ function updateHearts(){
 }
 
 // ── GAME OVER ──
-function triggerGameOver(finalScore){
+async function triggerGameOver(finalScore){
   gameActive=false;stopTimer();
   const ds=finalScore!==undefined?finalScore:score;
   if(ds>topScore){topScore=ds;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
   document.getElementById('go-score').textContent=ds;
   document.getElementById('go-label').textContent=`${MODES[mode].name} mode · Best Streak: ${bestStreak}`;
-  // Check if score makes top 10
-  const lb=getLeaderboard();
-  const sorted=[...lb].sort((a,b)=>b.score-a.score);
-  const makesBoard=ds>0&&(sorted.length<10||ds>=(sorted[sorted.length-1]?.score||0));
+  // Always show initials if score > 0
   const initialsWrap=document.getElementById('initials-wrap');
   const saveBtn=document.getElementById('save-score-btn');
-  if(initialsWrap)initialsWrap.style.display=makesBoard?'flex':'none';
-  if(saveBtn)saveBtn.style.display=makesBoard?'inline-block':'none';
-  // clear initials
+  const showEntry=ds>0;
+  if(initialsWrap)initialsWrap.style.display=showEntry?'flex':'none';
+  if(saveBtn)saveBtn.style.display=showEntry?'inline-block':'none';
   ['ini-0','ini-1','ini-2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  renderGameOverLb(null,ds);
+  await renderGameOverLb(null,ds);
   document.getElementById('gameover-overlay').classList.add('show');
-  if(makesBoard) setTimeout(()=>document.getElementById('ini-0')?.focus(),300);
+  if(showEntry) setTimeout(()=>document.getElementById('ini-0')?.focus(),300);
 }
 function initialNext(el,nextId){
   el.value=el.value.toUpperCase();
@@ -1730,30 +1767,42 @@ function getInitials(){
   return(['ini-0','ini-1','ini-2'].map(id=>(document.getElementById(id)?.value||'').toUpperCase()).join(''))||'???';
 }
 
-function saveScore(){
+async function saveScore(){
   const name=getInitials()||'???';
-  const lb=getLeaderboard();
   const finalScore=parseInt(document.getElementById('go-score').textContent)||0;
+  // Save to Supabase
+  try{
+    await sbInsertScore(name,finalScore,mode,bestStreak);
+  } catch(e){
+    console.warn('Supabase save failed, saving locally',e);
+  }
+  // Also save to localStorage as backup
+  const lb=getLeaderboard();
   const entry={name,score:finalScore,mode,streak:bestStreak,date:new Date().toLocaleDateString()};
   lb.push(entry);lb.sort((a,b)=>b.score-a.score);lb.splice(10);
-  saveLeaderboard(lb);renderGameOverLb(entry,finalScore);
+  saveLeaderboard(lb);
+  await renderGameOverLb(name,finalScore);
   document.getElementById('initials-wrap').style.display='none';
   document.getElementById('save-score-btn').style.display='none';
 }
 
-function renderGameOverLb(highlight,currentScore){
-  const lb=getLeaderboard();
+async function renderGameOverLb(highlightName,highlightScore){
   const container=document.getElementById('leaderboard-list');container.innerHTML='';
-  if(!lb.length&&!currentScore){
+  let entries=[];
+  try{
+    entries=await sbGetScores('all')||[];
+  } catch(e){
+    entries=getLeaderboard();
+  }
+  if(!entries.length){
     container.innerHTML='<div style="font-family:\'Press Start 2P\',monospace;font-size:0.46rem;color:var(--dim);padding:8px;">NO SCORES YET</div>';return;
   }
-  const medals=['🥇','🥈','🥉'];
-  const rankClass=['rank-1','rank-2','rank-3'];
-  lb.slice(0,8).forEach((e,i)=>{
+  const ordinals=['1ST','2ND','3RD','4TH','5TH','6TH','7TH','8TH','9TH','10TH'];
+  entries.slice(0,8).forEach((e,i)=>{
     const row=document.createElement('div');
-    const isMe=highlight&&e===highlight;
-    row.className='lb-row '+(rankClass[i]||'')+(isMe?' me':'');
-    row.innerHTML=`<span class="lb-r">${medals[i]||i+1}</span><span class="lb-s">${e.score}</span><span class="lb-m ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-n">${e.name||'???'}</span>`;
+    const isMe=highlightName&&e.name===highlightName&&e.score===highlightScore;
+    row.className='arcade-row'+(isMe?' me':'');
+    row.innerHTML=`<span class="arcade-rank">${ordinals[i]||i+1}</span><span class="arcade-score">${e.score}</span><span class="arcade-name">${(e.name||'???').slice(0,3).toUpperCase()}</span>`;
     container.appendChild(row);
   });
 }
