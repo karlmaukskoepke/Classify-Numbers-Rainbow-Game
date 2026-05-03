@@ -38,17 +38,17 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
-  /* overflow:hidden clips the long chains at the bottom edge */
   overflow:hidden;
-  height:260px;
+  /* tall enough to show most of the chains, clipped cleanly at bottom */
+  height:270px;
   padding-top:6px;
   pointer-events:none;
 }
 
-/* title — sits inside garland-wrap at the bottom, in the natural flow gap */
+/* title — absolute, sits at bottom of garland-wrap above chains */
 .title-box{
   position:absolute;
-  bottom:8px;
+  bottom:10px;
   left:50%;
   transform:translateX(-50%);
   z-index:10;
@@ -138,6 +138,27 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   flex:1;display:flex;align-items:center;justify-content:center;
   padding:12px 32px 16px;overflow:hidden;
 }
+
+/* ── GARLAND STRINGS ── */
+.garland{display:flex;align-items:flex-start;justify-content:center;gap:0;width:100%;position:relative;pointer-events:none;}
+.gs{display:inline-flex;flex-direction:column;align-items:center;align-self:flex-start;position:relative;transform-origin:top center;animation:sway var(--sd,4s) ease-in-out infinite alternate;animation-delay:var(--dl,0s);cursor:pointer;padding:0 4px;flex-shrink:0;pointer-events:auto;}
+.gs:hover{animation-play-state:paused;}
+@keyframes sway{from{transform:rotate(var(--sf,-2deg));}to{transform:rotate(var(--st,2deg));}}
+.g-hook{width:2px;height:18px;background:var(--border);border-radius:1px;}
+.g-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;font-weight:700;color:var(--dim);white-space:nowrap;margin:2px 0;text-align:center;}
+.g-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.gcell{border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:800;color:rgba(0,0,0,0.75);}
+.gcell.d0{color:rgba(0,0,0,0.45);}
+.gcell.d3,.gcell.d4{color:rgba(0,0,0,0.6);}
+.gdot{color:var(--dim);text-align:center;line-height:1;}
+.g-ellipsis{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:2px;}
+.g-ell-dot{border-radius:3px;background:var(--dim);}
+
+/* tooltip */
+.gtip{position:fixed;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:14px 18px;width:240px;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.18s;box-shadow:0 12px 40px rgba(0,0,0,0.7);text-align:left;}
+.gtip.show{opacity:1;}
+.gtip-type{font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:7px;}
+.gtip-body{font-size:0.82rem;color:var(--text);line-height:1.55;}
 /* instructions popup */
 .instructions-overlay{
   position:fixed;inset:0;z-index:60;
@@ -522,7 +543,9 @@ body.shake{animation:screenShake 0.5s ease;}
 <!-- ══ SPLASH SCREEN ══ -->
 <div class="screen" id="splash-screen">
   <div class="garland-wrap">
-    <!-- title box: clickable hub -->
+    <div class="garland" id="garland"></div>
+
+    <!-- title box: clickable hub — sits over the garland -->
     <div class="title-box" id="title-box" onclick="toggleTitleMenu(event)">
       <div class="title-main">
         <div class="title-rational">
@@ -534,16 +557,14 @@ body.shake{animation:screenShake 0.5s ease;}
         <div class="title-irrational" id="title-irrational-letters"></div>
       </div>
     </div>
+  </div>
 
-    <!-- bloom menu — fixed center overlay when open -->
-    <div class="title-menu-backdrop" id="title-menu-backdrop" onclick="closeTitleMenu()"></div>
-    <div class="title-menu" id="title-menu">
-      <button class="title-menu-btn learn-btn" onclick="event.stopPropagation();startTraining()">🎯 Training</button>
-      <button class="title-menu-btn play-btn-hub" onclick="event.stopPropagation();startGame()">▶ Play</button>
-      <button class="title-menu-btn help-hub-btn" onclick="event.stopPropagation();showInstructions()">? How to Play</button>
-    </div>
-
-    <div class="garland" id="garland"></div>
+  <!-- bloom menu — fixed center overlay when open -->
+  <div class="title-menu-backdrop" id="title-menu-backdrop" onclick="closeTitleMenu()"></div>
+  <div class="title-menu" id="title-menu">
+    <button class="title-menu-btn learn-btn" onclick="event.stopPropagation();startTraining()">🎯 Training</button>
+    <button class="title-menu-btn play-btn-hub" onclick="event.stopPropagation();startGame()">▶ Play</button>
+    <button class="title-menu-btn help-hub-btn" onclick="event.stopPropagation();showInstructions()">? How to Play</button>
   </div>
 
   <!-- ARCADE HIGH SCORE BOX -->
@@ -1140,7 +1161,6 @@ function showComingSoon(){
   if(comingSoonTimer)clearTimeout(comingSoonTimer);
   comingSoonTimer=setTimeout(()=>el.classList.remove('show'),2200);
   closeTitleMenu();
-}
 }
 
 // ── INSTRUCTIONS ──
