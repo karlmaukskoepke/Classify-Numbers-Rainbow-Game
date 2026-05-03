@@ -41,11 +41,23 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .garland-wrap{
   flex-shrink:0;width:100%;
   overflow:hidden;
-  height:220px;
+  height:320px;
   padding-top:4px;
   pointer-events:none;
   position:relative;
 }
+
+/* billboard — sits between garland and title, arrow points UP at chains */
+.splash-billboard{
+  flex-shrink:0;text-align:center;padding:4px 0 2px;pointer-events:none;
+}
+.billboard-arrow{
+  font-size:1rem;color:var(--accent);display:block;
+  animation:arrowBounce 1.2s ease-in-out infinite;
+  text-shadow:0 0 10px var(--accent);line-height:1.2;
+}
+@keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.billboard-text{font-family:'Syne',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:2px;}
 
 /* title row — sits in flow right below garland */
 .splash-title-row{
@@ -81,20 +93,23 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 /* leaderboard */
 .splash-center{
   flex:1;display:flex;align-items:flex-start;justify-content:center;
-  padding:10px 32px 0;overflow:hidden;min-height:0;
+  padding:6px 32px 0;overflow:hidden;min-height:0;
 }
 
-/* billboard */
-.splash-billboard{
-  flex-shrink:0;text-align:center;padding:6px 0 8px;pointer-events:none;
+/* two-column layout: 1-5 left, 6-10 right */
+.lb-two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px 16px;
 }
-.billboard-arrow{
-  font-size:1rem;color:var(--accent);display:block;
-  animation:arrowBounce 1.2s ease-in-out infinite;
-  text-shadow:0 0 10px var(--accent);line-height:1.2;
+.arcade-row{
+  display:grid;grid-template-columns:52px 1fr 50px;
+  gap:0 6px;font-size:0.48rem;letter-spacing:0.04em;padding:4px 2px;line-height:1.4;
 }
-@keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.billboard-text{font-family:'Syne',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);}
+.arcade-rank{color:inherit;}
+.arcade-score{text-align:center;color:inherit;}
+.arcade-name{text-align:right;color:inherit;letter-spacing:0.06em;}
+.arcade-empty{font-size:0.44rem;color:#444;text-align:center;padding:16px 0;line-height:2;grid-column:1/-1;}
 
 /* title menu (fixed center popup) */
 .title-menu{
@@ -181,22 +196,9 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .lb-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
 .lb-cursor{display:inline-block;animation:blink 0.8s step-end infinite;}
-/* column headers */
-.arcade-lb-cols{
-  display:grid;grid-template-columns:72px 1fr 56px;gap:0 6px;
-  font-size:0.44rem;color:var(--gold);letter-spacing:0.05em;
-  border-bottom:1px solid #2a2a3a;padding-bottom:5px;margin-bottom:3px;
-}
-.arcade-col-hdr{color:var(--gold);}
-.arcade-col-hdr.center{text-align:center;}
-.arcade-col-hdr.right{text-align:right;}
-/* score rows */
-#lb-cols{display:flex;flex-direction:column;gap:1px;}
-.arcade-row{
-  display:grid;grid-template-columns:72px 1fr 56px;gap:0 6px;
-  font-size:0.48rem;letter-spacing:0.04em;padding:4px 0;
-  line-height:1.4;
-}
+/* column headers (removed — two-column grid handles layout) */
+/* score rows — keep per-rank color rules, arcade-row shape defined above */
+#lb-cols{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;}
 /* per-rank colors — each row a distinct hue */
 .arcade-row:nth-child(1)  .arcade-rank,.arcade-row:nth-child(1)  .arcade-score,.arcade-row:nth-child(1)  .arcade-name{color:var(--gold);}
 .arcade-row:nth-child(2)  .arcade-rank,.arcade-row:nth-child(2)  .arcade-score,.arcade-row:nth-child(2)  .arcade-name{color:#ffffff;}
@@ -208,12 +210,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .arcade-row:nth-child(8)  .arcade-rank,.arcade-row:nth-child(8)  .arcade-score,.arcade-row:nth-child(8)  .arcade-name{color:#ffffff;}
 .arcade-row:nth-child(9)  .arcade-rank,.arcade-row:nth-child(9)  .arcade-score,.arcade-row:nth-child(9)  .arcade-name{color:var(--gold);}
 .arcade-row:nth-child(10) .arcade-rank,.arcade-row:nth-child(10) .arcade-score,.arcade-row:nth-child(10) .arcade-name{color:#ffffff;}
-/* current player always hot pink */
 .arcade-row.me .arcade-rank,.arcade-row.me .arcade-score,.arcade-row.me .arcade-name{color:var(--irrational-glow)!important;}
-.arcade-rank{color:inherit;}
-.arcade-score{text-align:center;color:inherit;}
-.arcade-name{text-align:right;color:inherit;letter-spacing:0.06em;}
-.arcade-empty{font-size:0.44rem;color:#444;text-align:center;padding:16px 0;line-height:2;}
 
 /* ── TRAINING MODE ── */
 .training-banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(46,204,142,0.15);border:1px solid var(--green);border-radius:20px;padding:3px 14px;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);z-index:15;white-space:nowrap;display:none;}
@@ -533,12 +530,18 @@ body.shake{animation:screenShake 0.5s ease;}
 <!-- ══ SPLASH SCREEN ══ -->
 <div class="screen" id="splash-screen">
 
-  <!-- Garland only — no title inside -->
+  <!-- Garland -->
   <div class="garland-wrap">
     <div class="garland" id="garland"></div>
   </div>
 
-  <!-- Title in normal flow, right below garland -->
+  <!-- Billboard ABOVE title — points up at the chains -->
+  <div class="splash-billboard">
+    <span class="billboard-text">Move cursor over any string to learn about that number</span>
+    <span class="billboard-arrow">↑</span>
+  </div>
+
+  <!-- Title in normal flow -->
   <div class="splash-title-row">
     <div class="title-box" id="title-box" onclick="toggleTitleMenu(event)">
       <div class="title-main">
@@ -554,7 +557,7 @@ body.shake{animation:screenShake 0.5s ease;}
     </div>
   </div>
 
-  <!-- Leaderboard -->
+  <!-- Leaderboard — two columns for 10 entries -->
   <div class="splash-center">
     <div class="arcade-lb" id="arcade-lb">
       <div class="arcade-lb-header">
@@ -565,19 +568,8 @@ body.shake{animation:screenShake 0.5s ease;}
           <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">STREAK</button>
         </div>
       </div>
-      <div class="arcade-lb-cols">
-        <span class="arcade-col-hdr">RANK</span>
-        <span class="arcade-col-hdr center">SCORE</span>
-        <span class="arcade-col-hdr right">INITIAL</span>
-      </div>
-      <div id="lb-cols"></div>
+      <div class="lb-two-col" id="lb-cols"></div>
     </div>
-  </div>
-
-  <!-- Billboard below leaderboard -->
-  <div class="splash-billboard">
-    <span class="billboard-arrow">↑</span>
-    <span class="billboard-text">Move cursor over any string to learn about that number</span>
   </div>
 
 </div>
