@@ -39,8 +39,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   align-items:center;
   justify-content:flex-start;
   overflow:hidden;
-  /* tall enough to show most of the chains, clipped cleanly at bottom */
-  height:270px;
+  /* tall enough to show most chains; title box sits at bottom */
+  height:420px;
   padding-top:6px;
   pointer-events:none;
 }
@@ -55,7 +55,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   background:rgba(13,13,20,0.97);
   border:2px solid var(--accent);
   border-radius:16px;
-  padding:14px 30px;
+  padding:12px 28px 14px;
   text-align:center;
   box-shadow:0 0 50px rgba(108,99,255,0.4), inset 0 0 40px rgba(108,99,255,0.06);
   pointer-events:all;
@@ -65,6 +65,12 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   user-select:none;
 }
 .title-box:hover{box-shadow:0 0 70px rgba(108,99,255,0.65), inset 0 0 40px rgba(108,99,255,0.12);}
+.title-click-hint{
+  font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--dim);margin-top:7px;font-family:'Syne',sans-serif;
+  animation:pulseHint 2s ease infinite;
+}
+@keyframes pulseHint{0%,100%{opacity:0.5}50%{opacity:1;}}
 .title-main{
   font-family:'Orbitron',sans-serif;
   font-size:2.2rem;font-weight:900;
@@ -255,8 +261,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
    GAME SCREEN
 ══════════════════════════════════════ */
 header{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
-.logo{font-family:'Orbitron',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;cursor:pointer;}
-.logo span{color:var(--accent);}
+.logo{font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.04em;color:var(--dim);white-space:nowrap;cursor:pointer;padding:4px 10px;border-radius:8px;border:1px solid var(--border);transition:all 0.18s;}
+.logo:hover{color:var(--text);border-color:var(--dim);}
 .mode-badge{padding:3px 12px;border-radius:20px;font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;background:var(--surface2);border:2px solid var(--mode-color);color:var(--mode-color);transition:all 0.4s;}
 .mode-badge.mega{--mode-color:#ffd700;}
 .mode-badge.monster{--mode-color:#ff8c00;}
@@ -556,6 +562,7 @@ body.shake{animation:screenShake 0.5s ease;}
         <span class="title-vs">vs</span>
         <div class="title-irrational" id="title-irrational-letters"></div>
       </div>
+      <div class="title-click-hint">click to play</div>
     </div>
   </div>
 
@@ -596,7 +603,7 @@ body.shake{animation:screenShake 0.5s ease;}
 <!-- ══ GAME SCREEN ══ -->
 <div class="screen hidden" id="game-screen">
 <header>
-  <div class="logo" onclick="goToSplash()" title="Home">Rational <span>vs</span> Irrational</div>
+  <div class="logo" onclick="goToSplash()" title="Back to Home">← Home</div>
   <div class="mode-badge" id="mode-badge">Normal</div>
   <div class="timer-bar-wrap" id="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
   <div class="lives" id="lives">
@@ -617,7 +624,7 @@ body.shake{animation:screenShake 0.5s ease;}
     </div>
     <div class="gallery" id="gallery">
       <div class="gallery-dead-zone" id="gallery-dead-zone"></div>
-      <div class="training-banner" id="training-banner">🎯 Training Mode — no score recorded</div>
+      <div class="training-banner" id="training-banner">🎯 Training Mode — no score recorded &nbsp;·&nbsp; <span style="text-decoration:underline;cursor:pointer;" onclick="goToSplash()">← Home</span></div>
       <div class="parent-zone rational" id="parent-rational">
         <div class="parent-label">
           <div class="parent-label-text">Rational</div>
@@ -919,6 +926,51 @@ const VOCAB_FALLBACK={
   hint:'Think: does it end? Does it repeat?',
   choices:['terminate after finitely many digits','repeat a block of digits forever','never terminate and never repeat','equal a fraction of two integers'],
   correct:2
+};
+// Add any missing reversed-direction keys as aliases
+const VOCAB_ALIASES={
+  'whole>frac-term': {
+    q:'0.5 terminates. A whole number has __________ decimal part.',
+    hint:'7 = 7.0 — no decimal digits at all.',
+    choices:['a terminating','a repeating','no','an infinite'],
+    correct:2
+  },
+  'whole>irr-sqrt': {
+    q:'√2 = 1.41421... — it never ends and never repeats. That makes it __________.',
+    hint:'Perfect squares give whole roots. Non-perfect squares give irrational roots.',
+    choices:['a whole number','a terminating decimal','irrational','a repeating decimal'],
+    correct:2
+  },
+  'frac-term>frac-rep':{
+    q:'0.333... never stops. A terminating decimal __________.',
+    hint:'One ends. One keeps going.',
+    choices:['also never stops','has a block that repeats','stops completely after finitely many digits','is always irrational'],
+    correct:2
+  },
+  'irr-sqrt>frac-term':{
+    q:'Terminating decimals __________.',
+    hint:'1/2=0.5 ✓  1/4=0.25 ✓  1/8=0.125 ✓',
+    choices:['repeat a block','go on forever with no pattern','end completely after a finite number of digits','must be greater than 1'],
+    correct:2
+  },
+  'whole>frac-rep':{
+    q:'Whole numbers have __________ decimal part.',
+    hint:'7, 0, −3 — no dot, no decimal.',
+    choices:['a repeating','a terminating','no','an irrational'],
+    correct:2
+  },
+  'irr-sqrt>irr-dec':{
+    q:'Both √2 and π are irrational. They both __________ and never terminate.',
+    hint:'Neither one ever settles into a repeating block.',
+    choices:['terminate eventually','repeat a block','never repeat','equal a fraction'],
+    correct:2
+  },
+  'irr-dec>irr-sqrt':{
+    q:'√2 is irrational because 2 is not a __________.',
+    hint:'√4=2 ✓  √9=3 ✓  √25=5 ✓ — those work because they are perfect squares.',
+    choices:['even number','prime number','perfect square','multiple of 5'],
+    correct:2
+  },
 };
 
 // ── GARLAND DATA ── left→right: repeating(long) → terminating(long→short) → integers(short center) → terminating(short→long) → irrationals(long)
@@ -1573,7 +1625,7 @@ function showVocabPopup(wrongZoneId,rightZoneId,numDisplay){
   document.getElementById('vc-cat-right').textContent=ZONE_NAMES[rightZoneId]||rightZoneId;
 
   const key=wrongZoneId+'>'+rightZoneId;
-  const qData=VOCAB_Q[key]||VOCAB_FALLBACK;
+  const qData=VOCAB_Q[key]||VOCAB_ALIASES[key]||VOCAB_FALLBACK;
 
   // build fill-in-blank question with blank styled
   const qEl=document.getElementById('vocab-q');
@@ -1798,13 +1850,10 @@ function classify(zoneId){
   document.getElementById('drag-tile').classList.add('gone');
 
   if(trainingMode){
-    // training: check if hint had already fired (CSS class still present would mean hint showed)
-    // We track pre-hint streak — increment only if hint had NOT fired yet (timer still pending)
-    if(trainingHintTimer!==null){
-      // timer still running = answered before hint = pre-hint correct
+    // increment pre-hint streak only if student answered BEFORE hint fired
+    if(!trainingHintFired){
       trainingPreHintStreak++;
     } else {
-      // hint already fired (timer ran out and cleared) = reset pre-hint streak
       trainingPreHintStreak=0;
     }
     flashScreen('flash-gold');
@@ -1945,43 +1994,48 @@ function startBubbles(){
 
 function showNextBubble(){
   if(document.getElementById('splash-screen').classList.contains('hidden'))return;
-  // create bubble at random position in the empty left/right space
   const el=document.createElement('div');
   el.className='thought-bubble';
   el.textContent=BUBBLE_TEXTS[bubbleIdx%BUBBLE_TEXTS.length];
   bubbleIdx++;
 
-  // random position: left zone or right zone of splash, avoiding center
-  const side=Math.random()<0.5?'left':'right';
+  // Position in left or right margin, well away from center content
   const vw=window.innerWidth;
   const vh=window.innerHeight;
-  let x,y;
-  if(side==='left'){
-    x=Math.random()*Math.max(60,vw*0.18)+20;
-  } else {
-    x=vw-Math.random()*Math.max(60,vw*0.18)-140;
-  }
-  y=Math.random()*(vh*0.55)+vh*0.08;
+  // center band ~480px wide — stay outside it
+  const centerLeft=(vw-480)/2;
+  const centerRight=(vw+480)/2;
+  const margin=20;
+  const bubbleW=180; // approximate bubble width
 
-  el.style.left=x+'px';
+  let x,y;
+  // Pick a side randomly, or always the side with more room
+  const leftSpace=centerLeft-margin-bubbleW;
+  const rightSpace=vw-centerRight-margin-bubbleW;
+  const useLeft=leftSpace>60&&(rightSpace<60||Math.random()<0.5);
+
+  if(useLeft){
+    x=margin+Math.random()*Math.max(0,leftSpace);
+  } else {
+    x=centerRight+margin+Math.random()*Math.max(0,rightSpace);
+  }
+  // vertical: anywhere in lower 2/3 of screen (below garland)
+  y=vh*0.40+Math.random()*(vh*0.45);
+
+  el.style.left=Math.max(margin,x)+'px';
   el.style.top=y+'px';
   document.body.appendChild(el);
   bubbleEl=el;
 
-  // fade in
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{ el.style.opacity='0.75'; });
-  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.opacity='0.8'; }));
 
-  // hold 2.8s then fade out
   bubbleTimer=setTimeout(()=>{
     el.style.opacity='0';
     setTimeout(()=>{
       el.remove();
-      if(el===bubbleEl) bubbleEl=null;
-      // wait random 1.5-3.5s before next bubble
-      const wait=1500+Math.random()*2000;
-      bubbleTimer=setTimeout(showNextBubble, wait);
+      if(el===bubbleEl)bubbleEl=null;
+      const wait=1800+Math.random()*2500;
+      bubbleTimer=setTimeout(showNextBubble,wait);
     },700);
   },2800);
 }
@@ -1994,8 +2048,9 @@ function stopBubbles(){
 // ── TRAINING MODE ──
 let trainingMode=false;
 let trainingHintTimer=null;
-let trainingPreHintStreak=0; // correct answers before hint fires
-const TRAINING_MASTERY=5;    // pre-hint correct answers needed to suggest Play
+let trainingHintFired=false;  // true once the 3.5s hint has fired for current number
+let trainingPreHintStreak=0;
+const TRAINING_MASTERY=5;
 
 function startTraining(){
   trainingMode=true;trainingPreHintStreak=0;
@@ -2020,6 +2075,7 @@ function startTraining(){
 
 function clearTrainingHint(){
   if(trainingHintTimer){clearTimeout(trainingHintTimer);trainingHintTimer=null;}
+  trainingHintFired=false;
   document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('training-hint'));
   document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('training-hint-rational','training-hint-irrational'));
 }
@@ -2029,12 +2085,12 @@ function scheduleTrainingHint(){
   if(!trainingMode||answered)return;
   trainingHintTimer=setTimeout(()=>{
     if(answered||!trainingMode||!current)return;
-    // light up correct parent zone
+    trainingHintFired=true;
+    trainingHintTimer=null;
     const correctParent=ZONE_PARENT[current.answer];
     document.getElementById('parent-'+correctParent)?.classList.add('training-hint-'+correctParent);
-    // also highlight correct subcategory col
     document.querySelectorAll('.zone-col').forEach(z=>{
-      if(z.dataset.zoneId===current.answer) z.classList.add('training-hint');
+      if(z.dataset.zoneId===current.answer)z.classList.add('training-hint');
     });
   },3500);
 }
