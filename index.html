@@ -62,16 +62,17 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .g-ellipsis{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:2px;}
 .g-ell-dot{border-radius:3px;background:var(--dim);}
 
-/* splash-stage: fills screen, flex column */
+/* splash-stage: fills screen, pointer-events passthrough */
 .splash-stage{
   flex:1;display:flex;flex-direction:column;
   position:relative;width:100%;
+  pointer-events:none;
 }
 
-/* splash-content: sits above garland, padded so content starts below short chains */
+/* splash-content: all clicks work here, pushed below short chains */
 .splash-content{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  padding-top:78px;
+  padding-top:180px; /* fallback — overridden by JS after garland renders */
   padding-bottom:16px;
   gap:10px;
   position:relative;z-index:2;
@@ -2054,7 +2055,27 @@ function keepTraining(){
   nextNumber();
 }
 
+function positionSplashContent(){
+  // Find the bottom of the shortest garland string (the center ones)
+  const strings=document.querySelectorAll('.gs');
+  if(!strings.length)return;
+  let minBottom=Infinity;
+  strings.forEach(gs=>{
+    const r=gs.getBoundingClientRect();
+    if(r.bottom<minBottom)minBottom=r.bottom;
+  });
+  // splashScreen top
+  const splashTop=document.getElementById('splash-screen').getBoundingClientRect().top;
+  const shortestBottom=minBottom-splashTop;
+  // Set padding-top to just below the shortest chain + small gap
+  const content=document.querySelector('.splash-content');
+  if(content)content.style.paddingTop=(shortestBottom+12)+'px';
+}
+
 buildGarland();colorIrrationalTitle();renderSplashLb();resetLbRotate();
+// Position after a brief delay so garland has rendered and sway animation settled
+setTimeout(positionSplashContent,100);
+window.addEventListener('resize',positionSplashContent);
 </script>
 </body>
 </html>
