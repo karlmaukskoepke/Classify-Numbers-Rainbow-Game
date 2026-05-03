@@ -32,10 +32,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 
 /* ── GARLAND WRAP — clips chains so they don't overflow into leaderboard ── */
 /* ══ SPLASH LAYOUT ══ */
-#splash-screen{
-  display:flex;flex-direction:column;
-  position:relative;overflow:hidden;
-}
+/* (no overrides needed — .screen gives fixed+flex, #splash-screen line 27 gives z-index+bg) */
 
 /* Garland: absolutely positioned, purely decorative, never blocks clicks */
 .garland{
@@ -74,10 +71,11 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 /* splash-content: sits above garland, padded so content starts below short chains */
 .splash-content{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  padding-top:78px; /* pushes below the ~2-cell center chains */
+  padding-top:78px;
   padding-bottom:16px;
   gap:10px;
   position:relative;z-index:2;
+  pointer-events:all;
 }
 
 /* billboard */
@@ -761,7 +759,7 @@ body.shake{animation:screenShake 0.5s ease;}
 
 <script>
 const DC=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9','#3b82f6','#a855f7','#f72585'];
-let garlandStrings=null; // cached for tooltip hit-testing
+var garlandStrings=null; // cached for tooltip hit-testing
 
 const MODES={
   normal: {name:'Normal', mult:1,colors:true, timer:0,    threshold:10,next:'mega',   color:'var(--accent)'},
