@@ -43,151 +43,88 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   /* CRITICAL: let garland overflow without blocking clicks below */
   pointer-events:none;
 }
-/* title — now horizontal, centered, nestled under short center chains */
+/* title — horizontal, centered, merged with play button */
 .title-box{
   position:absolute;
-  bottom:-8px;
+  bottom:-58px;
   left:50%;
   transform:translateX(-50%);
   z-index:10;
-  background:rgba(13,13,20,0.95);
+  background:rgba(13,13,20,0.97);
   border:2px solid var(--accent);
   border-radius:16px;
-  padding:14px 28px;
+  padding:14px 30px;
   text-align:center;
-  box-shadow:0 0 40px rgba(108,99,255,0.35), inset 0 0 30px rgba(108,99,255,0.06);
-  pointer-events:none;
+  box-shadow:0 0 50px rgba(108,99,255,0.4), inset 0 0 40px rgba(108,99,255,0.06);
+  pointer-events:all;
   white-space:nowrap;
+  cursor:pointer;
+  transition:box-shadow 0.2s;
+  user-select:none;
 }
+.title-box:hover{box-shadow:0 0 70px rgba(108,99,255,0.65), inset 0 0 40px rgba(108,99,255,0.12);}
 .title-main{
   font-family:'Orbitron',sans-serif;
-  font-size:1.5rem;font-weight:900;
-  letter-spacing:0.04em;
-  line-height:1;
-  display:flex;align-items:center;gap:10px;
+  font-size:2.2rem;font-weight:900;
+  letter-spacing:0.04em;line-height:1;
+  display:flex;align-items:center;gap:14px;
 }
-/* Rational — styled as a fraction to hint at its meaning */
-.title-rational{
-  color:var(--rational-glow);
-  text-shadow:0 0 20px rgba(46,204,142,0.5);
-  display:inline-flex;flex-direction:column;align-items:center;gap:0;
-  font-size:1rem;
-}
-.title-rational .t-top{font-size:1.1rem;font-weight:900;letter-spacing:0.04em;}
-.title-rational .t-line{width:100%;height:2px;background:var(--rational-glow);border-radius:1px;margin:2px 0;box-shadow:0 0 8px rgba(46,204,142,0.6);}
-.title-rational .t-bot{font-size:0.75rem;font-weight:700;opacity:0.8;}
-.title-vs{color:var(--dim);font-size:0.75rem;letter-spacing:0.2em;font-weight:400;}
-/* Irrational — each letter a different digit color */
-.title-irrational{
-  font-size:1.5rem;font-weight:900;
-  text-shadow:none;
-  display:inline-flex;gap:1px;
-  letter-spacing:0.02em;
-}
+.title-rational{color:var(--rational-glow);text-shadow:0 0 20px rgba(46,204,142,0.5);display:inline-flex;flex-direction:column;align-items:center;}
+.title-rational .t-top{font-size:2.2rem;font-weight:900;letter-spacing:0.04em;line-height:1;}
+.title-rational .t-line{width:100%;height:2px;background:var(--rational-glow);border-radius:1px;margin:3px 0;box-shadow:0 0 10px rgba(46,204,142,0.7);}
+.title-rational .t-bot{font-size:1rem;font-weight:700;opacity:0.85;letter-spacing:0.08em;}
+.title-vs{color:var(--dim);font-size:1rem;letter-spacing:0.2em;font-weight:400;}
+.title-irrational{font-size:2.2rem;font-weight:900;display:inline-flex;gap:0;letter-spacing:0.02em;}
 .title-irrational span{display:inline-block;}
-.title-sub{
-  font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--dim);margin-top:8px;font-family:'Syne',sans-serif;
-  white-space:normal;line-height:1.4;
-}
 
-.garland{
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  gap:0;
-  width:100%;
-  position:relative;
-  pointer-events:none;
-}
-.gs{
-  display:inline-flex;flex-direction:column;align-items:center;
-  align-self:flex-start;
-  position:relative;
-  transform-origin:top center;
-  animation:sway var(--sd,4s) ease-in-out infinite alternate;
-  animation-delay:var(--dl,0s);
-  cursor:pointer;
-  padding:0 4px;
-  flex-shrink:0;
-  /* re-enable pointer events only on actual chain elements */
-  pointer-events:auto;
-}
-.gs:hover{animation-play-state:paused;}
-@keyframes sway{
-  from{transform:rotate(var(--sf,-2deg));}
-  to{transform:rotate(var(--st,2deg));}
-}
-.g-hook{width:2px;height:18px;background:var(--border);border-radius:1px;}
-.g-lbl{
-  font-family:'Space Mono',monospace;font-size:0.58rem;font-weight:700;
-  color:var(--dim);white-space:nowrap;margin:2px 0;text-align:center;
-}
-.g-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.gcell{
-  border-radius:4px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Space Mono',monospace;font-weight:800;
-  color:rgba(0,0,0,0.75);
-}
-.gcell.d0{color:rgba(0,0,0,0.45);}
-.gcell.d3,.gcell.d4{color:rgba(0,0,0,0.6);}
-.gdot{color:var(--dim);text-align:center;line-height:1;}
-/* fading ellipsis block */
-.g-ellipsis{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  margin-top:2px;
-}
-.g-ell-dot{
-  border-radius:3px;
-  background:var(--dim);
-}
-
-/* tooltip — positioned by JS near cursor */
-.gtip{
+/* floating thought bubbles — JS positions and cycles them */
+.thought-bubble{
   position:fixed;
-  background:var(--surface);
-  border:2px solid var(--border);
-  border-radius:14px;padding:14px 18px;
-  width:240px;z-index:100;
-  opacity:0;pointer-events:none;
-  transition:opacity 0.18s;
-  box-shadow:0 12px 40px rgba(0,0,0,0.7);
-  text-align:left;
+  font-size:0.58rem;letter-spacing:0.08em;
+  color:var(--dim);background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;padding:6px 12px;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;z-index:5;
+  transition:opacity 0.7s ease;
 }
-.gtip.show{opacity:1;}
-.gtip-type{font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:7px;}
-.gtip-body{font-size:0.82rem;color:var(--text);line-height:1.55;}
+.thought-bubble::after{
+  content:'';position:absolute;bottom:-6px;left:50%;
+  transform:translateX(-50%);
+  width:6px;height:6px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border);
+}
+
+/* bloom menu */
+.title-menu{
+  position:absolute;bottom:-118px;left:50%;
+  transform:translateX(-50%) translateY(-6px);
+  z-index:11;display:flex;gap:8px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.22s, transform 0.28s cubic-bezier(0.34,1.3,0.64,1);
+}
+.title-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
+.title-menu-btn{
+  padding:10px 18px;border-radius:12px;border:none;
+  font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:700;
+  cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
+  transition:all 0.18s;white-space:nowrap;
+}
+.play-btn-hub{background:linear-gradient(135deg,var(--accent),#9580ff);color:white;box-shadow:0 0 20px rgba(108,99,255,0.4);}
+.play-btn-hub:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(108,99,255,0.7);}
+.learn-btn{background:rgba(46,204,142,0.12);color:var(--green);border:1px solid rgba(46,204,142,0.5);}
+.learn-btn:hover{background:rgba(46,204,142,0.22);}
+.help-hub-btn{background:rgba(108,99,255,0.12);color:var(--accent);border:1px solid rgba(108,99,255,0.5);}
+.help-hub-btn:hover{background:rgba(108,99,255,0.22);}
+
+.coming-soon{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--dim);border-radius:14px;padding:20px 32px;text-align:center;z-index:80;font-size:0.85rem;color:var(--dim);opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.coming-soon.show{opacity:1;}
 
 /* ── SPLASH CENTER ── */
 .splash-center{
-  flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;
-  gap:28px;padding:12px 28px 16px;
-  overflow:hidden;
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:48px 32px 16px;overflow:hidden;
 }
-.splash-main{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;flex-shrink:0;
-}
-.splash-hint{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);opacity:0.55;}
-.play-btn{
-  padding:16px 52px;border-radius:14px;border:none;
-  background:linear-gradient(135deg,var(--accent),#9580ff);
-  color:white;font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;
-  cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;
-  transition:all 0.2s;
-  box-shadow:0 0 30px rgba(108,99,255,0.4);
-  position:relative;z-index:5;
-}
-.play-btn:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(108,99,255,0.7);}
-.how-to-play-btn{
-  font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--dim);background:none;border:1px solid var(--border);
-  border-radius:20px;padding:4px 12px;cursor:pointer;
-  font-family:'Syne',sans-serif;transition:all 0.2s;
-}
-.how-to-play-btn:hover{color:var(--text);border-color:var(--dim);}
-
 /* instructions popup */
 .instructions-overlay{
   position:fixed;inset:0;z-index:60;
@@ -197,96 +134,88 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 }
 .instructions-overlay.show{opacity:1;pointer-events:all;}
 .instructions-box{
-  background:var(--surface);
-  border:2px solid var(--accent);
-  border-radius:20px;
-  padding:28px 36px;
-  max-width:480px;width:92%;
-  box-shadow:0 0 60px rgba(108,99,255,0.3);
-  animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);
+  background:var(--surface);border:2px solid var(--accent);border-radius:20px;
+  padding:28px 36px;max-width:480px;width:92%;
+  box-shadow:0 0 60px rgba(108,99,255,0.3);animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);
 }
 .instructions-box h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--accent);margin-bottom:16px;text-align:center;}
 .instructions-box ol{padding-left:20px;display:flex;flex-direction:column;gap:10px;}
 .instructions-box li{font-size:0.85rem;color:var(--dim);line-height:1.55;}
 .instructions-box li strong{color:var(--text);}
-.instructions-close{
-  display:block;margin:20px auto 0;
-  padding:10px 32px;border-radius:10px;border:none;
-  background:var(--accent);color:white;
-  font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;
-}
+.instructions-close{display:block;margin:20px auto 0;padding:10px 32px;border-radius:10px;border:none;background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;}
 /* in-game help button */
-.help-btn{
-  position:absolute;bottom:14px;right:14px;z-index:20;
-  width:32px;height:32px;border-radius:50%;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--dim);font-size:1rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.18s;font-family:'Syne',sans-serif;font-weight:700;
-}
+.help-btn{position:fixed;bottom:14px;right:14px;z-index:20;width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--dim);font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all 0.18s;font-family:'Syne',sans-serif;font-weight:700;}
 .help-btn:hover{border-color:var(--accent);color:var(--accent);}
+.help-btn.visible{display:flex;}
 
-/* ── ARCADE LEADERBOARD ── */
-.splash-lb{
-  flex:1;max-width:440px;
-  background:var(--surface);
-  border:2px solid var(--border);
-  border-radius:18px;
-  padding:14px 18px;
-  display:flex;flex-direction:column;gap:8px;
-  box-shadow:0 0 30px rgba(0,0,0,0.4);
-  overflow:hidden;
-}
-.lb-header{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  border-bottom:1px solid var(--border);padding-bottom:8px;
-}
-.lb-arcade-title{
+/* ── ARCADE LEADERBOARD — reference image style ── */
+.arcade-lb{
+  width:100%;max-width:480px;
+  background:#0a0a0a;
+  border:3px solid #2a2a3a;
+  border-radius:6px;
+  padding:16px 22px;
   font-family:'Press Start 2P',monospace;
-  font-size:0.65rem;color:var(--gold);
-  letter-spacing:0.06em;
-  text-shadow:0 0 10px rgba(255,215,0,0.5);
-  animation:blink 1.4s step-end infinite;
+  box-shadow:0 0 30px rgba(0,0,0,0.8);
 }
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.lb-tabs{display:flex;gap:5px;}
-.lb-tab{
-  padding:3px 10px;border-radius:20px;font-size:0.55rem;font-weight:700;
-  letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;
-  border:1px solid var(--border);color:var(--dim);background:transparent;
-  transition:all 0.2s;font-family:'Syne',sans-serif;
-}
+.arcade-lb-header{text-align:center;margin-bottom:12px;}
+.arcade-lb-title{font-size:0.58rem;color:#fff;letter-spacing:0.06em;display:block;margin-bottom:10px;}
+.lb-tabs{display:flex;gap:6px;justify-content:center;}
+.lb-tab{padding:3px 9px;border-radius:3px;font-size:0.42rem;cursor:pointer;border:1px solid #333;color:#666;background:transparent;transition:all 0.2s;font-family:'Press Start 2P',monospace;letter-spacing:0.03em;}
 .lb-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
-
-.lb-body{
-  position:relative;flex:1;
-  display:flex;flex-direction:column;gap:2px;
-  overflow:hidden;
-}
-.lb-body::after{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);
-}
-.lb-row{
-  display:flex;align-items:center;gap:7px;
-  font-family:'Press Start 2P',monospace;
-  font-size:0.5rem;letter-spacing:0.03em;
-  padding:5px 7px;border-radius:4px;
-  background:var(--surface2);
-}
-.lb-row:first-child{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);}
-.lb-row:nth-child(2){background:rgba(200,200,200,0.06);border:1px solid rgba(200,200,200,0.15);}
-.lb-row:nth-child(3){background:rgba(205,127,50,0.06);border:1px solid rgba(205,127,50,0.2);}
-.lb-r{color:var(--dim);width:16px;flex-shrink:0;}
-.lb-n{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.lb-s{color:var(--gold);}
-.lb-m{font-size:0.38rem;padding:2px 5px;border-radius:6px;font-weight:700;font-family:'Syne',sans-serif;}
-.lb-m.normal{background:rgba(108,99,255,0.2);color:var(--accent);}
-.lb-m.mega{background:rgba(255,215,0,0.2);color:var(--gold);}
-.lb-m.monster{background:rgba(255,140,0,0.2);color:#ff8c00;}
-.lb-m.ultra{background:rgba(247,37,133,0.2);color:#f72585;}
-.lb-empty{font-family:'Press Start 2P',monospace;font-size:0.48rem;color:var(--dim);padding:12px;text-align:center;line-height:1.8;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
 .lb-cursor{display:inline-block;animation:blink 0.8s step-end infinite;}
+/* column headers */
+.arcade-lb-cols{
+  display:grid;grid-template-columns:72px 1fr 56px;gap:0 6px;
+  font-size:0.44rem;color:var(--gold);letter-spacing:0.05em;
+  border-bottom:1px solid #2a2a3a;padding-bottom:5px;margin-bottom:3px;
+}
+.arcade-col-hdr{color:var(--gold);}
+.arcade-col-hdr.center{text-align:center;}
+.arcade-col-hdr.right{text-align:right;}
+/* score rows */
+#lb-cols{display:flex;flex-direction:column;gap:1px;}
+.arcade-row{
+  display:grid;grid-template-columns:72px 1fr 56px;gap:0 6px;
+  font-size:0.48rem;letter-spacing:0.04em;padding:4px 0;
+  line-height:1.4;
+}
+/* per-rank colors — each row a distinct hue */
+.arcade-row:nth-child(1)  .arcade-rank,.arcade-row:nth-child(1)  .arcade-score,.arcade-row:nth-child(1)  .arcade-name{color:var(--gold);}
+.arcade-row:nth-child(2)  .arcade-rank,.arcade-row:nth-child(2)  .arcade-score,.arcade-row:nth-child(2)  .arcade-name{color:#ffffff;}
+.arcade-row:nth-child(3)  .arcade-rank,.arcade-row:nth-child(3)  .arcade-score,.arcade-row:nth-child(3)  .arcade-name{color:#ff9f43;}
+.arcade-row:nth-child(4)  .arcade-rank,.arcade-row:nth-child(4)  .arcade-score,.arcade-row:nth-child(4)  .arcade-name{color:var(--gold);}
+.arcade-row:nth-child(5)  .arcade-rank,.arcade-row:nth-child(5)  .arcade-score,.arcade-row:nth-child(5)  .arcade-name{color:#ffffff;}
+.arcade-row:nth-child(6)  .arcade-rank,.arcade-row:nth-child(6)  .arcade-score,.arcade-row:nth-child(6)  .arcade-name{color:var(--irrational-glow);}
+.arcade-row:nth-child(7)  .arcade-rank,.arcade-row:nth-child(7)  .arcade-score,.arcade-row:nth-child(7)  .arcade-name{color:var(--gold);}
+.arcade-row:nth-child(8)  .arcade-rank,.arcade-row:nth-child(8)  .arcade-score,.arcade-row:nth-child(8)  .arcade-name{color:#ffffff;}
+.arcade-row:nth-child(9)  .arcade-rank,.arcade-row:nth-child(9)  .arcade-score,.arcade-row:nth-child(9)  .arcade-name{color:var(--gold);}
+.arcade-row:nth-child(10) .arcade-rank,.arcade-row:nth-child(10) .arcade-score,.arcade-row:nth-child(10) .arcade-name{color:#ffffff;}
+/* current player always hot pink */
+.arcade-row.me .arcade-rank,.arcade-row.me .arcade-score,.arcade-row.me .arcade-name{color:var(--irrational-glow)!important;}
+.arcade-rank{color:inherit;}
+.arcade-score{text-align:center;color:inherit;}
+.arcade-name{text-align:right;color:inherit;letter-spacing:0.06em;}
+.arcade-empty{font-size:0.44rem;color:#444;text-align:center;padding:16px 0;line-height:2;}
+
+/* ── TRAINING MODE ── */
+.training-banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(46,204,142,0.15);border:1px solid var(--green);border-radius:20px;padding:3px 14px;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);z-index:15;white-space:nowrap;display:none;}
+.training-banner.show{display:block;}
+.zone-col.training-hint{animation:trainingPulse 1.2s ease infinite;}
+@keyframes trainingPulse{0%,100%{background:transparent;}50%{background:rgba(255,215,0,0.12);}}
+.parent-zone.training-hint-rational{box-shadow:inset 0 0 50px rgba(46,204,142,0.22)!important;}
+.parent-zone.training-hint-irrational{box-shadow:inset 0 0 50px rgba(247,37,133,0.22)!important;}
+.training-ready{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--green);border-radius:18px;padding:28px 36px;text-align:center;z-index:90;box-shadow:0 0 50px rgba(46,204,142,0.3);opacity:0;pointer-events:none;transition:opacity 0.3s;max-width:400px;width:92%;}
+.training-ready.show{opacity:1;pointer-events:all;animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);}
+.training-ready h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--green);margin-bottom:10px;}
+.training-ready p{font-size:0.82rem;color:var(--dim);margin-bottom:18px;line-height:1.55;}
+.training-ready-btns{display:flex;gap:10px;justify-content:center;}
+.tr-btn{padding:10px 22px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.18s;}
+.tr-btn.primary{background:var(--accent);color:white;}
+.tr-btn.primary:hover{background:#8b83ff;}
+.tr-btn.secondary{background:var(--surface2);color:var(--dim);border:1px solid var(--border);}
+.tr-btn.secondary:hover{color:var(--text);}
 
 /* ══════════════════════════════════════
    GAME SCREEN
@@ -313,7 +242,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 
 /* tile panel */
 .tile-panel{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:10px 20px 8px;background:var(--surface);border-bottom:2px solid var(--border);}
-.drag-tile{display:inline-flex;flex-direction:column;align-items:center;gap:6px;padding:12px 22px;background:var(--surface2);border:2px solid var(--border);border-radius:14px;cursor:grab;user-select:none;touch-action:none;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;}
+.drag-tile{display:inline-flex;flex-direction:column;align-items:center;gap:6px;padding:14px 26px;background:var(--surface2);border:2px solid var(--border);border-radius:14px;cursor:grab;user-select:none;touch-action:none;transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;-webkit-user-select:none;-webkit-touch-callout:none;}
 .drag-tile:hover{border-color:var(--accent);box-shadow:0 0 28px rgba(108,99,255,0.3);}
 .drag-tile.dragging{opacity:0.3;transform:scale(0.9);cursor:grabbing;}
 .drag-tile.gone{visibility:hidden;}
@@ -321,7 +250,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .tile-number{font-family:'Space Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--text);line-height:1;white-space:nowrap;}
 .tile-hint{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);}
 .tile-strip{display:flex;flex-wrap:nowrap;align-items:center;gap:3px;}
-.tc{width:32px;height:32px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.82rem;font-weight:700;color:rgba(0,0,0,0.75);opacity:0;transform:scale(0.5);transition:opacity 0.12s,transform 0.12s;}
+.tc{width:32px;height:32px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.95rem;font-weight:700;color:rgba(0,0,0,0.75);opacity:0;transform:scale(0.5);transition:opacity 0.12s,transform 0.12s;}
 .tc.vis{opacity:1;transform:scale(1);}
 .tc.d0,.hcell.d0{color:rgba(0,0,0,0.45);}
 .tc.d3,.hcell.d3{color:rgba(0,0,0,0.6);}
@@ -379,7 +308,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 @keyframes hangDrop{0%{transform:translateY(-16px);opacity:0}100%{transform:translateY(0);opacity:1}}
 .hang-label{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--dim);white-space:nowrap;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;}
 .hang-strip{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.hcell{width:18px;height:18px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.55rem;font-weight:700;color:rgba(0,0,0,0.7);}
+.hcell{width:18px;height:18px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.7rem;font-weight:700;color:rgba(0,0,0,0.7);}
 .hdot{font-size:0.7rem;color:var(--dim);line-height:14px;text-align:center;width:18px;}
 .hell{font-size:0.72rem;color:var(--dim);text-align:center;line-height:1.3;}
 .hconn{width:2px;height:5px;background:var(--border);border-radius:1px;margin:0 auto;}
@@ -401,13 +330,29 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 @keyframes onFire{from{text-shadow:0 0 8px #ff8c00,0 0 20px #ff3b3b}to{text-shadow:0 0 18px #ffe600,0 0 45px #ff8c00}}
 .sb-label{font-size:0.62rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);font-weight:600;text-align:center;}
 .sb-divider{width:100%;height:1px;background:var(--border);margin:2px 0;}
-.badge-section-title{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--border);padding-bottom:4px;width:100%;}
-.badge-list{display:flex;flex-direction:column;gap:6px;width:100%;}
-.badge{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);opacity:0;transform:scale(0.7) translateY(8px);transition:opacity 0.4s,transform 0.4s;}
-.badge.earned{opacity:1;transform:scale(1) translateY(0);animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1);}
-@keyframes badgePop{0%{transform:scale(0.5) translateY(10px);opacity:0}60%{transform:scale(1.1) translateY(-2px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
-.badge-icon{font-size:1.1rem;flex-shrink:0;}
-.badge-text{font-size:0.62rem;font-weight:700;color:var(--text);line-height:1.25;}
+/* hint system */
+.hint-pip{font-size:1.4rem;transition:all 0.3s;}
+.hint-pip.used{opacity:0.2;filter:grayscale(1);}
+.hint-btn{
+  padding:8px 16px;border-radius:10px;border:none;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'Syne',sans-serif;font-size:0.72rem;font-weight:700;
+  cursor:pointer;transition:all 0.18s;width:100%;
+}
+.hint-btn:hover{border-color:var(--gold);color:var(--gold);}
+.hint-btn:disabled{opacity:0.3;cursor:not-allowed;}
+/* hint popup */
+.hint-popup{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:var(--surface);border:2px solid var(--gold);border-radius:16px;
+  padding:22px 28px;max-width:360px;width:90%;z-index:65;
+  box-shadow:0 0 40px rgba(255,215,0,0.25);text-align:center;
+  opacity:0;pointer-events:none;transition:opacity 0.2s;
+}
+.hint-popup.show{opacity:1;pointer-events:all;}
+.hint-popup-title{font-size:1rem;font-weight:800;color:var(--gold);margin-bottom:10px;}
+.hint-popup-body{font-size:0.88rem;color:var(--text);line-height:1.6;}
+.hint-popup-close{margin-top:14px;padding:8px 24px;border-radius:8px;border:none;background:var(--gold);color:black;font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;}
 
 /* ── CORRECT POPUP (brief) ── */
 .brief-flash{
@@ -564,36 +509,46 @@ body.shake{animation:screenShake 0.5s ease;}
 <!-- ══ SPLASH SCREEN ══ -->
 <div class="screen" id="splash-screen">
   <div class="garland-wrap">
-    <div class="title-box">
+    <!-- title box: clickable hub -->
+    <div class="title-box" id="title-box" onclick="toggleTitleMenu(event)">
       <div class="title-main">
         <div class="title-rational">
           <span class="t-top">Rational</span>
           <div class="t-line"></div>
-          <span class="t-bot">p/q</span>
+          <span class="t-bot">p / q</span>
         </div>
         <span class="title-vs">vs</span>
         <div class="title-irrational" id="title-irrational-letters"></div>
       </div>
-      <div class="title-sub">hover any chain · ? for help</div>
     </div>
+
+    <!-- bloom menu below title -->
+    <div class="title-menu" id="title-menu">
+      <button class="title-menu-btn learn-btn" onclick="event.stopPropagation();startTraining()">🎯 Training</button>
+      <button class="title-menu-btn play-btn-hub" onclick="event.stopPropagation();startGame()">▶ Play</button>
+      <button class="title-menu-btn help-hub-btn" onclick="event.stopPropagation();showInstructions()">? How to Play</button>
+    </div>
+
     <div class="garland" id="garland"></div>
   </div>
+
+  <!-- ARCADE HIGH SCORE BOX -->
   <div class="splash-center">
-    <div class="splash-main">
-      <div class="splash-hint">↑ hover any color chain to explore</div>
-      <button class="play-btn" id="play-btn" onclick="startGame()">▶ Play</button>
-      <button class="how-to-play-btn" onclick="showInstructions()">? How to Play</button>
-    </div>
-    <div class="splash-lb" onclick="cycleLbTab()" title="Click to cycle leaderboard">
-      <div class="lb-header">
-        <div class="lb-arcade-title">HIGH SCORES<span class="lb-cursor">_</span></div>
+    <div class="arcade-lb" id="arcade-lb">
+      <div class="arcade-lb-header">
+        <span class="arcade-lb-title">THE 10 BEST PLAYERS</span>
         <div class="lb-tabs">
-          <button class="lb-tab active" id="tab-week" onclick="event.stopPropagation();switchLbTab('week')">Week</button>
-          <button class="lb-tab" id="tab-all" onclick="event.stopPropagation();switchLbTab('all')">All Time</button>
-          <button class="lb-tab" id="tab-streak" onclick="event.stopPropagation();switchLbTab('streak')">Streak</button>
+          <button class="lb-tab active" id="tab-week" onclick="switchLbTab('week')">WEEK</button>
+          <button class="lb-tab" id="tab-all" onclick="switchLbTab('all')">ALL TIME</button>
+          <button class="lb-tab" id="tab-streak" onclick="switchLbTab('streak')">STREAK</button>
         </div>
       </div>
-      <div class="lb-body" id="lb-body"></div>
+      <div class="arcade-lb-cols">
+        <span class="arcade-col-hdr">RANK</span>
+        <span class="arcade-col-hdr center">SCORE</span>
+        <span class="arcade-col-hdr right">INITIAL</span>
+      </div>
+      <div id="lb-cols"></div>
     </div>
   </div>
 </div>
@@ -627,6 +582,7 @@ body.shake{animation:screenShake 0.5s ease;}
     </div>
     <div class="gallery" id="gallery">
       <div class="gallery-dead-zone" id="gallery-dead-zone"></div>
+      <div class="training-banner" id="training-banner">🎯 Training Mode — no score recorded</div>
       <div class="parent-zone rational" id="parent-rational">
         <div class="parent-label">
           <div class="parent-label-text">Rational</div>
@@ -666,27 +622,41 @@ body.shake{animation:screenShake 0.5s ease;}
       <span class="sb-label">💎 Perfect Placements</span>
     </div>
     <div class="sb-divider"></div>
-    <div class="badge-section-title">Badges</div>
-    <div class="badge-list" id="badge-list"></div>
+    <div class="sb-section" id="hint-section">
+      <div class="sb-label">💡 Hints</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin:4px 0;">
+        <span class="hint-pip" id="hint-pip-0">💡</span>
+        <span class="hint-pip" id="hint-pip-1">💡</span>
+        <span class="hint-pip" id="hint-pip-2">💡</span>
+      </div>
+      <button class="hint-btn" id="hint-btn" onclick="useHint()">Use a Hint</button>
+    </div>
   </div>
 </div>
 </div><!-- end game-screen -->
-<button class="help-btn" id="help-btn" onclick="showInstructions()" style="display:none" title="How to Play">?</button>
+<button class="help-btn" id="help-btn" onclick="showInstructions()" title="How to Play">?</button>
 
 <!-- brief correct flash -->
 <div class="brief-flash" id="brief-flash">✓</div>
+
+<!-- HINT POPUP -->
+<div class="hint-popup" id="hint-popup">
+  <div class="hint-popup-title">💡 Hint</div>
+  <div class="hint-popup-body" id="hint-popup-body"></div>
+  <button class="hint-popup-close" onclick="closeHint()">Got it</button>
+</div>
+
+<div class="coming-soon" id="coming-soon">📖 Learn Mode — coming soon!</div>
 
 <!-- INSTRUCTIONS POPUP -->
 <div class="instructions-overlay" id="instructions-overlay" onclick="hideInstructions()">
   <div class="instructions-box" onclick="event.stopPropagation()">
     <h2>How to Play</h2>
     <ol>
-      <li><strong>A number appears at the top</strong> with its decimal expansion as color-coded squares — each digit has a unique color.</li>
+      <li><strong>A number appears at the top</strong> with its decimal expansion shown as color-coded squares — each digit has a unique color.</li>
       <li><strong>Drag it down</strong> toward Rational or Irrational. Hovering either side reveals the subcategories.</li>
       <li><strong>Drop it in the correct zone.</strong> Perfect placements (right side, first try) earn bonus 💎 points.</li>
       <li><strong>You have 3 lives ❤️❤️❤️.</strong> Each wrong answer loses a life and resets your score to zero.</li>
-      <li><strong>Build a streak of 10</strong> to enter MEGA mode — colors disappear and your points multiply! Keep going for MONSTER ×3 and ULTRA ×5.</li>
-      <li><strong>Game over</strong> after 3 mistakes — enter your initials to save your score!</li>
     </ol>
     <button class="instructions-close" onclick="hideInstructions()">Got it — Let's Play!</button>
   </div>
@@ -703,12 +673,13 @@ body.shake{animation:screenShake 0.5s ease;}
         <div class="vc-category" id="vc-cat-wrong" style="color:var(--red)"></div>
       </div>
       <div class="vocab-card right-card">
-        <div class="vc-label right-lbl">Correct answer</div>
+        <div class="vc-label right-lbl">Correct category</div>
         <div class="vc-number" id="vc-number-right"></div>
         <div class="vc-category" id="vc-cat-right" style="color:var(--green)"></div>
+        <div class="vc-hint" id="vc-hint" style="font-size:0.7rem;color:var(--dim);margin-top:6px;font-style:italic;line-height:1.4;display:none;"></div>
       </div>
     </div>
-    <div class="vocab-q" id="vocab-q"></div>
+    <div class="vocab-q" id="vocab-q" style="margin-bottom:14px;font-size:1rem;font-weight:700;color:var(--text);line-height:1.5;text-align:center;"></div>
     <div class="vocab-choices" id="vocab-choices"></div>
     <button class="vocab-continue-btn" id="vocab-continue" onclick="dismissVocab()">Got it — back to game →</button>
   </div>
@@ -731,17 +702,26 @@ body.shake{animation:screenShake 0.5s ease;}
     <div class="gameover-title">GAME OVER</div>
     <div class="gameover-score" id="go-score">0</div>
     <div class="gameover-label" id="go-label">Final Score</div>
-    <div class="initials-wrap">
+    <div class="initials-wrap" id="initials-wrap">
       <input class="initial-box" id="ini-0" maxlength="1" placeholder="A" autocomplete="off" oninput="initialNext(this,'ini-1')"/>
       <input class="initial-box" id="ini-1" maxlength="1" placeholder="A" autocomplete="off" oninput="initialNext(this,'ini-2')" onkeydown="initialBack(event,this,'ini-0')"/>
       <input class="initial-box" id="ini-2" maxlength="1" placeholder="A" autocomplete="off" onkeydown="initialBack(event,this,'ini-1')"/>
     </div>
-    <div>
-      <button class="go-btn primary" onclick="saveScore()">Save Score</button>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+      <button class="go-btn primary" id="save-score-btn" onclick="saveScore()">Save Score</button>
       <button class="go-btn secondary" onclick="restartGame()">Play Again</button>
     </div>
-    <div class="lb-title-go">🏆 Leaderboard</div>
-    <div id="leaderboard-list"></div>
+    <div class="lb-title-go" style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--gold);margin:14px 0 8px;letter-spacing:0.06em;">🏆 HIGH SCORES</div>
+    <div id="leaderboard-list" style="display:flex;flex-direction:column;gap:2px;"></div>
+  </div>
+</div>
+
+<div class="training-ready" id="training-ready">
+  <h2>🎉 You're Ready!</h2>
+  <p>You placed 5 in a row without the hint.<br>That's real understanding — not just guessing!</p>
+  <div class="training-ready-btns">
+    <button class="tr-btn primary" onclick="switchToPlay()">▶ Start Play Mode</button>
+    <button class="tr-btn secondary" onclick="keepTraining()">Keep Training</button>
   </div>
 </div>
 
@@ -795,73 +775,114 @@ const BADGE_DEFS=[
 
 // ── VOCAB QUESTIONS (wrong→right) ──
 // key: wrongAnswer+'>'+rightAnswer
+// vocab questions: fill-in-blank format, targeted by wrong→right transition
+// hint: optional HTML shown in juxtaposition right card to add visual context
 const VOCAB_Q={
+  // Placed irrational, was repeating
   'irr-dec>frac-rep':{
-    q:'The number you saw has a pattern that repeats forever. What does "repeating decimal" mean?',
-    choices:['A. The decimal ends after a few digits','B. The same digit or block of digits repeats without end','C. The decimal goes on with no pattern at all','D. The number is a whole number'],
+    q:'A repeating decimal __________.',
+    hint:'Look for a block of digits that cycles.',
+    choices:['never ends and has no pattern','has a block of digits that repeats forever','terminates after a few places','is always a whole number'],
     correct:1
   },
   'irr-sqrt>frac-rep':{
-    q:'What makes a decimal "repeating" rather than irrational?',
-    choices:['A. It never ends','B. It has a pattern of digits that cycles endlessly','C. It can only come from a square root','D. It is greater than 1'],
-    correct:1
+    q:'Repeating decimals __________ in a fixed block.',
+    hint:'The same digits cycle over and over.',
+    choices:['terminate','never end and never repeat','cycle','come from square roots'],
+    correct:2
   },
+  // Placed terminating, was repeating
   'frac-term>frac-rep':{
-    q:'"Terminating" means the decimal ends. "Repeating" means it never ends. Which was this number?',
-    choices:['A. It ended — terminating decimal','B. It repeated a block forever — repeating decimal','C. It had no pattern — irrational','D. It was a whole number'],
-    correct:1
+    q:'0.333... never stops. A terminating decimal __________.',
+    hint:'One ends. One keeps going.',
+    choices:['also never stops','has a block that repeats','stops completely after finitely many digits','is always irrational'],
+    correct:2
   },
+  // Placed repeating, was terminating
   'frac-rep>frac-term':{
-    q:'A terminating decimal ends completely. Which description fits a terminating decimal?',
-    choices:['A. Digits that repeat in a cycle forever','B. Digits that go on with no pattern','C. The decimal stops — no more digits after a certain point','D. It must be less than 1'],
+    q:'A terminating decimal __________.',
+    hint:'Denominator has only factors of 2 and 5? It terminates!',
+    choices:['repeats a block forever','goes on with no pattern','stops — no more digits after a point','must be less than 1'],
     correct:2
   },
   'irr-sqrt>frac-term':{
-    q:'What makes a decimal "terminating"?',
-    choices:['A. It repeats the same block of digits','B. It never has a pattern','C. It ends — the decimal stops completely','D. It comes from a square root'],
+    q:'Terminating decimals __________.',
+    hint:'1/2 = 0.5 ✓  1/4 = 0.25 ✓  1/8 = 0.125 ✓',
+    choices:['repeat a block','go on forever with no pattern','end completely after a finite number of digits','must be greater than 1'],
     correct:2
   },
   'irr-dec>frac-term':{
-    q:'A terminating decimal and an irrational decimal both go on — true or false?',
-    choices:['A. True — both go on forever','B. False — irrational decimals never end, but terminating ones stop','C. False — neither terminates','D. True — both repeat eventually'],
-    correct:1
-  },
-  'frac-rep>irr-dec':{
-    q:'What is the difference between a repeating decimal and an irrational one?',
-    choices:['A. Irrational decimals always repeat the same digit','B. Repeating decimals have a cycling block; irrational decimals never have any repeating block','C. There is no difference — both are irrational','D. Irrational decimals always terminate'],
-    correct:1
-  },
-  'frac-term>irr-dec':{
-    q:'An irrational decimal never repeats and never terminates. How does that differ from a terminating decimal?',
-    choices:['A. Terminating decimals also never end','B. A terminating decimal ends completely; an irrational one goes on forever with no pattern','C. They are the same — both are rational','D. Irrational decimals have a repeating block'],
-    correct:1
-  },
-  'whole>frac-rep':{
-    q:'How is a repeating decimal different from a whole number?',
-    choices:['A. Whole numbers have decimal parts','B. A repeating decimal has digits after the decimal point that cycle forever; whole numbers have no decimal part','C. They are both irrational','D. Repeating decimals always equal whole numbers'],
-    correct:1
-  },
-  'frac-term>whole':{
-    q:'What qualifies a number as an integer (whole number)?',
-    choices:['A. It has a decimal that terminates','B. It is a fraction','C. It has no fractional part — no digits after the decimal point','D. It is negative'],
+    q:'An irrational decimal __________, while a terminating one stops.',
+    hint:'π = 3.14159... goes on forever. 0.75 stops.',
+    choices:['also stops eventually','repeats a block','goes on forever with no repeating block','equals a simple fraction'],
     correct:2
   },
-  'irr-sqrt>whole':{
-    q:'When is the square root of a number a whole number?',
-    choices:['A. When it is any prime number','B. When the number under the root is a perfect square (like 4, 9, 25)','C. Always — all square roots are whole','D. When the number is odd'],
-    correct:1
+  // Placed repeating or terminating, was irrational
+  'frac-rep>irr-dec':{
+    q:'An irrational decimal never repeats and __________.',
+    hint:'No block ever cycles. No end in sight.',
+    choices:['terminates','has a repeating block','never terminates either','equals a fraction'],
+    correct:2
+  },
+  'frac-term>irr-dec':{
+    q:'Irrational decimals __________ and never terminate.',
+    hint:'π, √2, √3 — endless, patternless.',
+    choices:['terminate','repeat a block','never repeat','equal p/q'],
+    correct:2
+  },
+  // Placed whole/integer somewhere wrong
+  'whole>frac-rep':{
+    q:'Whole numbers have __________ decimal part.',
+    hint:'7, 0, −3 — no dot, no decimal.',
+    choices:['a repeating','a terminating','no','an irrational'],
+    correct:2
+  },
+  'frac-term>whole':{
+    q:'An integer (whole number) has __________ digits after the decimal point.',
+    hint:'7 = 7.  −5 = −5.  Zero decimal places.',
+    choices:['infinitely many repeating','infinitely many random','exactly zero — none','exactly two'],
+    correct:2
   },
   'frac-rep>whole':{
-    q:'A repeating decimal like 0.333... is NOT a whole number because:',
-    choices:['A. It is negative','B. It has digits after the decimal that never stop','C. It is less than 10','D. It is irrational'],
+    q:'0.333... is NOT a whole number because __________.',
+    hint:'Whole numbers: ...−2, −1, 0, 1, 2, 3...',
+    choices:['it is negative','it has decimal digits that never stop','it is less than 10','it is irrational'],
+    correct:1
+  },
+  // √ confusion: placed non-perfect sqrt as whole, or vice versa
+  'irr-sqrt>whole':{
+    q:'√n is a whole number only when n is a __________.',
+    hint:'√4=2 ✓  √9=3 ✓  √25=5 ✓  √2=1.414... ✗',
+    choices:['prime number','perfect square (like 4, 9, 16, 25...)','even number','multiple of 10'],
+    correct:1
+  },
+  'whole>irr-sqrt':{
+    q:'If n is NOT a perfect square, then √n __________.',
+    hint:'√5 = 2.2360679...  √7 = 2.6457513...',
+    choices:['is a whole number','is a repeating decimal','is irrational — non-terminating, non-repeating','terminates eventually'],
+    correct:2
+  },
+  // Placed whole as irrational
+  'whole>irr-dec':{
+    q:'Negative numbers can be __________.',
+    hint:'−5 is rational. −π is irrational. Sign doesn\'t decide!',
+    choices:['only irrational','only rational','either rational or irrational — sign doesn\'t matter','never whole numbers'],
+    correct:2
+  },
+  // Placed fraction as irrational
+  'frac-rep>irr-sqrt':{
+    q:'A repeating decimal is __________ irrational.',
+    hint:'1/3 = 0.333... repeats → rational. √2 = 1.414... no repeat → irrational.',
+    choices:['always','never — it is always rational','sometimes','only when it comes from a square root'],
     correct:1
   },
 };
 
-// fallback question for any combo not covered
+// fallback
 const VOCAB_FALLBACK={
-  q:'Which best describes what makes a number irrational?',
-  choices:['A. Its decimal terminates (ends)','B. Its decimal repeats in a pattern','C. Its decimal never terminates and never repeats','D. It is a fraction of two whole numbers'],
+  q:'Irrational numbers __________.',
+  hint:'Think: does it end? Does it repeat?',
+  choices:['terminate after finitely many digits','repeat a block of digits forever','never terminate and never repeat','equal a fraction of two integers'],
   correct:2
 };
 
@@ -1061,9 +1082,9 @@ function resetLbRotate(){
   },7000);
 }
 function renderSplashLb(){
-  const body=document.getElementById('lb-body');
-  if(!body)return;
-  body.innerHTML='';
+  const container=document.getElementById('lb-cols');
+  if(!container)return;
+  container.innerHTML='';
   const lb=getLeaderboard();
   const now=new Date(),weekAgo=new Date(now-7*24*60*60*1000);
   let entries=[];
@@ -1071,73 +1092,109 @@ function renderSplashLb(){
   else if(lbTab==='all') entries=[...lb].sort((a,b)=>b.score-a.score).slice(0,10);
   else entries=[...lb].sort((a,b)=>(b.streak||0)-(a.streak||0)).slice(0,10);
   if(!entries.length){
-    body.innerHTML='<div class="lb-empty">NO SCORES YET<br>BE THE FIRST!</div>';return;
+    container.innerHTML='<div class="arcade-empty">NO SCORES YET<br>BE THE FIRST!</div>';return;
   }
-  const medals=['🥇','🥈','🥉'];
+  const ordinals=['1ST','2ND','3RD','4TH','5TH','6TH','7TH','8TH','9TH','10TH'];
   entries.forEach((e,i)=>{
-    const row=document.createElement('div');row.className='lb-row';
+    const row=document.createElement('div');
+    row.className='arcade-row';
     const val=lbTab==='streak'?(e.streak||0):e.score;
-    row.innerHTML=`<span class="lb-r">${medals[i]||i+1}</span><span class="lb-n">${e.name||'???'}</span><span class="lb-m ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-s">${val}</span>`;
-    body.appendChild(row);
+    row.innerHTML=`<span class="arcade-rank">${ordinals[i]||i+1}</span><span class="arcade-score">${val}</span><span class="arcade-name">${(e.name||'???').slice(0,3)}</span>`;
+    container.appendChild(row);
   });
 }
 
-// ── COLOR IRRATIONAL TITLE LETTERS ──
-function colorIrrationalTitle(){
-  const el=document.getElementById('title-irrational-letters');
-  if(!el)return;
-  const word='Irrational';
-  // assign each letter a digit color cycling through DC
-  el.innerHTML='';
-  [...word].forEach((ch,i)=>{
-    const span=document.createElement('span');
-    span.textContent=ch;
-    span.style.color=DC[i%DC.length];
-    span.style.textShadow=`0 0 10px ${DC[i%DC.length]}88`;
-    el.appendChild(span);
-  });
+// ── TITLE HUB MENU ──
+let titleMenuOpen=false;
+function toggleTitleMenu(e){
+  if(e)e.stopPropagation();
+  titleMenuOpen=!titleMenuOpen;
+  document.getElementById('title-menu').classList.toggle('open',titleMenuOpen);
+}
+// close menu when clicking outside
+document.addEventListener('click',()=>{
+  if(titleMenuOpen){titleMenuOpen=false;document.getElementById('title-menu')?.classList.remove('open');}
+});
+
+let comingSoonTimer=null;
+function showComingSoon(){
+  const el=document.getElementById('coming-soon');if(!el)return;
+  el.classList.add('show');
+  if(comingSoonTimer)clearTimeout(comingSoonTimer);
+  comingSoonTimer=setTimeout(()=>el.classList.remove('show'),2200);
+  // close title menu
+  titleMenuOpen=false;document.getElementById('title-menu').classList.remove('open');
 }
 
 // ── INSTRUCTIONS ──
 let hasSeenInstructions=localStorage.getItem('nc-seen-instructions')==='1';
 function showInstructions(){
+  titleMenuOpen=false;document.getElementById('title-menu')?.classList.remove('open');
   document.getElementById('instructions-overlay').classList.add('show');
 }
 function hideInstructions(){
   document.getElementById('instructions-overlay').classList.remove('show');
-  if(!hasSeenInstructions){
-    hasSeenInstructions=true;
-    localStorage.setItem('nc-seen-instructions','1');
-  }
+  if(!hasSeenInstructions){hasSeenInstructions=true;localStorage.setItem('nc-seen-instructions','1');}
 }
 
 // ── LEADERBOARD CYCLE ON CLICK ──
 function cycleLbTab(){
   const tabs=['week','all','streak'];
-  const next=tabs[(tabs.indexOf(lbTab)+1)%tabs.length];
-  switchLbTab(next);
+  switchLbTab(tabs[(tabs.indexOf(lbTab)+1)%tabs.length]);
 }
+// I-r-r-a-t-i-o-n-a-l
+// The two r's get same color, the two a's get same color
+function colorIrrationalTitle(){
+  const el=document.getElementById('title-irrational-letters');
+  if(!el)return;
+  const word='Irrational';
+  // Assign colors: I=#06c9c9, r=#ff3b3b(both r's match), r=#ff3b3b, a=#ffd700(both a's match), t=#a855f7, i=#22c55e, o=#ff8c00, n=#3b82f6, a=#ffd700, l=#f72585
+  const colors=['#06c9c9','#ff3b3b','#ff3b3b','#ffd700','#a855f7','#22c55e','#ff8c00','#3b82f6','#ffd700','#f72585'];
+  el.innerHTML='';
+  [...word].forEach((ch,i)=>{
+    const span=document.createElement('span');
+    span.textContent=ch;
+    span.style.color=colors[i];
+    span.style.textShadow=`0 0 12px ${colors[i]}88`;
+    el.appendChild(span);
+  });
+}
+
 
 // ── SCREEN SWITCHING ──
 let gameInitialized=false;
 function startGame(){
+  trainingMode=false;
+  document.getElementById('training-banner').classList.remove('show');
+  // restore sidebar
+  ['s-score','s-streak','s-best'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.closest('.sb-section').style.opacity='';
+  });
+  stopBubbles();
   document.getElementById('splash-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
   document.getElementById('gtip').classList.remove('show');
-  document.getElementById('help-btn').style.display='flex';
+  document.getElementById('help-btn').classList.add('visible');
   if(lbRotateTimer){clearInterval(lbRotateTimer);lbRotateTimer=null;}
   if(!gameInitialized){
     gameInitialized=true;
-    buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();nextNumber();
+    buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();initHints();nextNumber();
   }
-  // show instructions on first play
   if(!hasSeenInstructions) setTimeout(showInstructions,400);
 }
 function goToSplash(){
+  trainingMode=false;trainingPreHintStreak=0;clearTrainingHint();
+  document.getElementById('training-banner').classList.remove('show');
+  ['s-score','s-streak','s-best'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.closest('.sb-section').style.opacity='';
+  });
   document.getElementById('game-screen').classList.add('hidden');
   document.getElementById('splash-screen').classList.remove('hidden');
-  document.getElementById('help-btn').style.display='none';
+  document.getElementById('help-btn').classList.remove('visible');
   renderSplashLb();resetLbRotate();
+  setTimeout(startBubbles,600);
 }
 
 // ══════════════════════════════════════
@@ -1274,24 +1331,46 @@ function buildGallery(){
   });
 }
 
-function buildBadgeList(){
-  const bl=document.getElementById('badge-list');bl.innerHTML='';
-  BADGE_DEFS.forEach(b=>{
-    const el=document.createElement('div');el.className='badge';el.id='badge-'+b.id;
-    el.innerHTML=`<span class="badge-icon">${b.icon}</span><span class="badge-text">${b.label}</span>`;
-    bl.appendChild(el);
-  });
+// ── HINT SYSTEM ──
+let hintsRemaining=3;
+function initHints(){
+  hintsRemaining=3;
+  for(let i=0;i<3;i++){
+    const pip=document.getElementById('hint-pip-'+i);
+    if(pip)pip.classList.remove('used');
+  }
+  const btn=document.getElementById('hint-btn');
+  if(btn){btn.disabled=false;btn.textContent='Use a Hint';}
 }
-function checkBadges(){
-  const state={total,streak,cleanStreak,masteryDone,mode};
-  BADGE_DEFS.forEach(b=>{
-    if(!earnedBadges.has(b.id)&&b.check(state)){
-      earnedBadges.add(b.id);
-      const el=document.getElementById('badge-'+b.id);
-      if(el){el.classList.add('earned');el.style.borderColor='var(--accent)';}
-    }
-  });
+function useHint(){
+  if(hintsRemaining<=0||!current||answered)return;
+  hintsRemaining--;
+  // grey out used pip
+  const pip=document.getElementById('hint-pip-'+(2-hintsRemaining));
+  if(pip)pip.classList.add('used');
+  if(hintsRemaining===0){
+    const btn=document.getElementById('hint-btn');
+    if(btn){btn.disabled=true;btn.textContent='No hints left';}
+  }
+  // build hint text based on current number's category
+  const hintMap={
+    'whole':'This number is an Integer or Whole Number — it has no fractional part. Whole numbers are always rational.',
+    'frac-term':'This is a Terminating Decimal — its decimal expansion ends after a finite number of digits. Fractions whose denominators have only factors of 2 and 5 always terminate.',
+    'frac-rep':'This is a Repeating Decimal — a block of digits repeats forever. Fractions whose denominators have prime factors other than 2 and 5 always repeat.',
+    'irr-sqrt':'This is the square root of a non-perfect square. Since it\'s not a perfect square, the root goes on forever with no repeating block — irrational.',
+    'irr-dec':'This is a Non-Repeating, Non-Terminating Decimal — it never ends and never settles into a repeating block. That\'s the definition of irrational.',
+  };
+  const hintText=hintMap[current.answer]||'Think: does the decimal end? Does it repeat? Or does it go on forever with no pattern?';
+  document.getElementById('hint-popup-body').textContent=hintText;
+  document.getElementById('hint-popup').classList.add('show');
 }
+function closeHint(){
+  document.getElementById('hint-popup').classList.remove('show');
+}
+
+// kept for compatibility but now no-ops since badges removed
+function buildBadgeList(){}
+function checkBadges(){}
 
 // ── TILE STRIP ──
 function renderTileStrip(num){
@@ -1455,28 +1534,33 @@ function showVocabPopup(wrongZoneId,rightZoneId,numDisplay){
   else{wnEl.textContent=numDisplay;rnEl.textContent=numDisplay;}
   document.getElementById('vc-cat-wrong').textContent=ZONE_NAMES[wrongZoneId]||wrongZoneId;
   document.getElementById('vc-cat-right').textContent=ZONE_NAMES[rightZoneId]||rightZoneId;
+
   const key=wrongZoneId+'>'+rightZoneId;
   const qData=VOCAB_Q[key]||VOCAB_FALLBACK;
-  document.getElementById('vocab-q').textContent=qData.q;
+
+  // build fill-in-blank question with blank styled
+  const qEl=document.getElementById('vocab-q');
+  qEl.innerHTML=qData.q.replace('__________','<span style="display:inline-block;min-width:120px;border-bottom:2px solid var(--accent);margin:0 4px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+
+  // show hint in right card if available
+  const hintEl=document.getElementById('vc-hint');
+  if(hintEl){hintEl.textContent=qData.hint||'';hintEl.style.display=qData.hint?'block':'none';}
+
   const choicesEl=document.getElementById('vocab-choices');choicesEl.innerHTML='';
-  const keys=['A','B','C','D'];
   qData.choices.forEach((ch,i)=>{
     const btn=document.createElement('button');btn.className='vc-choice';
-    btn.innerHTML=`<span class="vc-key">${keys[i]}.</span><span>${ch}</span>`;
+    btn.textContent=ch;
     btn.addEventListener('click',()=>handleVocabChoice(i,qData.correct,btn,choicesEl));
     choicesEl.appendChild(btn);
   });
+
   document.getElementById('vocab-continue').style.display='none';
-  // auto-show continue after 6 seconds regardless
-  if(vocabTimer)clearInterval(vocabTimer);
+  // 30 second fallback — just show continue, don't reveal answer
+  if(vocabTimer)clearTimeout(vocabTimer);
   vocabTimer=setTimeout(()=>{
-    // highlight correct answer if not yet answered
-    if(!vocabAnswered){
-      const correctBtn=choicesEl.children[qData.correct];
-      if(correctBtn)correctBtn.classList.add('right-choice');
-    }
     document.getElementById('vocab-continue').style.display='block';
-  },6000);
+  },30000);
+
   document.getElementById('vocab-overlay').classList.add('show');
 }
 
@@ -1485,7 +1569,6 @@ function handleVocabChoice(idx,correct,btn,choicesEl){
   if(idx===correct){
     vocabAnswered=true;
     btn.classList.add('right-choice');
-    // disable other buttons
     Array.from(choicesEl.children).forEach(b=>b.disabled=true);
     if(vocabTimer){clearTimeout(vocabTimer);vocabTimer=null;}
     setTimeout(()=>document.getElementById('vocab-continue').style.display='block',600);
@@ -1531,11 +1614,19 @@ function triggerGameOver(finalScore){
   if(ds>topScore){topScore=ds;localStorage.setItem('nc-topscore',topScore);document.getElementById('s-top').textContent=topScore;}
   document.getElementById('go-score').textContent=ds;
   document.getElementById('go-label').textContent=`${MODES[mode].name} mode · Best Streak: ${bestStreak}`;
+  // Check if score makes top 10
+  const lb=getLeaderboard();
+  const sorted=[...lb].sort((a,b)=>b.score-a.score);
+  const makesBoard=ds>0&&(sorted.length<10||ds>=(sorted[sorted.length-1]?.score||0));
+  const initialsWrap=document.getElementById('initials-wrap');
+  const saveBtn=document.getElementById('save-score-btn');
+  if(initialsWrap)initialsWrap.style.display=makesBoard?'flex':'none';
+  if(saveBtn)saveBtn.style.display=makesBoard?'inline-block':'none';
   // clear initials
   ['ini-0','ini-1','ini-2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  renderGameOverLb(null);
+  renderGameOverLb(null,ds);
   document.getElementById('gameover-overlay').classList.add('show');
-  setTimeout(()=>document.getElementById('ini-0')?.focus(),300);
+  if(makesBoard) setTimeout(()=>document.getElementById('ini-0')?.focus(),300);
 }
 function initialNext(el,nextId){
   el.value=el.value.toUpperCase();
@@ -1554,16 +1645,25 @@ function saveScore(){
   const finalScore=parseInt(document.getElementById('go-score').textContent)||0;
   const entry={name,score:finalScore,mode,streak:bestStreak,date:new Date().toLocaleDateString()};
   lb.push(entry);lb.sort((a,b)=>b.score-a.score);lb.splice(10);
-  saveLeaderboard(lb);renderGameOverLb(entry);
+  saveLeaderboard(lb);renderGameOverLb(entry,finalScore);
+  document.getElementById('initials-wrap').style.display='none';
+  document.getElementById('save-score-btn').style.display='none';
 }
-function renderGameOverLb(highlight){
-  const lb=getLeaderboard();const container=document.getElementById('leaderboard-list');container.innerHTML='';
-  if(!lb.length){container.innerHTML='<div style="font-size:0.7rem;color:var(--dim);padding:8px;">No scores yet.</div>';return;}
+
+function renderGameOverLb(highlight,currentScore){
+  const lb=getLeaderboard();
+  const container=document.getElementById('leaderboard-list');container.innerHTML='';
+  if(!lb.length&&!currentScore){
+    container.innerHTML='<div style="font-family:\'Press Start 2P\',monospace;font-size:0.46rem;color:var(--dim);padding:8px;">NO SCORES YET</div>';return;
+  }
   const medals=['🥇','🥈','🥉'];
+  const rankClass=['rank-1','rank-2','rank-3'];
   lb.slice(0,8).forEach((e,i)=>{
-    const div=document.createElement('div');div.className='lb-entry'+(highlight&&e===highlight?' highlight':'');
-    div.innerHTML=`<span class="lb-rank">${medals[i]||i+1}</span><span class="lb-name">${e.name||'???'}</span><span class="lb-score">${e.score}</span>`;
-    container.appendChild(div);
+    const row=document.createElement('div');
+    const isMe=highlight&&e===highlight;
+    row.className='lb-row '+(rankClass[i]||'')+(isMe?' me':'');
+    row.innerHTML=`<span class="lb-r">${medals[i]||i+1}</span><span class="lb-s">${e.score}</span><span class="lb-m ${e.mode||'normal'}">${(MODES[e.mode]||MODES.normal).name}</span><span class="lb-n">${e.name||'???'}</span>`;
+    container.appendChild(row);
   });
 }
 function restartGame(){
@@ -1575,7 +1675,7 @@ function restartGame(){
   ZONES.forEach(z=>masteryHits[z.id]=0);
   updateHearts();updateModeUI();
   ['s-streak','s-best','s-score','s-clean'].forEach(id=>document.getElementById(id).textContent=0);
-  stopTimer();buildGallery();buildBadgeList();nextNumber();goToSplash();
+  stopTimer();buildGallery();buildBadgeList();initHints();nextNumber();goToSplash();
 }
 
 // ── HOVER REVEAL ──
@@ -1604,7 +1704,7 @@ function initParentHover(){
 // ── HANDLE WRONG ──
 function handleWrong(zoneId,timedOut){
   if(!gameActive)return;
-  answered=true;document.getElementById('drag-tile').classList.add('gone');stopTimer();
+  answered=true;document.getElementById('drag-tile').classList.add('gone');stopTimer();clearTrainingHint();
   if(zoneId){
     const wchain=document.getElementById('chain-'+zoneId);
     const we=document.getElementById('empty-'+zoneId);if(we)we.remove();
@@ -1634,6 +1734,7 @@ function handleWrong(zoneId,timedOut){
 function classify(zoneId){
   if(answered||!gameActive)return;
   stopTimer();answered=true;total++;
+  clearTrainingHint();
   const correct=zoneId===current.answer;
   const correctParent=ZONE_PARENT[current.answer];
   const isClean=correct&&!hoveredParents.has(correctParent==='rational'?'irrational':'rational');
@@ -1642,8 +1743,41 @@ function classify(zoneId){
   const emptyEl=document.getElementById('empty-'+targetId);if(emptyEl)emptyEl.remove();
   chain.appendChild(buildHangItem(current));chain.scrollLeft=chain.scrollWidth;
   document.getElementById('chain-'+targetId).closest('.zone-col').classList.add('correct-flash');
-  if(!correct){handleWrong(zoneId,false);return;}
+
+  if(!correct){
+    if(trainingMode){
+      // in training: no life lost, just show vocab popup and continue
+      trainingPreHintStreak=0;
+      document.getElementById('drag-tile').classList.add('gone');
+      shakeScreen();flashScreen('flash-red');
+      setTimeout(()=>{
+        if(gameActive)showVocabPopup(zoneId,current.answer,current.display);
+      },400);
+      return;
+    }
+    handleWrong(zoneId,false);return;
+  }
+
   document.getElementById('drag-tile').classList.add('gone');
+
+  if(trainingMode){
+    // training: check if hint had already fired (CSS class still present would mean hint showed)
+    // We track pre-hint streak — increment only if hint had NOT fired yet (timer still pending)
+    if(trainingHintTimer!==null){
+      // timer still running = answered before hint = pre-hint correct
+      trainingPreHintStreak++;
+    } else {
+      // hint already fired (timer ran out and cleared) = reset pre-hint streak
+      trainingPreHintStreak=0;
+    }
+    flashScreen('flash-gold');
+    showBriefFlash('✓','var(--green)');
+    checkTrainingMastery();
+    setTimeout(nextNumber,700);
+    return;
+  }
+
+  // ── NORMAL PLAY ──
   const mult=MODES[mode].mult;
   score+=mult+(isClean?1:0);streak++;modeTotalCorrect++;
   if(isClean)cleanStreak++;else cleanStreak=0;
@@ -1661,10 +1795,8 @@ function classify(zoneId){
     if(hits>=3){masteryDone.add(aid);setTimeout(()=>{for(let i=0;i<3;i++){const p=document.getElementById(`pip-${aid}-${i}`);if(p)p.style.display='none';}const crown=document.getElementById('crown-'+aid);if(crown)crown.classList.add('show');if(masteryDone.size===ZONES.length){setTimeout(()=>{document.getElementById('overlay').className='overlay show';document.getElementById('modal').className='modal show';},700);}},650);}
   }
   checkBadges();
-  // level up check
   const modeData=MODES[mode];
   if(modeData.next&&streak>=modeData.threshold){setTimeout(()=>triggerLevelUp(modeData.next),200);return;}
-  // brief correct flash, then auto-advance
   flashScreen('flash-gold');
   showBriefFlash(isClean?'💎':'✓',isClean?'#06c9c9':'var(--green)');
   setTimeout(nextNumber,700);
@@ -1673,11 +1805,12 @@ function classify(zoneId){
 // ── NEXT NUMBER ──
 function nextNumber(){
   if(!gameActive)return;
+  clearTrainingHint();
   answered=false;isDragging=false;hoveredParents.clear();
   collapseAll();
   document.getElementById('drag-tile').classList.remove('gone','no-colors');
-  document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('correct-flash','wrong-flash','drag-over'));
-  document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('drag-hover-rational','drag-hover-irrational'));
+  document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('correct-flash','wrong-flash','drag-over','training-hint'));
+  document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('drag-hover-rational','drag-hover-irrational','training-hint-rational','training-hint-irrational'));
   const pool=getPool();
   const unmastered=ZONES.filter(z=>!masteryDone.has(z.id)).map(z=>z.id);
   const preferred=pool.filter(i=>unmastered.includes(BANK[i].answer));
@@ -1688,6 +1821,7 @@ function nextNumber(){
   if(current.displayHTML)numEl.innerHTML=current.displayHTML;else numEl.textContent=current.display;
   renderTileStrip(current);
   if(MODES[mode].timer)startTimer();
+  if(trainingMode)scheduleTrainingHint();
 }
 
 // ── COMPACT GHOST ──
@@ -1751,7 +1885,154 @@ function initDrag(){
 function closeCelebration(){document.getElementById('overlay').className='overlay';document.getElementById('modal').className='modal';nextNumber();}
 
 // ── INIT ──
+// ── FLOATING THOUGHT BUBBLES ──
+const BUBBLE_TEXTS = [
+  '↑ hover any chain',
+  'click the title to start',
+  'every color = a digit',
+  'some decimals end...',
+  '...others repeat forever',
+  'and some never repeat at all',
+  'which kind is this one?',
+  '↑ try hovering a chain',
+];
+let bubbleIdx=0, bubbleEl=null, bubbleTimer=null;
+
+function startBubbles(){
+  if(bubbleEl){bubbleEl.remove();bubbleEl=null;}
+  if(bubbleTimer){clearTimeout(bubbleTimer);bubbleTimer=null;}
+  // only show on splash
+  if(document.getElementById('splash-screen').classList.contains('hidden'))return;
+  showNextBubble();
+}
+
+function showNextBubble(){
+  if(document.getElementById('splash-screen').classList.contains('hidden'))return;
+  // create bubble at random position in the empty left/right space
+  const el=document.createElement('div');
+  el.className='thought-bubble';
+  el.textContent=BUBBLE_TEXTS[bubbleIdx%BUBBLE_TEXTS.length];
+  bubbleIdx++;
+
+  // random position: left zone or right zone of splash, avoiding center
+  const side=Math.random()<0.5?'left':'right';
+  const vw=window.innerWidth;
+  const vh=window.innerHeight;
+  let x,y;
+  if(side==='left'){
+    x=Math.random()*Math.max(60,vw*0.18)+20;
+  } else {
+    x=vw-Math.random()*Math.max(60,vw*0.18)-140;
+  }
+  y=Math.random()*(vh*0.55)+vh*0.08;
+
+  el.style.left=x+'px';
+  el.style.top=y+'px';
+  document.body.appendChild(el);
+  bubbleEl=el;
+
+  // fade in
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ el.style.opacity='0.75'; });
+  });
+
+  // hold 2.8s then fade out
+  bubbleTimer=setTimeout(()=>{
+    el.style.opacity='0';
+    setTimeout(()=>{
+      el.remove();
+      if(el===bubbleEl) bubbleEl=null;
+      // wait random 1.5-3.5s before next bubble
+      const wait=1500+Math.random()*2000;
+      bubbleTimer=setTimeout(showNextBubble, wait);
+    },700);
+  },2800);
+}
+
+function stopBubbles(){
+  if(bubbleTimer){clearTimeout(bubbleTimer);bubbleTimer=null;}
+  if(bubbleEl){bubbleEl.style.opacity='0';setTimeout(()=>bubbleEl?.remove(),700);bubbleEl=null;}
+}
+
+// ── TRAINING MODE ──
+let trainingMode=false;
+let trainingHintTimer=null;
+let trainingPreHintStreak=0; // correct answers before hint fires
+const TRAINING_MASTERY=5;    // pre-hint correct answers needed to suggest Play
+
+function startTraining(){
+  trainingMode=true;trainingPreHintStreak=0;
+  titleMenuOpen=false;document.getElementById('title-menu').classList.remove('open');
+  stopBubbles();
+  document.getElementById('splash-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  document.getElementById('help-btn').classList.add('visible');
+  document.getElementById('training-banner').classList.add('show');
+  // hide score/streak sidebar sections in training
+  document.getElementById('s-score').closest('.sb-section').style.opacity='0.3';
+  document.getElementById('s-streak').closest('.sb-section').style.opacity='0.3';
+  document.getElementById('s-best').closest('.sb-section').style.opacity='0.3';
+  if(!gameInitialized){
+    gameInitialized=true;
+    buildGallery();buildBadgeList();initParentHover();initDrag();updateModeUI();initHints();
+  }
+  // reset for training (no score, no lives deducted)
+  answered=false;gameActive=true;
+  nextNumber();
+}
+
+function clearTrainingHint(){
+  if(trainingHintTimer){clearTimeout(trainingHintTimer);trainingHintTimer=null;}
+  document.querySelectorAll('.zone-col').forEach(z=>z.classList.remove('training-hint'));
+  document.querySelectorAll('.parent-zone').forEach(p=>p.classList.remove('training-hint-rational','training-hint-irrational'));
+}
+
+function scheduleTrainingHint(){
+  clearTrainingHint();
+  if(!trainingMode||answered)return;
+  trainingHintTimer=setTimeout(()=>{
+    if(answered||!trainingMode||!current)return;
+    // light up correct parent zone
+    const correctParent=ZONE_PARENT[current.answer];
+    document.getElementById('parent-'+correctParent)?.classList.add('training-hint-'+correctParent);
+    // also highlight correct subcategory col
+    document.querySelectorAll('.zone-col').forEach(z=>{
+      if(z.dataset.zoneId===current.answer) z.classList.add('training-hint');
+    });
+  },3500);
+}
+
+function checkTrainingMastery(){
+  if(!trainingMode)return;
+  if(trainingPreHintStreak>=TRAINING_MASTERY){
+    // show ready prompt
+    document.getElementById('training-ready').classList.add('show');
+  }
+}
+
+function switchToPlay(){
+  document.getElementById('training-ready').classList.remove('show');
+  trainingMode=false;trainingPreHintStreak=0;
+  clearTrainingHint();
+  // restore sidebar opacity
+  document.getElementById('s-score').closest('.sb-section').style.opacity='';
+  document.getElementById('s-streak').closest('.sb-section').style.opacity='';
+  document.getElementById('s-best').closest('.sb-section').style.opacity='';
+  document.getElementById('training-banner').classList.remove('show');
+  // reset game state for real play
+  score=0;streak=0;lives=3;answered=false;gameActive=true;
+  updateHearts();updateModeUI();initHints();nextNumber();
+}
+
+function keepTraining(){
+  document.getElementById('training-ready').classList.remove('show');
+  trainingPreHintStreak=0;
+  nextNumber();
+}
+
 buildGarland();colorIrrationalTitle();renderSplashLb();resetLbRotate();
+// start floating bubbles after a short delay
+setTimeout(startBubbles,1800);
 </script>
 </body>
 </html>
