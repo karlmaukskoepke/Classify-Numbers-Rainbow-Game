@@ -39,15 +39,15 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   align-items:center;
   justify-content:flex-start;
   overflow:hidden;
-  height:400px;
+  height:340px;
   padding-top:4px;
   pointer-events:none;
 }
 
-/* title nestled right under the center short chains */
+/* title sits just below the shortest center chains (~65px from top) */
 .title-box{
   position:absolute;
-  bottom:12px;
+  top:68px;
   left:50%;
   transform:translateX(-50%);
   z-index:10;
@@ -84,25 +84,32 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .title-irrational{font-size:2.2rem;font-weight:900;display:inline-flex;gap:0;letter-spacing:0.02em;}
 .title-irrational span{display:inline-block;}
 
-/* floating thought bubbles — bigger, brighter, animated */
-.thought-bubble{
-  position:fixed;
-  font-family:'Syne',sans-serif;
-  font-size:0.8rem;font-weight:700;
-  letter-spacing:0.06em;
+/* ── NEON BILLBOARD ── */
+.neon-billboard{
+  position:absolute;
+  bottom:16px;left:50%;
+  transform:translateX(-50%);
+  z-index:4;
+  text-align:center;
+  pointer-events:none;
+}
+.neon-billboard-arrow{
+  font-size:1.4rem;
+  color:var(--accent);
+  animation:arrowBounce 1.2s ease-in-out infinite;
+  display:block;margin-bottom:2px;
+  text-shadow:0 0 12px var(--accent);
+}
+@keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.neon-billboard-text{
+  font-family:'Syne',sans-serif;font-size:0.72rem;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;
   color:var(--text);
   background:var(--surface2);
-  border:2px solid var(--accent);
-  border-radius:14px;padding:8px 16px;
-  white-space:nowrap;pointer-events:none;
-  opacity:0;z-index:5;
-  box-shadow:0 0 20px rgba(108,99,255,0.4);
-  transition:opacity 0.6s ease;
-}
-.thought-bubble.glow{
-  border-color:var(--gold);
-  box-shadow:0 0 24px rgba(255,215,0,0.5);
-  color:var(--gold);
+  border:1px solid var(--accent);
+  border-radius:10px;padding:7px 16px;
+  box-shadow:0 0 16px rgba(108,99,255,0.35);
+  white-space:nowrap;display:inline-block;
 }
 
 /* bloom menu — now positioned relative to splash-center, not garland */
@@ -555,14 +562,15 @@ body.shake{animation:screenShake 0.5s ease;}
 
 <!-- Title menu — position:fixed, lives at body level so it's never clipped by splash screen -->
 <div class="title-menu-backdrop" id="title-menu-backdrop" onclick="closeTitleMenu()"></div>
-<div class="title-menu" id="title-menu">
-  <button class="title-menu-btn learn-btn" onclick="event.stopPropagation();startTraining()">🎯 Training</button>
-  <button class="title-menu-btn play-btn-hub" onclick="event.stopPropagation();startGame()">▶ Play</button>
-  <button class="title-menu-btn help-hub-btn" onclick="event.stopPropagation();showInstructions()">? How to Play</button>
+<div class="title-menu" id="title-menu" onclick="event.stopPropagation()">
+  <button class="title-menu-btn learn-btn" onclick="startTraining()">🎯 Training</button>
+  <button class="title-menu-btn play-btn-hub" onclick="startGame()">▶ Play</button>
+  <button class="title-menu-btn help-hub-btn" onclick="showInstructions()">? How to Play</button>
 </div>
 
 <!-- ══ SPLASH SCREEN ══ -->
 <div class="screen" id="splash-screen">
+
   <div class="garland-wrap">
     <div class="garland" id="garland"></div>
 
@@ -598,6 +606,11 @@ body.shake{animation:screenShake 0.5s ease;}
         <span class="arcade-col-hdr right">INITIAL</span>
       </div>
       <div id="lb-cols"></div>
+      <!-- billboard sits at the bottom of the leaderboard box -->
+      <div style="text-align:center;padding-top:12px;pointer-events:none;">
+        <span style="font-size:1.2rem;color:var(--accent);display:block;animation:arrowBounce 1.2s ease-in-out infinite;text-shadow:0 0 12px var(--accent);">↑</span>
+        <span style="font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);">Move cursor over any string to learn about that number</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1980,70 +1993,9 @@ function initDrag(){
 function closeCelebration(){document.getElementById('overlay').className='overlay';document.getElementById('modal').className='modal';nextNumber();}
 
 // ── INIT ──
-// ── FLOATING THOUGHT BUBBLES ──
-const BUBBLE_TEXTS=[
-  {t:'👆 Click any color chain to learn!', glow:true},
-  {t:'Each color is a different digit 0–9', glow:false},
-  {t:'👆 Hover a chain to see what kind of number it is', glow:true},
-  {t:'Some decimals end. Some repeat. Some go on forever.', glow:false},
-  {t:'👆 Try clicking a chain — what kind is 1/3?', glow:true},
-  {t:'Rational vs Irrational — can you tell the difference?', glow:false},
-  {t:'👆 Click a chain on the left — those repeat!', glow:true},
-  {t:'The colors match the digits in the number', glow:false},
-];
-let bubbleIdx=0,bubbleEl=null,bubbleTimer=null;
-
-function startBubbles(){
-  if(bubbleEl){bubbleEl.remove();bubbleEl=null;}
-  if(bubbleTimer){clearTimeout(bubbleTimer);bubbleTimer=null;}
-  // only show on splash
-  if(document.getElementById('splash-screen').classList.contains('hidden'))return;
-  showNextBubble();
-}
-
-function showNextBubble(){
-  if(document.getElementById('splash-screen').classList.contains('hidden'))return;
-  const item=BUBBLE_TEXTS[bubbleIdx%BUBBLE_TEXTS.length];
-  bubbleIdx++;
-  const el=document.createElement('div');
-  el.className='thought-bubble'+(item.glow?' glow':'');
-  el.textContent=item.t;
-  // Position in left or right margin away from center leaderboard
-  const vw=window.innerWidth;
-  const vh=window.innerHeight;
-  const centerBand=500;
-  const leftEdge=(vw-centerBand)/2;
-  const rightEdge=(vw+centerBand)/2;
-  const bubbleW=260;
-  const margin=16;
-  const leftSpace=leftEdge-margin-bubbleW;
-  const rightSpace=vw-rightEdge-margin-bubbleW;
-  let x,y;
-  const useLeft=leftSpace>40&&(rightSpace<40||Math.random()<0.5);
-  if(useLeft){
-    x=margin+Math.random()*Math.max(10,leftSpace);
-  } else {
-    x=rightEdge+margin+Math.random()*Math.max(10,rightSpace);
-    if(x+bubbleW>vw-margin)x=vw-bubbleW-margin;
-  }
-  y=vh*0.42+Math.random()*(vh*0.40);
-  el.style.left=Math.max(margin,x)+'px';
-  el.style.top=y+'px';
-  document.body.appendChild(el);
-  bubbleEl=el;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.opacity='1';}));
-  bubbleTimer=setTimeout(()=>{
-    el.style.opacity='0';
-    setTimeout(()=>{el.remove();if(el===bubbleEl)bubbleEl=null;
-      bubbleTimer=setTimeout(showNextBubble,2000+Math.random()*2000);
-    },600);
-  },3500);
-}
-
-function stopBubbles(){
-  if(bubbleTimer){clearTimeout(bubbleTimer);bubbleTimer=null;}
-  if(bubbleEl){bubbleEl.style.opacity='0';setTimeout(()=>bubbleEl?.remove(),700);bubbleEl=null;}
-}
+// (thought bubbles removed — replaced with fixed neon billboard)
+function startBubbles(){}
+function stopBubbles(){}
 
 // ── TRAINING MODE ──
 let trainingMode=false;
@@ -2124,8 +2076,6 @@ function keepTraining(){
 }
 
 buildGarland();colorIrrationalTitle();renderSplashLb();resetLbRotate();
-// start floating bubbles after a short delay
-setTimeout(startBubbles,1800);
 </script>
 </body>
 </html>
