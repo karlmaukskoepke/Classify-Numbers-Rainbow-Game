@@ -30,23 +30,25 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
    SPLASH SCREEN
 ══════════════════════════════════════ */
 
-/* ── GARLAND ── */
+/* ── GARLAND WRAP — clips chains so they don't overflow into leaderboard ── */
 .garland-wrap{
   flex-shrink:0;
   position:relative;
   display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  overflow:visible;
-  height:300px;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  /* overflow:hidden clips the long chains at the bottom edge */
+  overflow:hidden;
+  height:260px;
   padding-top:6px;
-  /* CRITICAL: let garland overflow without blocking clicks below */
   pointer-events:none;
 }
-/* title — horizontal, centered, merged with play button */
+
+/* title — sits inside garland-wrap at the bottom, in the natural flow gap */
 .title-box{
   position:absolute;
-  bottom:-58px;
+  bottom:8px;
   left:50%;
   transform:translateX(-50%);
   z-index:10;
@@ -77,7 +79,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .title-irrational{font-size:2.2rem;font-weight:900;display:inline-flex;gap:0;letter-spacing:0.02em;}
 .title-irrational span{display:inline-block;}
 
-/* floating thought bubbles — JS positions and cycles them */
+/* floating thought bubbles */
 .thought-bubble{
   position:fixed;
   font-size:0.58rem;letter-spacing:0.08em;
@@ -95,35 +97,46 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   background:var(--surface2);border:1px solid var(--border);
 }
 
-/* bloom menu */
+/* bloom menu — now positioned relative to splash-center, not garland */
 .title-menu{
-  position:absolute;bottom:-118px;left:50%;
-  transform:translateX(-50%) translateY(-6px);
-  z-index:11;display:flex;gap:8px;
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-200%) scale(0.9);
+  z-index:50;display:flex;gap:8px;
   opacity:0;pointer-events:none;
   transition:opacity 0.22s, transform 0.28s cubic-bezier(0.34,1.3,0.64,1);
 }
-.title-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
+.title-menu.open{
+  opacity:1;pointer-events:all;
+  transform:translate(-50%,-50%) scale(1);
+}
 .title-menu-btn{
-  padding:10px 18px;border-radius:12px;border:none;
-  font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:700;
+  padding:12px 20px;border-radius:12px;border:none;
+  font-family:'Orbitron',sans-serif;font-size:0.75rem;font-weight:700;
   cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
   transition:all 0.18s;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
 }
-.play-btn-hub{background:linear-gradient(135deg,var(--accent),#9580ff);color:white;box-shadow:0 0 20px rgba(108,99,255,0.4);}
-.play-btn-hub:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(108,99,255,0.7);}
-.learn-btn{background:rgba(46,204,142,0.12);color:var(--green);border:1px solid rgba(46,204,142,0.5);}
-.learn-btn:hover{background:rgba(46,204,142,0.22);}
-.help-hub-btn{background:rgba(108,99,255,0.12);color:var(--accent);border:1px solid rgba(108,99,255,0.5);}
-.help-hub-btn:hover{background:rgba(108,99,255,0.22);}
+.play-btn-hub{background:linear-gradient(135deg,var(--accent),#9580ff);color:white;box-shadow:0 0 20px rgba(108,99,255,0.5);}
+.play-btn-hub:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(108,99,255,0.8);}
+.learn-btn{background:rgba(46,204,142,0.18);color:var(--green);border:1px solid rgba(46,204,142,0.6);}
+.learn-btn:hover{background:rgba(46,204,142,0.28);}
+.help-hub-btn{background:rgba(108,99,255,0.18);color:var(--accent);border:1px solid rgba(108,99,255,0.6);}
+.help-hub-btn:hover{background:rgba(108,99,255,0.28);}
+/* dark backdrop when menu opens */
+.title-menu-backdrop{
+  position:fixed;inset:0;z-index:49;background:rgba(0,0,0,0.5);
+  opacity:0;pointer-events:none;transition:opacity 0.22s;
+}
+.title-menu-backdrop.show{opacity:1;pointer-events:all;}
 
-.coming-soon{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--dim);border-radius:14px;padding:20px 32px;text-align:center;z-index:80;font-size:0.85rem;color:var(--dim);opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.coming-soon{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--dim);border-radius:14px;padding:20px 32px;text-align:center;z-index:80;font-size:0.85rem;color:var(--dim);opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .coming-soon.show{opacity:1;}
 
 /* ── SPLASH CENTER ── */
 .splash-center{
   flex:1;display:flex;align-items:center;justify-content:center;
-  padding:48px 32px 16px;overflow:hidden;
+  padding:12px 32px 16px;overflow:hidden;
 }
 /* instructions popup */
 .instructions-overlay{
@@ -522,7 +535,8 @@ body.shake{animation:screenShake 0.5s ease;}
       </div>
     </div>
 
-    <!-- bloom menu below title -->
+    <!-- bloom menu — fixed center overlay when open -->
+    <div class="title-menu-backdrop" id="title-menu-backdrop" onclick="closeTitleMenu()"></div>
     <div class="title-menu" id="title-menu">
       <button class="title-menu-btn learn-btn" onclick="event.stopPropagation();startTraining()">🎯 Training</button>
       <button class="title-menu-btn play-btn-hub" onclick="event.stopPropagation();startGame()">▶ Play</button>
@@ -1110,11 +1124,14 @@ function toggleTitleMenu(e){
   if(e)e.stopPropagation();
   titleMenuOpen=!titleMenuOpen;
   document.getElementById('title-menu').classList.toggle('open',titleMenuOpen);
+  document.getElementById('title-menu-backdrop')?.classList.toggle('show',titleMenuOpen);
 }
-// close menu when clicking outside
-document.addEventListener('click',()=>{
-  if(titleMenuOpen){titleMenuOpen=false;document.getElementById('title-menu')?.classList.remove('open');}
-});
+function closeTitleMenu(){
+  titleMenuOpen=false;
+  document.getElementById('title-menu')?.classList.remove('open');
+  document.getElementById('title-menu-backdrop')?.classList.remove('show');
+}
+document.addEventListener('click',()=>{ if(titleMenuOpen)closeTitleMenu(); });
 
 let comingSoonTimer=null;
 function showComingSoon(){
@@ -1122,14 +1139,14 @@ function showComingSoon(){
   el.classList.add('show');
   if(comingSoonTimer)clearTimeout(comingSoonTimer);
   comingSoonTimer=setTimeout(()=>el.classList.remove('show'),2200);
-  // close title menu
-  titleMenuOpen=false;document.getElementById('title-menu').classList.remove('open');
+  closeTitleMenu();
+}
 }
 
 // ── INSTRUCTIONS ──
 let hasSeenInstructions=localStorage.getItem('nc-seen-instructions')==='1';
 function showInstructions(){
-  titleMenuOpen=false;document.getElementById('title-menu')?.classList.remove('open');
+  closeTitleMenu();
   document.getElementById('instructions-overlay').classList.add('show');
 }
 function hideInstructions(){
@@ -1165,8 +1182,8 @@ function colorIrrationalTitle(){
 let gameInitialized=false;
 function startGame(){
   trainingMode=false;
+  closeTitleMenu();
   document.getElementById('training-banner').classList.remove('show');
-  // restore sidebar
   ['s-score','s-streak','s-best'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.closest('.sb-section').style.opacity='';
@@ -1962,7 +1979,7 @@ const TRAINING_MASTERY=5;    // pre-hint correct answers needed to suggest Play
 
 function startTraining(){
   trainingMode=true;trainingPreHintStreak=0;
-  titleMenuOpen=false;document.getElementById('title-menu').classList.remove('open');
+  closeTitleMenu();
   stopBubbles();
   document.getElementById('splash-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
