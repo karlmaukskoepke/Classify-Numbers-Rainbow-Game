@@ -31,25 +31,29 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 ══════════════════════════════════════ */
 
 /* ── GARLAND WRAP — clips chains so they don't overflow into leaderboard ── */
-/* ══ SPLASH LAYOUT — simple flex column, no absolute positioning ══ */
+/* ══ SPLASH LAYOUT — garland floats freely, content in normal flow ══ */
 #splash-screen{
   display:flex;flex-direction:column;align-items:center;
-  overflow:hidden;
-}
-
-/* garland clips chains at bottom edge */
-.garland-wrap{
-  flex-shrink:0;width:100%;
-  overflow:hidden;
-  height:320px;
-  padding-top:4px;
-  pointer-events:none;
+  overflow:visible;
   position:relative;
 }
 
-/* billboard — sits between garland and title, arrow points UP at chains */
+/* garland: absolutely positioned, floats over everything, never clips, never blocks clicks */
+.garland-wrap{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:100%;          /* full screen height so chains can hang as far as they want */
+  pointer-events:none;  /* NEVER intercepts clicks — pure decoration */
+  z-index:1;            /* behind content */
+  overflow:visible;
+}
+
+/* billboard */
 .splash-billboard{
-  flex-shrink:0;text-align:center;padding:4px 0 2px;pointer-events:none;
+  flex-shrink:0;text-align:center;padding:12px 0 6px;pointer-events:none;
+  position:relative;z-index:2;
+  /* push down enough to sit below the short center chains (~70px) */
+  margin-top:70px;
 }
 .billboard-arrow{
   font-size:1rem;color:var(--accent);display:block;
@@ -59,13 +63,13 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 @keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .billboard-text{font-family:'Syne',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:2px;}
 
-/* title row — sits in flow right below garland */
+/* title row — in normal flow, z-index above garland */
 .splash-title-row{
   flex-shrink:0;
   display:flex;justify-content:center;
   width:100%;
   padding:0 20px;
-  position:relative;z-index:10;
+  position:relative;z-index:2;
 }
 .title-box{
   background:rgba(13,13,20,0.97);
@@ -90,20 +94,20 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .title-irrational{font-size:2.2rem;font-weight:900;display:inline-flex;gap:0;letter-spacing:0.02em;}
 .title-irrational span{display:inline-block;}
 
-/* leaderboard */
+/* leaderboard — fills remaining space, z-index above garland */
 .splash-center{
   flex:1;display:flex;align-items:flex-start;justify-content:center;
-  padding:6px 32px 0;overflow:hidden;min-height:0;
+  padding:12px 32px 8px;
+  min-height:0;
+  position:relative;z-index:2;
+  width:100%;
 }
 
-/* two-column layout: 1-5 left, 6-10 right */
-.lb-two-col{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:2px 16px;
-}
+/* two-column leaderboard grid: 5 entries per column */
+#lb-cols{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;}
+.lb-two-col{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;}
 .arcade-row{
-  display:grid;grid-template-columns:52px 1fr 50px;
+  display:grid;grid-template-columns:48px 1fr 46px;
   gap:0 6px;font-size:0.48rem;letter-spacing:0.04em;padding:4px 2px;line-height:1.4;
 }
 .arcade-rank{color:inherit;}
@@ -137,7 +141,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .coming-soon.show{opacity:1;}
 
 /* ── GARLAND STRINGS ── */
-.garland{display:flex;align-items:flex-start;justify-content:center;gap:0;width:100%;position:relative;pointer-events:none;}
+.garland{display:flex;align-items:flex-start;justify-content:center;gap:0;width:100%;position:absolute;top:4px;left:0;right:0;pointer-events:none;}
 .gs{display:inline-flex;flex-direction:column;align-items:center;align-self:flex-start;position:relative;transform-origin:top center;animation:sway var(--sd,4s) ease-in-out infinite alternate;animation-delay:var(--dl,0s);cursor:pointer;padding:0 4px;flex-shrink:0;pointer-events:auto;}
 .gs:hover{animation-play-state:paused;}
 @keyframes sway{from{transform:rotate(var(--sf,-2deg));}to{transform:rotate(var(--st,2deg));}}
