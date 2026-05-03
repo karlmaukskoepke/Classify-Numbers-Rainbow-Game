@@ -38,10 +38,10 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
+  /* clip chains but let title box peek below via overflow-x:hidden only */
   overflow:hidden;
-  /* tall enough to show most chains; title box sits at bottom */
-  height:420px;
-  padding-top:6px;
+  height:480px;
+  padding-top:4px;
   pointer-events:none;
 }
 
@@ -108,30 +108,35 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   position:fixed;
   top:50%;left:50%;
   transform:translate(-50%,-200%) scale(0.9);
-  z-index:50;display:flex;gap:8px;
+  z-index:50;display:flex;gap:10px;
   opacity:0;pointer-events:none;
   transition:opacity 0.22s, transform 0.28s cubic-bezier(0.34,1.3,0.64,1);
+  /* solid opaque container */
+  background:var(--surface);
+  border:2px solid var(--accent);
+  border-radius:16px;
+  padding:16px 22px;
+  box-shadow:0 0 50px rgba(108,99,255,0.5), 0 20px 60px rgba(0,0,0,0.9);
 }
 .title-menu.open{
   opacity:1;pointer-events:all;
   transform:translate(-50%,-50%) scale(1);
 }
 .title-menu-btn{
-  padding:12px 20px;border-radius:12px;border:none;
+  padding:12px 20px;border-radius:10px;border:none;
   font-family:'Orbitron',sans-serif;font-size:0.75rem;font-weight:700;
   cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
   transition:all 0.18s;white-space:nowrap;
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
 }
-.play-btn-hub{background:linear-gradient(135deg,var(--accent),#9580ff);color:white;box-shadow:0 0 20px rgba(108,99,255,0.5);}
-.play-btn-hub:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(108,99,255,0.8);}
-.learn-btn{background:rgba(46,204,142,0.18);color:var(--green);border:1px solid rgba(46,204,142,0.6);}
-.learn-btn:hover{background:rgba(46,204,142,0.28);}
-.help-hub-btn{background:rgba(108,99,255,0.18);color:var(--accent);border:1px solid rgba(108,99,255,0.6);}
-.help-hub-btn:hover{background:rgba(108,99,255,0.28);}
+.play-btn-hub{background:linear-gradient(135deg,var(--accent),#9580ff);color:white;box-shadow:0 0 16px rgba(108,99,255,0.4);}
+.play-btn-hub:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(108,99,255,0.7);}
+.learn-btn{background:rgba(46,204,142,0.2);color:var(--green);border:2px solid rgba(46,204,142,0.6);}
+.learn-btn:hover{background:rgba(46,204,142,0.35);}
+.help-hub-btn{background:rgba(108,99,255,0.2);color:var(--accent);border:2px solid rgba(108,99,255,0.6);}
+.help-hub-btn:hover{background:rgba(108,99,255,0.35);}
 /* dark backdrop when menu opens */
 .title-menu-backdrop{
-  position:fixed;inset:0;z-index:49;background:rgba(0,0,0,0.5);
+  position:fixed;inset:0;z-index:49;background:rgba(0,0,0,0.65);
   opacity:0;pointer-events:none;transition:opacity 0.22s;
 }
 .title-menu-backdrop.show{opacity:1;pointer-events:all;}
@@ -142,7 +147,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 /* ── SPLASH CENTER ── */
 .splash-center{
   flex:1;display:flex;align-items:center;justify-content:center;
-  padding:12px 32px 16px;overflow:hidden;
+  padding:4px 32px 12px;overflow:hidden;
 }
 
 /* ── GARLAND STRINGS ── */
@@ -1052,15 +1057,15 @@ const GARLAND_DATA=[
   {lbl:'1/4096',dec:'0.000244140625',               type:'frac-term',color:'#2ecc8e',cells:20,sf:2, st:5, sd:5.3,dl:5.8,sz:12,
    tip:'1/4096 = 0.000244140625. Long but finite. 4096 = 2¹² — terminates.'},
 
-  // RIGHT REPEATING — rising curtain
-  {lbl:'4/9',   dec:'0.4444444',    repeat:'4',     type:'frac-rep', color:'#7c6af7',cells:22,sf:3, st:6, sd:3.6,dl:6.0,sz:14,
-   tip:'4/9 = 0.444... The digit 4 repeats endlessly. All ninths repeat a single digit.'},
-  {lbl:'2/3',   dec:'0.6666666',    repeat:'6',     type:'frac-rep', color:'#7c6af7',cells:24,sf:3, st:6, sd:4.4,dl:6.2,sz:14,
-   tip:'2/3 = 0.666... The 6 repeats forever. Rational — it equals exactly 2/3.'},
-  {lbl:'1/11',  dec:'0.090909',     repeat:'09',    type:'frac-rep', color:'#7c6af7',cells:26,sf:4, st:7, sd:4.9,dl:6.4,sz:13,
-   tip:'1/11 = 0.0909... Block 09 repeats. 11 is prime — its decimal always has period 2.'},
-  {lbl:'5/6',   dec:'0.833333',     repeat:'3',     type:'frac-rep', color:'#7c6af7',cells:26,sf:4, st:7, sd:5.4,dl:6.6,sz:13,
-   tip:'5/6 = 0.8333... The 3 repeats. 6 = 2 × 3 — the factor of 3 prevents termination.'},
+  // RIGHT REPEATING — replaced with irrationals
+  {lbl:'φ',     dec:'1.61803398874989484820458683',              type:'irr-dec', color:'#f76a8a',cells:22,sf:3, st:6, sd:3.6,dl:6.0,sz:14,
+   tip:'φ (phi) = 1.61803... the Golden Ratio. Appears in art, nature, and spirals. Irrational and non-repeating.'},
+  {lbl:'e',     dec:'2.71828182845904523536028747',               type:'irr-dec', color:'#f76a8a',cells:24,sf:3, st:6, sd:4.4,dl:6.2,sz:14,
+   tip:"e = 2.71828... Euler's number. The base of natural logarithms. Non-terminating, non-repeating — irrational."},
+  {lbl:'√6',    dec:'2.44948974278317809819728407',               type:'irr-sqrt',color:'#ff9f43',cells:26,sf:4, st:7, sd:4.9,dl:6.4,sz:13,
+   tip:'√6 = 2.44948... 6 is not a perfect square — its root is irrational, non-terminating, non-repeating.'},
+  {lbl:'√7',    dec:'2.64575131106459059050161575',               type:'irr-sqrt',color:'#ff9f43',cells:26,sf:4, st:7, sd:5.4,dl:6.6,sz:13,
+   tip:'√7 = 2.64575... 7 is prime — not a perfect square. Its square root goes on forever with no pattern.'},
 
   // FAR RIGHT — irrationals, tallest curtain
   {lbl:'√3',    dec:'1.73205080756887',              type:'irr-sqrt', color:'#ff9f43',cells:26,sf:4, st:7, sd:3.7,dl:6.8,sz:13,
@@ -1102,8 +1107,10 @@ function buildGarland(){
       for(const c of abs){if(c==='.'){chars.push({c:'.',isD:false});continue;}chars.push({c,isD:true});}
     }
     const isTermOrWhole=num.type==='frac-term'||num.type==='whole';
+    // Whole numbers with no decimal point should NEVER get an ellipsis
+    const hasDecimal=num.dec.includes('.');
     const dCount=chars.filter(x=>x.isD).length;
-    const needsEll=!isTermOrWhole||(dCount>=chainLen);
+    const needsEll=(!isTermOrWhole||(dCount>=chainLen))&&(hasDecimal||num.type!=='whole');
     let trimmed=[];let dc2=0;
     for(const s of chars){if(s.isD){if(dc2>=chainLen)break;dc2++;}trimmed.push(s);}
 
