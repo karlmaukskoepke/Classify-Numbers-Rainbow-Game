@@ -222,6 +222,12 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .parent-zone.training-hint-rational{box-shadow:inset 0 0 50px rgba(46,204,142,0.22)!important;}
 .parent-zone.training-hint-irrational{box-shadow:inset 0 0 50px rgba(247,37,133,0.22)!important;}
 .training-ready{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--green);border-radius:18px;padding:28px 36px;text-align:center;z-index:90;box-shadow:0 0 50px rgba(46,204,142,0.3);opacity:0;pointer-events:none;transition:opacity 0.3s;max-width:400px;width:92%;}
+.timer-warn-overlay{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.timer-warn-overlay.show{opacity:1;pointer-events:all;}
+.timer-warn-box{background:var(--surface);border:3px solid var(--gold);border-radius:20px;padding:32px 40px;text-align:center;max-width:380px;width:92%;box-shadow:0 0 60px rgba(255,215,0,0.4);animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);}
+.timer-warn-icon{font-size:2.5rem;margin-bottom:10px;}
+.timer-warn-title{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--gold);margin-bottom:10px;letter-spacing:0.06em;}
+.timer-warn-body{font-size:0.85rem;color:var(--dim);margin-bottom:20px;line-height:1.6;}
 .training-ready.show{opacity:1;pointer-events:all;animation:popIn 0.4s cubic-bezier(0.34,1.3,0.64,1);}
 .training-ready h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--green);margin-bottom:10px;}
 .training-ready p{font-size:0.82rem;color:var(--dim);margin-bottom:18px;line-height:1.55;}
@@ -346,27 +352,43 @@ header{display:flex;align-items:center;justify-content:space-between;padding:7px
 .sb-label{font-size:0.62rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);font-weight:600;text-align:center;}
 .sb-divider{width:100%;height:1px;background:var(--border);margin:2px 0;}
 /* hint system */
-.hint-pip{font-size:1.4rem;transition:all 0.3s;}
-.hint-pip.used{opacity:0.2;filter:grayscale(1);}
-.hint-btn{
-  padding:8px 16px;border-radius:10px;border:none;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text);font-family:'Syne',sans-serif;font-size:0.72rem;font-weight:700;
-  cursor:pointer;transition:all 0.18s;width:100%;
+/* header hint pips */
+.header-hints{display:flex;gap:4px;align-items:center;}
+.header-hint-pip{font-size:1.1rem;transition:all 0.4s;filter:grayscale(1);opacity:0.3;}
+.header-hint-pip.used{opacity:0.1;filter:grayscale(1);text-decoration:line-through;}
+.header-hint-pip.available{filter:grayscale(0);opacity:1;}
+
+/* hint bulb button — glows increasingly over time */
+.hint-bulb{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:2px solid transparent;border-radius:14px;
+  padding:8px 18px;cursor:pointer;
+  transition:all 0.6s ease;
+  margin-top:8px;
+  opacity:0.35; /* starts dim */
 }
-.hint-btn:hover{border-color:var(--gold);color:var(--gold);}
-.hint-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.hint-bulb:disabled{cursor:not-allowed;opacity:0.15;}
+.hint-bulb.glow-1{opacity:0.55;border-color:rgba(255,215,0,0.2);box-shadow:0 0 8px rgba(255,215,0,0.1);}
+.hint-bulb.glow-2{opacity:0.75;border-color:rgba(255,215,0,0.4);box-shadow:0 0 16px rgba(255,215,0,0.25);}
+.hint-bulb.glow-3{opacity:1;border-color:var(--gold);box-shadow:0 0 28px rgba(255,215,0,0.5);animation:hintPulse 1.2s ease-in-out infinite;}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.4);}50%{box-shadow:0 0 40px rgba(255,215,0,0.8);}}
+.bulb-icon{font-size:1.8rem;transition:filter 0.6s;}
+.hint-bulb.glow-1 .bulb-icon,.hint-bulb.glow-2 .bulb-icon,.hint-bulb.glow-3 .bulb-icon{filter:drop-shadow(0 0 6px gold);}
+.bulb-label{font-family:'Syne',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);}
+.hint-bulb.glow-3 .bulb-label{color:var(--gold);}
+
 /* hint popup */
 .hint-popup{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
   background:var(--surface);border:2px solid var(--gold);border-radius:16px;
-  padding:22px 28px;max-width:360px;width:90%;z-index:65;
+  padding:22px 28px;max-width:400px;width:90%;z-index:65;
   box-shadow:0 0 40px rgba(255,215,0,0.25);text-align:center;
   opacity:0;pointer-events:none;transition:opacity 0.2s;
 }
 .hint-popup.show{opacity:1;pointer-events:all;}
-.hint-popup-title{font-size:1rem;font-weight:800;color:var(--gold);margin-bottom:10px;}
-.hint-popup-body{font-size:0.88rem;color:var(--text);line-height:1.6;}
+.hint-popup-category{font-size:0.7rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.hint-popup-answer{font-size:1.2rem;font-weight:900;font-family:'Orbitron',sans-serif;margin-bottom:12px;}
+.hint-popup-body{font-size:0.88rem;color:var(--text);line-height:1.65;margin-bottom:16px;}
 .hint-popup-close{margin-top:14px;padding:8px 24px;border-radius:8px;border:none;background:var(--gold);color:black;font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;}
 
 /* ── CORRECT POPUP (brief) ── */
@@ -595,6 +617,11 @@ body.shake{animation:screenShake 0.5s ease;}
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
   </div>
+  <div class="header-hints">
+    <span class="header-hint-pip" id="hint-pip-0">💡</span>
+    <span class="header-hint-pip" id="hint-pip-1">💡</span>
+    <span class="header-hint-pip" id="hint-pip-2">💡</span>
+  </div>
   <div class="multiplier" id="multiplier">×1</div>
 </header>
 <div class="body-row">
@@ -605,6 +632,10 @@ body.shake{animation:screenShake 0.5s ease;}
         <div class="tile-number" id="tile-number">—</div>
         <div class="tile-strip" id="tile-strip"></div>
       </div>
+      <button class="hint-bulb" id="hint-bulb" onclick="useHint()">
+        <span class="bulb-icon" id="bulb-icon">🔦</span>
+        <span class="bulb-label">Need a hint?</span>
+      </button>
     </div>
     <div class="gallery" id="gallery">
       <div class="gallery-dead-zone" id="gallery-dead-zone"></div>
@@ -627,6 +658,15 @@ body.shake{animation:screenShake 0.5s ease;}
   </div>
   <div class="sidebar">
     <div class="sb-section">
+      <span class="sb-val score-val" id="s-score">0</span>
+      <span class="sb-label">Current Score</span>
+    </div>
+    <div class="sb-section">
+      <span class="sb-val" id="s-top">0</span>
+      <span class="sb-label">🏆 Personal Best</span>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-section">
       <span class="sb-val streak-val" id="s-streak">0</span>
       <span class="sb-label">🔥 Current Streak</span>
     </div>
@@ -636,26 +676,8 @@ body.shake{animation:screenShake 0.5s ease;}
     </div>
     <div class="sb-divider"></div>
     <div class="sb-section">
-      <span class="sb-val score-val" id="s-score">0</span>
-      <span class="sb-label">Current Score</span>
-    </div>
-    <div class="sb-section">
-      <span class="sb-val" id="s-top">0</span>
-      <span class="sb-label">🏆 Top Score</span>
-    </div>
-    <div class="sb-section">
       <span class="sb-val clean-val" id="s-clean">0</span>
       <span class="sb-label">💎 Perfect Placements</span>
-    </div>
-    <div class="sb-divider"></div>
-    <div class="sb-section" id="hint-section">
-      <div class="sb-label">💡 Hints</div>
-      <div style="display:flex;gap:6px;justify-content:center;margin:4px 0;">
-        <span class="hint-pip" id="hint-pip-0">💡</span>
-        <span class="hint-pip" id="hint-pip-1">💡</span>
-        <span class="hint-pip" id="hint-pip-2">💡</span>
-      </div>
-      <button class="hint-btn" id="hint-btn" onclick="useHint()">Use a Hint</button>
     </div>
   </div>
 </div>
@@ -667,9 +689,10 @@ body.shake{animation:screenShake 0.5s ease;}
 
 <!-- HINT POPUP -->
 <div class="hint-popup" id="hint-popup">
-  <div class="hint-popup-title">💡 Hint</div>
+  <div class="hint-popup-category" id="hint-popup-category">RATIONAL NUMBER</div>
+  <div class="hint-popup-answer" id="hint-popup-answer" style="color:var(--green)">Terminating Decimal</div>
   <div class="hint-popup-body" id="hint-popup-body"></div>
-  <button class="hint-popup-close" onclick="closeHint()">Got it</button>
+  <button class="hint-popup-close" onclick="closeHint()">Got it ✓</button>
 </div>
 
 <div class="coming-soon" id="coming-soon">📖 Learn Mode — coming soon!</div>
@@ -682,7 +705,7 @@ body.shake{animation:screenShake 0.5s ease;}
       <li><strong>A number appears at the top</strong> with its decimal expansion shown as color-coded squares — each digit has a unique color.</li>
       <li><strong>Drag it down</strong> toward Rational or Irrational. Hovering either side reveals the subcategories.</li>
       <li><strong>Drop it in the correct zone.</strong> Perfect placements (right side, first try) earn bonus 💎 points.</li>
-      <li><strong>You have 3 lives ❤️❤️❤️.</strong> Each wrong answer loses a life and resets your score to zero.</li>
+      <li><strong>You have 3 lives ❤️❤️❤️.</strong> Each wrong answer costs a life and a 30% score penalty.</li>
     </ol>
     <button class="instructions-close" onclick="hideInstructions()">Got it — Let's Play!</button>
   </div>
@@ -751,6 +774,16 @@ body.shake{animation:screenShake 0.5s ease;}
   </div>
 </div>
 
+<!-- Timer warning modal -->
+<div class="timer-warn-overlay" id="timer-warn-overlay">
+  <div class="timer-warn-box">
+    <div class="timer-warn-icon">⏱️</div>
+    <div class="timer-warn-title" id="timer-warn-title">CRAZY STREAK!</div>
+    <div class="timer-warn-body" id="timer-warn-body">A timer is starting now. Drag each number before time runs out!</div>
+    <button class="tr-btn primary" onclick="dismissTimerWarn()">I'm Ready!</button>
+  </div>
+</div>
+
 <div class="overlay" id="overlay" onclick="closeCelebration()"></div>
 <div class="modal" id="modal">
   <h2>👑 All Mastered!</h2>
@@ -763,10 +796,11 @@ const DC=['#aaaaaa','#ff3b3b','#ff8c00','#ffe600','#7ed321','#22c55e','#06c9c9',
 var garlandStrings=null; // cached for tooltip hit-testing
 
 const MODES={
-  normal: {name:'Normal', mult:1,colors:true, timer:0,    threshold:10,next:'mega',   color:'var(--accent)'},
-  mega:   {name:'MEGA',   mult:2,colors:false,timer:0,    threshold:20,next:'monster',color:'#ffd700'},
-  monster:{name:'MONSTER',mult:3,colors:false,timer:3000, threshold:35,next:'ultra',  color:'#ff8c00'},
-  ultra:  {name:'ULTRA',  mult:5,colors:false,timer:2000, threshold:999,next:null,    color:'#f72585'},
+  normal: {name:'Normal',       mult:1, colors:true, timer:0,    threshold:10, next:'mega',   color:'var(--accent)', timerWarn:false},
+  mega:   {name:'MEGA Streak',  mult:2, colors:false,timer:0,    threshold:20, next:'crazy',  color:'#ffd700',       timerWarn:false},
+  crazy:  {name:'CRAZY Streak', mult:3, colors:false,timer:5000, threshold:35, next:'ultra',  color:'#ff8c00',       timerWarn:true},
+  ultra:  {name:'ULTRA Streak', mult:5, colors:false,timer:3000, threshold:50, next:'insane', color:'#f72585',       timerWarn:false},
+  insane: {name:'INSANE Streak',mult:8, colors:false,timer:1500, threshold:999,next:null,     color:'#cc00ff',       timerWarn:false},
 };
 
 const ZONE_PARENT={'whole':'rational','frac-term':'rational','frac-rep':'rational','irr-sqrt':'irrational','irr-dec':'irrational'};
@@ -1465,39 +1499,88 @@ function buildGallery(){
 
 // ── HINT SYSTEM ──
 let hintsRemaining=3;
+let hintGlowTimer=null;
 function initHints(){
   hintsRemaining=3;
+  // reset pips
   for(let i=0;i<3;i++){
     const pip=document.getElementById('hint-pip-'+i);
-    if(pip)pip.classList.remove('used');
+    if(pip){pip.classList.remove('used');pip.classList.add('available');}
   }
-  const btn=document.getElementById('hint-btn');
-  if(btn){btn.disabled=false;btn.textContent='Use a Hint';}
+  // reset bulb
+  const bulb=document.getElementById('hint-bulb');
+  if(bulb){bulb.disabled=false;bulb.className='hint-bulb';}
+  document.getElementById('bulb-icon').textContent='🔦';
+  startHintGlow();
 }
+
+function startHintGlow(){
+  if(hintGlowTimer)clearTimeout(hintGlowTimer);
+  const bulb=document.getElementById('hint-bulb');
+  if(!bulb||bulb.disabled)return;
+  // stage 1: after 4s
+  hintGlowTimer=setTimeout(()=>{
+    if(answered||!gameActive)return;
+    bulb.classList.add('glow-1');
+    // stage 2: after 8s
+    hintGlowTimer=setTimeout(()=>{
+      if(answered||!gameActive)return;
+      bulb.classList.add('glow-2');
+      // stage 3: after 12s — fully glowing
+      hintGlowTimer=setTimeout(()=>{
+        if(answered||!gameActive)return;
+        bulb.classList.add('glow-3');
+        document.getElementById('bulb-icon').textContent='💡';
+      },4000);
+    },4000);
+  },4000);
+}
+
+function stopHintGlow(){
+  if(hintGlowTimer){clearTimeout(hintGlowTimer);hintGlowTimer=null;}
+}
+
 function useHint(){
   if(hintsRemaining<=0||!current||answered)return;
+  stopHintGlow();stopTimer();
   hintsRemaining--;
-  // grey out used pip
+  // grey out a pip
   const pip=document.getElementById('hint-pip-'+(2-hintsRemaining));
-  if(pip)pip.classList.add('used');
-  if(hintsRemaining===0){
-    const btn=document.getElementById('hint-btn');
-    if(btn){btn.disabled=true;btn.textContent='No hints left';}
+  if(pip){pip.classList.remove('available');pip.classList.add('used');}
+  // disable bulb if no hints left
+  const bulb=document.getElementById('hint-bulb');
+  if(hintsRemaining===0&&bulb){
+    bulb.disabled=true;bulb.className='hint-bulb';
+    document.getElementById('bulb-icon').textContent='🔦';
+  } else if(bulb){
+    bulb.className='hint-bulb'; // reset glow for this round
+    document.getElementById('bulb-icon').textContent='🔦';
   }
-  // build hint text based on current number's category
-  const hintMap={
-    'whole':'This number is an Integer or Whole Number — it has no fractional part. Whole numbers are always rational.',
-    'frac-term':'This is a Terminating Decimal — its decimal expansion ends after a finite number of digits. Fractions whose denominators have only factors of 2 and 5 always terminate.',
-    'frac-rep':'This is a Repeating Decimal — a block of digits repeats forever. Fractions whose denominators have prime factors other than 2 and 5 always repeat.',
-    'irr-sqrt':'This is the square root of a non-perfect square. Since it\'s not a perfect square, the root goes on forever with no repeating block — irrational.',
-    'irr-dec':'This is a Non-Repeating, Non-Terminating Decimal — it never ends and never settles into a repeating block. That\'s the definition of irrational.',
+
+  // Build hybrid hint: parent category + subcategory name + explanation
+  const parentName=ZONE_PARENT[current.answer]==='rational'?'✅ Rational Number':'❌ Irrational Number';
+  const parentColor=ZONE_PARENT[current.answer]==='rational'?'var(--rational-glow)':'var(--irrational-glow)';
+  const subName=ZONE_NAMES[current.answer]||current.answer;
+  const explanations={
+    'whole':'This number has no decimal part at all — it\'s a whole integer. Every integer can be written as itself divided by 1, making it perfectly rational.',
+    'frac-term':'The decimal expansion ends after a finite number of digits. Whenever a decimal terminates, you can write it as a fraction — so it\'s rational.',
+    'frac-rep':'A block of digits repeats forever. Repeating decimals always equal a fraction (try the 9s trick: 0.333... = 1/3), so they\'re rational.',
+    'irr-sqrt':'This is the square root of a number that isn\'t a perfect square. Its decimal goes on forever with no repeating block — impossible to write as a fraction.',
+    'irr-dec':'The digits continue infinitely with no repeating pattern. Famous examples include π and e. No fraction can equal this — it\'s irrational.',
   };
-  const hintText=hintMap[current.answer]||'Think: does the decimal end? Does it repeat? Or does it go on forever with no pattern?';
-  document.getElementById('hint-popup-body').textContent=hintText;
+  document.getElementById('hint-popup-category').textContent=parentName;
+  document.getElementById('hint-popup-answer').textContent=subName;
+  document.getElementById('hint-popup-answer').style.color=parentColor;
+  document.getElementById('hint-popup-body').textContent=explanations[current.answer]||'Think about whether this decimal ends, repeats, or goes on forever with no pattern.';
   document.getElementById('hint-popup').classList.add('show');
 }
+
 function closeHint(){
   document.getElementById('hint-popup').classList.remove('show');
+  // restart timer if in timed mode
+  if(MODES[mode].timer&&!answered)startTimer();
+  // restart glow for next attempt
+  if(!answered)startHintGlow();
 }
 
 // kept for compatibility but now no-ops since badges removed
@@ -1598,13 +1681,16 @@ function triggerLevelUp(newMode){
   const box=document.getElementById('levelup-box');
   document.getElementById('levelup-title').textContent=md.name;
   document.getElementById('levelup-mult').textContent=`×${md.mult} Points`;
-  const subs={mega:'Colors stripped. Trust yourself.',monster:'3 seconds. No colors. Go.',ultra:'2 seconds. Pure instinct.'};
+  const subs={
+    mega:'Colors stripped. Trust your memory!',
+    crazy:'5 seconds per number. Timer starts now!',
+    ultra:'Only 3 seconds. Stay sharp!',
+    insane:'1.5 seconds. Pure instinct. GO!'
+  };
   document.getElementById('levelup-sub').textContent=subs[newMode]||'';
-  const colors={mega:'#ffd700',monster:'#ff8c00',ultra:'#f72585'};
-  const col=colors[newMode]||'var(--accent)';
-  document.getElementById('levelup-title').style.color=col;
-  document.getElementById('levelup-mult').style.color=col;
-  overlay.style.background=`radial-gradient(ellipse at center,${col}22 0%,transparent 70%)`;
+  document.getElementById('levelup-title').style.color=md.color;
+  document.getElementById('levelup-mult').style.color=md.color;
+  overlay.style.background=`radial-gradient(ellipse at center,${md.color}22 0%,transparent 70%)`;
   flashScreen('flash-gold');
   overlay.className='levelup-overlay';box.style.animation='none';
   void overlay.offsetWidth;
@@ -1612,19 +1698,47 @@ function triggerLevelUp(newMode){
   box.style.animation='levelupBox 2.5s cubic-bezier(0.34,1.3,0.64,1) forwards';
   setTimeout(()=>{
     mode=newMode;updateModeUI();overlay.className='levelup-overlay';
-    answered=false;document.getElementById('drag-tile').classList.remove('gone');
-    if(MODES[newMode].timer)startTimer();
+    if(md.timerWarn){
+      // Show timer warning before resuming
+      showTimerWarn(md);
+    } else {
+      answered=false;document.getElementById('drag-tile').classList.remove('gone');
+      if(md.timer)startTimer();
+    }
   },2500);
 }
+
+let timerWarnPending=false;
+function showTimerWarn(md){
+  timerWarnPending=true;
+  document.getElementById('timer-warn-title').textContent=md.name+'!';
+  document.getElementById('timer-warn-body').textContent=`A ${md.timer/1000}-second timer is starting now. Drag each number before time runs out — or you lose a life!`;
+  document.getElementById('timer-warn-overlay').classList.add('show');
+}
+function dismissTimerWarn(){
+  document.getElementById('timer-warn-overlay').classList.remove('show');
+  timerWarnPending=false;
+  answered=false;
+  document.getElementById('drag-tile').classList.remove('gone');
+  if(MODES[mode].timer)startTimer();
+  nextNumber();
+}
+
 function updateModeUI(){
   const md=MODES[mode];
   const badge=document.getElementById('mode-badge');
   badge.textContent=md.name+' ×'+md.mult;badge.className='mode-badge '+(mode==='normal'?'':mode);
   document.getElementById('multiplier').textContent='×'+md.mult;
   document.getElementById('timer-bar-wrap').className='timer-bar-wrap'+(md.timer?' active':'');
-  const hints={normal:'Drag to Rational or Irrational ↓',mega:'No colors — classify by sight! ↓',monster:'3 seconds! Classify now! ↓',ultra:'2 seconds! GO! ↓'};
-  document.getElementById('tile-hint').textContent=hints[mode];
-  const hintOpacity={normal:'0.20',mega:'0.08',monster:'0',ultra:'0'};
+  const hints={
+    normal:'Drag to Rational or Irrational ↓',
+    mega:'No colors — classify by memory! ↓',
+    crazy:'5 seconds! Classify now! ↓',
+    ultra:'3 seconds! GO! ↓',
+    insane:'1.5 seconds! FAST! ↓'
+  };
+  document.getElementById('tile-hint').textContent=hints[mode]||'↓';
+  const hintOpacity={normal:'0.20',mega:'0.08',crazy:'0',ultra:'0',insane:'0'};
   document.querySelectorAll('.parent-zone').forEach(pz=>pz.style.setProperty('--hint-opacity',hintOpacity[mode]||'0'));
 }
 
@@ -1858,8 +1972,7 @@ function handleWrong(zoneId,timedOut){
     chain.appendChild(buildHangItem(current));chain.scrollLeft=chain.scrollWidth;
   }
   const scoreAtMistake=score;
-  score=0;streak=0;cleanStreak=0;
-  document.getElementById('s-score').textContent=0;
+  streak=0;cleanStreak=0;
   document.getElementById('s-clean').textContent=0;
   updateStreak(0);
   loseLife(scoreAtMistake);
@@ -1875,7 +1988,7 @@ function handleWrong(zoneId,timedOut){
 function classify(zoneId){
   if(answered||!gameActive)return;
   stopTimer();answered=true;total++;
-  clearTrainingHint();
+  clearTrainingHint();stopHintGlow();
   const correct=zoneId===current.answer;
   const correctParent=ZONE_PARENT[current.answer];
   const isClean=correct&&!hoveredParents.has(correctParent==='rational'?'irrational':'rational');
@@ -1930,7 +2043,7 @@ function classify(zoneId){
     masteryHits[aid]=(masteryHits[aid]||0)+1;const hits=masteryHits[aid];
     const zc=ZONES.find(z=>z.id===aid)?.color||'var(--green)';
     for(let i=0;i<Math.min(hits,3);i++){const pip=document.getElementById(`pip-${aid}-${i}`);if(pip)setTimeout(()=>{pip.classList.add('filled');pip.style.background=zc;pip.style.borderColor=zc;pip.style.boxShadow=`0 0 5px ${zc}99`;},i*180);}
-    if(hits>=3){masteryDone.add(aid);setTimeout(()=>{for(let i=0;i<3;i++){const p=document.getElementById(`pip-${aid}-${i}`);if(p)p.style.display='none';}const crown=document.getElementById('crown-'+aid);if(crown)crown.classList.add('show');if(masteryDone.size===ZONES.length){setTimeout(()=>{document.getElementById('overlay').className='overlay show';document.getElementById('modal').className='modal show';},700);}},650);}
+    if(hits>=3){masteryDone.add(aid);setTimeout(()=>{for(let i=0;i<3;i++){const p=document.getElementById(`pip-${aid}-${i}`);if(p)p.style.display='none';}const crown=document.getElementById('crown-'+aid);if(crown)crown.classList.add('show');},650);}
   }
   checkBadges();
   const modeData=MODES[mode];
@@ -1944,6 +2057,13 @@ function classify(zoneId){
 function nextNumber(){
   if(!gameActive)return;
   clearTrainingHint();
+  stopHintGlow();
+  // reset bulb glow for new round
+  const bulb=document.getElementById('hint-bulb');
+  if(bulb&&!bulb.disabled){
+    bulb.className='hint-bulb';
+    document.getElementById('bulb-icon').textContent='🔦';
+  }
   answered=false;isDragging=false;hoveredParents.clear();
   collapseAll();
   document.getElementById('drag-tile').classList.remove('gone','no-colors');
@@ -1960,6 +2080,7 @@ function nextNumber(){
   renderTileStrip(current);
   if(MODES[mode].timer)startTimer();
   if(trainingMode)scheduleTrainingHint();
+  if(hintsRemaining>0)startHintGlow();
 }
 
 // ── COMPACT GHOST ──
